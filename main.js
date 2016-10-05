@@ -46,18 +46,7 @@ spotLight.position.set(40, 55, 10);
 	z = getRandomInt(-30,30); 
 	generaPianeta(x,y,z);
   }
-  
-  if (navicella == null)
-	  console.log("null");
-  else
-    console.log("non null");
-
-  controls = new THREE.FlyControls( navicella );
-	controls.movementSpeed = 1000;
-	controls.domElement = container;
-	controls.rollSpeed = Math.PI / 24;
-	controls.autoForward = false;
-	controls.dragToLook = false;
+  generaPianeta(41,50,10);
   
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -120,15 +109,25 @@ spotLight.position.set(40, 55, 10);
             }
 		  });
 		object.position.set(40,50,10);
-		object.rotation.set(0,40,0);
+		object.rotation.set(0,0,0);
 		
-		//camera.position.set(45, 50, 10);
+		camera.position.set(40, 45, 15); // FUNGE SENZA FIGLIO
+		//object.add(camera);	
+		
+		//camera.position.set(0, -0.25, 3); // FUNGE CON FIGLIO
 		camera.lookAt(object.position);
-		camera.position.set(0,0,0);
-		camera.translateZ(5);
-		object.add(camera);
 		
 		navicella = object;
+		
+		controls = new THREE.FlyControls( navicella );
+		controls.movementSpeed = 1000;
+		controls.domElement = container;
+		controls.rollSpeed = Math.PI / 24;
+		controls.autoForward = false;
+		controls.dragToLook = false;
+		
+		var axis = new THREE.AxisHelper(100);
+		navicella.add(axis);
 		
         scene.add( object );
         },onError );
@@ -160,8 +159,11 @@ spotLight.position.set(40, 55, 10);
 		stats.update();
    		renderer.render(scene,camera);
 		d = 2;
-		controls.movementSpeed = 0.33 * d;
-		controls.update( delta );
+		if (controls != null)
+		{
+			controls.movementSpeed = 0.33 * d;
+			controls.update( delta );
+		}
    }
 
    init();
