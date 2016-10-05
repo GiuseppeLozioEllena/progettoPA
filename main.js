@@ -149,7 +149,7 @@ $(function()
 		controls.autoForward = false;
 		controls.dragToLook = false;
 		
-		var axis = new THREE.AxisHelper(100);
+		var axis = new THREE.AxisHelper(5);
 		navicella.add(axis);
 		
         scene.add( object );
