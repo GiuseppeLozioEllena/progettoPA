@@ -12,10 +12,11 @@ $(function()
 
   function init()
   {
-
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,500);
     renderer=new THREE.WebGLRenderer({antialias:true});
+	
+	scene.add(setSkybox());
 
     renderer.setClearColor(0xdddddd);
     renderer.setSize(window.innerWidth,window.innerHeight);
@@ -51,9 +52,28 @@ $(function()
   }
   generaPianeta(41,50,10);
   
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+  function getRandomInt(min, max) 
+  {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function setSkybox()
+  {
+	var imagePrefix = "images/skybox-";
+	var directions = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+	var imageSuffix = ".png";
+
+	var materialArray = [];
+	for (var i = 0; i < 6; i++)
+		materialArray.push( new THREE.MeshBasicMaterial({
+	map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+	side: THREE.BackSide}));
+	var skyGeometry = new THREE.CubeGeometry( 500, 500, 500 );
+	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+	skyBox.rotation.x += Math.PI / 2;
+	return skyBox;
+  }
   
   function generaPianeta(x,y,z)
   {
