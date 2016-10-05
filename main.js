@@ -30,6 +30,7 @@ $(function()
 	   camera.lookAt(scene.position);
 	   
 	container = document.getElementById("webGL-container");
+	
   controls = new THREE.FlyControls( camera );
 	controls.movementSpeed = 1000;
 	controls.domElement = container;
@@ -42,7 +43,7 @@ $(function()
   spotLight.position.set(20,30,40);
   scene.add(spotLight);
   
-  //caricaNavicella();
+  caricaNavicella();
   for (i = 0; i < 20; i++)
   {
 	x = getRandomInt(-30,30); 
@@ -80,7 +81,7 @@ $(function()
               child.material.map = texture;
             }
 		  });
-		object.position.set(0,0,0);
+		object.position.set(x,y,z);
         scene.add( object );
         },onError );
   }
@@ -142,7 +143,6 @@ $(function()
 		requestAnimationFrame(animate);
 		stats.update();
    		renderer.render(scene,camera);
-		
 		d = 2;
 		controls.movementSpeed = 0.33 * d;
 		controls.update( delta );
@@ -157,5 +157,6 @@ $(function()
    		camera.aspect=SCREEN_WIDTH/SCREEN_HEIGHT;
    		camera.updateProjectionMatrix();
    		renderer.setSize(SCREEN_WIDTH,SCREEN_HEIGHT);
+
    });
 });
