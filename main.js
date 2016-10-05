@@ -40,7 +40,8 @@ $(function()
 
   spotLight=new THREE.SpotLight(0xffffff);
   spotLight.castShadow=true;
-  spotLight.position.set(20,30,40);
+//  spotLight.position.set(20,30,40);
+spotLight.position.set(40, 55, 10);
   scene.add(spotLight);
   
   caricaNavicella();
@@ -109,10 +110,11 @@ $(function()
             if ( child instanceof THREE.Mesh ) 
             {
               child.material.map = texture;
-			  child.scale.set( 0.01, 0.01, 0.01 );
+			  child.scale.set( 0.005, 0.005, 0.005 );
             }
 		  });
-		object.position.set(x,y,z);
+		object.position.set(40,50,10);
+		object.rotation.set(0,40,0);
 		
         scene.add( object );
         },onError );
