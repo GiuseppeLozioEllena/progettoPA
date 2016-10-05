@@ -10,6 +10,8 @@ $(function()
   
   var clock = new THREE.Clock();
   var textureFlare0, textureFlare2, textureFlare3;
+  
+  var terra;
 
   function init()
   {
@@ -45,6 +47,7 @@ $(function()
   
   
   caricaNavicella();
+  /*
   for (i = 0; i < 20; i++)
   {
 	x = getRandomInt(-30,30); 
@@ -52,8 +55,44 @@ $(function()
 	z = getRandomInt(-30,30); 
 	generaPianeta(x,y,z);
   }
+  */
   generaPianeta(41,50,10);
+  
   generateLensFlares();
+  //generateAsteroids();
+  
+  function generateMoon(parent)
+  {
+	// Parent
+	//parent = new THREE.Object3D();
+	//scene.add( parent );
+
+	// pivots
+	//var pivot1 = new THREE.Object3D();
+
+	//pivot1.rotation.z = 0;
+	
+	//parent.add( pivot1 );
+	
+	generateGenericPlanet(0, 1, 0, "textures/planet/moon.jpg");
+
+	// mesh
+	//var mesh1 = new THREE.Mesh( geometry, material );
+
+	//mesh1.position.y = 5;
+
+	//pivot1.add( mesh1 );
+  }
+  
+  function createMoonCallBack(mesh)
+  {
+	  //mesh1.position.y = 5;
+  }
+  
+  function generateAstoroids()
+  {
+	  
+  }
   
   function generateLensFlares()
   {
@@ -125,7 +164,7 @@ function addLight( h, s, l, x, y, z ) {
 
   function setSkybox()
   {
-	var imagePrefix = "images/skybox-";
+	var imagePrefix = "skybox/skybox-";
 	var directions = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".png";
 
@@ -150,7 +189,7 @@ function addLight( h, s, l, x, y, z ) {
         };
 
         var loader = new THREE.ImageLoader( manager );
-        loader.load( 'model/earth.jpg', function ( image ) {
+        loader.load( 'textures/planet/earth.jpg', function ( image ) {
           texture.image = image;
           texture.needsUpdate = true;
         } );
@@ -164,10 +203,48 @@ function addLight( h, s, l, x, y, z ) {
             if ( child instanceof THREE.Mesh ) 
             {
               child.material.map = texture;
+			  
             }
 		  });
 		object.position.set(x,y,z);
         scene.add( object );
+		terra = object;
+		generateMoon(object);
+        },onError );
+  }
+  
+  function generateGenericPlanet(x,y,z, texture_path)
+  {
+        var manager = new THREE.LoadingManager();
+        var texture = new THREE.Texture();
+
+        var onError = function ( xhr ) {
+        };
+
+        var loader = new THREE.ImageLoader( manager );
+        loader.load( texture_path, function ( image ) {
+          texture.image = image;
+          texture.needsUpdate = true;
+        } );
+		
+        // model
+        var loader = new THREE.OBJLoader( manager );
+        loader.load( 'model/earth.obj', function ( object )
+        {
+          object.traverse( function ( child ) 
+          {
+            if ( child instanceof THREE.Mesh ) 
+            {
+              child.material.map = texture;
+			  child.scale.set( 0.166, 0.166, 0.166 );
+            }
+		  });
+		object.position.set(x,y,z);
+        scene.add( object );
+
+		object.rotation.z = 0;
+		terra.add( object );
+		
         },onError );
   }
   
@@ -180,14 +257,14 @@ function addLight( h, s, l, x, y, z ) {
         };
 
         var loader = new THREE.ImageLoader( manager );
-        loader.load( 'Feisar_Ship_OBJ/maps/diffuse.bmp', function ( image ) {
+        loader.load( 'textures/spaceship/diffuse.bmp', function ( image ) {
           texture.image = image;
           texture.needsUpdate = true;
         } );
 		
         // model
         var loader = new THREE.OBJLoader( manager );
-        loader.load( 'Feisar_Ship_OBJ/Feisar_Ship.obj', function ( object )
+        loader.load( 'model/Feisar_Ship.obj', function ( object )
         {
           object.traverse( function ( child ) 
           {
@@ -254,6 +331,9 @@ function addLight( h, s, l, x, y, z ) {
 			controls.update( delta );
 			seguiNavicella();
 		}
+		
+		if (terra != null)
+			terra.rotation.z += 0.01;
    }
    
    function seguiNavicella()
