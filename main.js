@@ -6,7 +6,8 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var loader,model;
-
+  
+  var clock = new THREE.Clock();
 
   function init()
   {
@@ -20,15 +21,22 @@ $(function()
     renderer.shadowMap.enabled=true;
     renderer.shadowMap.soft=true;
 
-  	controls=new THREE.OrbitControls(camera,renderer.domElement);
+  	//controls=new THREE.OrbitControls(camera,renderer.domElement);
     //controls.addEventListener('change',animate);
 
 	   camera.position.x=40;
 	   camera.position.y=50;
 	   camera.position.z=10;
 	   camera.lookAt(scene.position);
+	   
+	container = document.getElementById("webGL-container");
 	
-  controlli = new THREE.FlyControls( camera );
+  controls = new THREE.FlyControls( camera );
+	controls.movementSpeed = 1000;
+	controls.domElement = container;
+	controls.rollSpeed = Math.PI / 24;
+	controls.autoForward = false;
+	controls.dragToLook = false;
 
   spotLight=new THREE.SpotLight(0xffffff);
   spotLight.castShadow=true;
@@ -98,9 +106,13 @@ $(function()
 
    function animate()
    {
-   		requestAnimationFrame(animate);
+   		var delta = clock.getDelta();
+		requestAnimationFrame(animate);
 		stats.update();
    		renderer.render(scene,camera);
+		d = 2;
+		controls.movementSpeed = 0.33 * d;
+		controls.update( delta );
    }
 
    init();
