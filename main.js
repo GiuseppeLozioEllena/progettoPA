@@ -94,14 +94,14 @@ $(function()
         };
 
         var loader = new THREE.ImageLoader( manager );
-        loader.load( 'model/texture_navicella_blu.jpg', function ( image ) {
+        loader.load( 'Feisar_Ship_OBJ/maps/diffuse.bmp', function ( image ) {
           texture.image = image;
           texture.needsUpdate = true;
         } );
 		
         // model
         var loader = new THREE.OBJLoader( manager );
-        loader.load( 'model/navicella.obj', function ( object )
+        loader.load( 'Feisar_Ship_OBJ/Feisar_Ship.obj', function ( object )
         {
           object.traverse( function ( child ) 
           {
@@ -174,7 +174,7 @@ $(function()
    {
 	   // X red, Y green , Z blue
 	   camera.position.set(navicella.position.x, navicella.position.y - 5, navicella.position.z + 5);
-	   spotLight.position.set( navicella.position.x, navicella.position.y + 8, navicella.position.z);
+	   spotLight.position.set( navicella.position.x, navicella.position.y + 3, navicella.position.z);
 	   //spotLight.target.position.set(navicella.position);
 	   camera.lookAt(navicella.position);
    }
