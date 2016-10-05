@@ -32,10 +32,13 @@ $(function()
 	   
 	container = document.getElementById("webGL-container");
 
-  spotLight=new THREE.SpotLight(0xffffff);
+  spotLight=new THREE.SpotLight(0xffffff,4,40);
   spotLight.castShadow=true;
-//  spotLight.position.set(20,30,40);
-spotLight.position.set(40, 55, 10);
+	//spotLight.position.set(20,30,40);
+	spotLight.position.set(40, 55, 10);
+	
+	scene.add(new THREE.SpotLightHelper(spotLight));
+
   scene.add(spotLight);
   
   caricaNavicella();
@@ -163,7 +166,17 @@ spotLight.position.set(40, 55, 10);
 		{
 			controls.movementSpeed = 0.33 * d;
 			controls.update( delta );
+			seguiNavicella();
 		}
+   }
+   
+   function seguiNavicella()
+   {
+	   // X red, Y green , Z blue
+	   camera.position.set(navicella.position.x, navicella.position.y - 5, navicella.position.z + 5);
+	   spotLight.position.set( navicella.position.x, navicella.position.y + 8, navicella.position.z);
+	   //spotLight.target.position.set(navicella.position);
+	   camera.lookAt(navicella.position);
    }
 
    init();
