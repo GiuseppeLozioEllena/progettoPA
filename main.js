@@ -15,7 +15,7 @@ $(function()
   {
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,500);
-    renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
 	scene.add(setSkybox());
 
@@ -63,8 +63,8 @@ $(function()
 	textureFlare2 = textureLoader.load( "textures/lensflare/lensflare2.png" );
 	textureFlare3 = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
-	//addLight( 0.55, 0.9, 0.5, 50, 0, 10 );
-	//addLight( 0.08, 0.8, 0.5,    0, 0, 10 );
+	addLight( 0.55, 0.9, 0.5, 50, 0, 10 );
+	addLight( 0.08, 0.8, 0.5,    0, 0, 10 );
 	addLight( 0.995, 0.5, 0.9, 40, 50, 10 );
   }
     
