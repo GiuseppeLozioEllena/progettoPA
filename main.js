@@ -34,7 +34,21 @@ $(function()
   spotLight.castShadow=true;
   spotLight.position.set(20,30,40);
   scene.add(spotLight);
-
+  
+  for (i = 0; i < 20; i++)
+  {
+	x = getRandomInt(-30,30); 
+	y = getRandomInt(-30,30); 
+	z = getRandomInt(-30,30); 
+	generaPianeta(x,y,z);
+  }
+  
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+  
+  function generaPianeta(x,y,z)
+  {
         var manager = new THREE.LoadingManager();
         var texture = new THREE.Texture();
 
@@ -46,6 +60,7 @@ $(function()
           texture.image = image;
           texture.needsUpdate = true;
         } );
+		
         // model
         var loader = new THREE.OBJLoader( manager );
         loader.load( 'model/earth.obj', function ( object )
@@ -56,10 +71,11 @@ $(function()
             {
               child.material.map = texture;
             }
-        });
-          scene.add( object );
-          },onError );
-
+		  });
+		object.position.set(x,y,z);
+        scene.add( object );
+        },onError );
+  }
 
 	guiControls=new function()
 	{
