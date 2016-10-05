@@ -6,6 +6,7 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var loader,model;
+  var navicella;
   
   var clock = new THREE.Clock();
 
@@ -27,16 +28,9 @@ $(function()
 	   camera.position.x=40;
 	   camera.position.y=50;
 	   camera.position.z=10;
-	   camera.lookAt(scene.position);
+	   //camera.lookAt(scene.position);
 	   
 	container = document.getElementById("webGL-container");
-	
-  controls = new THREE.FlyControls( camera );
-	controls.movementSpeed = 1000;
-	controls.domElement = container;
-	controls.rollSpeed = Math.PI / 24;
-	controls.autoForward = false;
-	controls.dragToLook = false;
 
   spotLight=new THREE.SpotLight(0xffffff);
   spotLight.castShadow=true;
@@ -52,6 +46,18 @@ spotLight.position.set(40, 55, 10);
 	z = getRandomInt(-30,30); 
 	generaPianeta(x,y,z);
   }
+  
+  if (navicella == null)
+	  console.log("null");
+  else
+    console.log("non null");
+
+  controls = new THREE.FlyControls( navicella );
+	controls.movementSpeed = 1000;
+	controls.domElement = container;
+	controls.rollSpeed = Math.PI / 24;
+	controls.autoForward = false;
+	controls.dragToLook = false;
   
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -89,7 +95,7 @@ spotLight.position.set(40, 55, 10);
   
   function caricaNavicella()
   {
-        var manager = new THREE.LoadingManager();
+		var manager = new THREE.LoadingManager();
         var texture = new THREE.Texture();
 
         var onError = function ( xhr ) {
@@ -115,6 +121,14 @@ spotLight.position.set(40, 55, 10);
 		  });
 		object.position.set(40,50,10);
 		object.rotation.set(0,40,0);
+		
+		//camera.position.set(45, 50, 10);
+		camera.lookAt(object.position);
+		camera.position.set(0,0,0);
+		camera.translateZ(5);
+		object.add(camera);
+		
+		navicella = object;
 		
         scene.add( object );
         },onError );
