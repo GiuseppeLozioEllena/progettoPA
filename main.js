@@ -11,7 +11,6 @@ $(function()
   function init()
   {
 
-  	
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,500);
     renderer=new THREE.WebGLRenderer({antialias:true});
@@ -28,7 +27,8 @@ $(function()
 	   camera.position.y=50;
 	   camera.position.z=10;
 	   camera.lookAt(scene.position);
-
+	
+  controlli = new THREE.FlyControls( camera );
 
   spotLight=new THREE.SpotLight(0xffffff);
   spotLight.castShadow=true;
@@ -79,13 +79,9 @@ $(function()
 
 	guiControls=new function()
 	{
-
 		this.rotationX=0.0;
 		this.rotationY=0.0;
-		this.rotationZ=0.0;
-
-
-	
+		this.rotationZ=0.0;	
 	}
 	datGUI=new dat.GUI();
 	datGUI.close();
@@ -103,13 +99,12 @@ $(function()
    function animate()
    {
    		requestAnimationFrame(animate);
-      stats.update();
+		stats.update();
    		renderer.render(scene,camera);
-
    }
 
    init();
-   animate();
+   animate(); 
 
    $(window).resize(function(){
    		SCREEN_WIDTH=window.innerWidth;
@@ -117,7 +112,6 @@ $(function()
    		camera.aspect=SCREEN_WIDTH/SCREEN_HEIGHT;
    		camera.updateProjectionMatrix();
    		renderer.setSize(SCREEN_WIDTH,SCREEN_HEIGHT);
-
 
    });
 });
