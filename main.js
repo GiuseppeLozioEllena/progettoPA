@@ -289,7 +289,7 @@ function addLight( h, s, l, x, y, z ) {
 		navicella = object;
 		
 		navicella.add(camera);
-		camera.position.set(0, 0, 1);
+		camera.position.set(0, 1, 3);
 		//camera.rotation.set(-90 * Math.PI / 180, 0, 0);
 		
 		controls = new THREE.FlyControls( navicella );
