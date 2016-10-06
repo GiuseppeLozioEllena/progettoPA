@@ -1,6 +1,6 @@
 $(function()
 {
-  var scene,camera,renderer, camera_father;
+  var scene,camera,renderer;
   var controls,guiControls,datGUI;
   var stats;
   var spotLight,hemi;
@@ -267,7 +267,7 @@ function addLight( h, s, l, x, y, z ) {
 		
         // model
         var loader = new THREE.OBJLoader( manager );
-        loader.load( 'model/Feisar_Ship.obj', function ( object )
+        loader.load( 'model/spaceship.obj', function ( object )
         {
           object.traverse( function ( child ) 
           {
@@ -284,16 +284,13 @@ function addLight( h, s, l, x, y, z ) {
 		//object.add(camera);	
 		
 		//camera.position.set(0, -0.25, 3); // FUNGE CON FIGLIO
-		camera.lookAt(object.position);
+		//camera.lookAt(object.position);
 		
 		navicella = object;
-		camera_father = new THREE.Object3D();
-		camera_father.position = navicella.position;
 		
-		camera_father.add(camera);
-		camera.position.set(0, 0, -5);
-		
-		scene.add(camera_father);
+		navicella.add(camera);
+		camera.position.set(0, 0, 1);
+		//camera.rotation.set(-90 * Math.PI / 180, 0, 0);
 		
 		controls = new THREE.FlyControls( navicella );
 		controls.movementSpeed = 1000;
@@ -367,12 +364,12 @@ function addLight( h, s, l, x, y, z ) {
 	   
 	   //camera.position.set(navicella.position.x, navicella.position.y - vector.y * 5 - 5, navicella.position.z + vector.z * 5);
 	
-	   camera_father.position.set(navicella.position.x, navicella.position.y, navicella.position.z);
-	   camera_father.rotation.set(navicella.rotation.x + ((240 * Math.PI) / 180)/*+ 90*/, -navicella.rotation.y, -navicella.rotation.z  + ((180 * Math.PI) / 180));
-	   camera.position.set(0, -1.5, 2);
+	   //camera_father.position.set(navicella.position.x, navicella.position.y, navicella.position.z);
+	   //camera_father.rotation.set(navicella.rotation.x + ((240 * Math.PI) / 180)/*+ 90*/, -navicella.rotation.y, -navicella.rotation.z  + ((180 * Math.PI) / 180));
+	   //camera.position.set(navicella.position.x, navicella.position.y, navicella.position.z);
 	   
-	   console.log(camera_father.position);
-	   console.log(navicella.position);
+	   //console.log(camera_father.position);
+	   //console.log(navicella.position);
 	   
 	   spotLight.position.set( navicella.position.x, navicella.position.y + 3, navicella.position.z);
 	   
