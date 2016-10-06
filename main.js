@@ -11,7 +11,7 @@ $(function()
   var clock = new THREE.Clock();
   var textureFlare0, textureFlare2, textureFlare3;
   
-  var terra;
+  var terra, fake_center;
 
   function init()
   {
@@ -61,11 +61,13 @@ $(function()
   generateLensFlares();
   //generateAsteroids();
   
-  function generateMoon(parent)
+  function generateMoon(x,y,z)
   {
 	// Parent
-	//parent = new THREE.Object3D();
-	//scene.add( parent );
+	parent = new THREE.Object3D();
+	parent.position.set(x,y,z);
+	scene.add( parent );
+	fake_center = parent;
 
 	// pivots
 	//var pivot1 = new THREE.Object3D();
@@ -209,7 +211,7 @@ function addLight( h, s, l, x, y, z ) {
 		object.position.set(x,y,z);
         scene.add( object );
 		terra = object;
-		generateMoon(object);
+		generateMoon(x,y,z);
         },onError );
   }
   
@@ -243,7 +245,8 @@ function addLight( h, s, l, x, y, z ) {
         scene.add( object );
 
 		object.rotation.z = 0;
-		terra.add( object );
+		fake_center.add(object);
+		//terra.add( object );
 		
         },onError );
   }
@@ -333,7 +336,10 @@ function addLight( h, s, l, x, y, z ) {
 		}
 		
 		if (terra != null)
-			terra.rotation.z += 0.01;
+			terra.rotation.z += 0.001;
+		
+		if (fake_center != null)
+			fake_center.rotation.z += 0.01;
    }
    
    function seguiNavicella()
