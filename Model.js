@@ -1,16 +1,10 @@
-var manager,texture;
 var posx,posy,posz;
-
 function Model(x,y,z) 
 {
-  
        posx=x;
        posy=y;
        posz=z;
-       manager = new THREE.LoadingManager();
-       texture = new THREE.Texture();
        this.Loadmodel=Loadmodel;
-       this.Loadtexture=Loadtexture;
        this.LoadmodelScale=LoadmodelScale;
 }
  var onError = function ( xhr ) 
@@ -18,9 +12,10 @@ function Model(x,y,z)
       
       };
 
-function Loadtexture(texture_path)
+function Loadmodel(texture_path,model_path)
 {
-     
+     var manager = new THREE.LoadingManager();
+     var  texture = new THREE.Texture();
         console.log(texture_path);
         var loader = new THREE.ImageLoader(manager);
         loader.load( texture_path, function ( image ) 
@@ -28,16 +23,10 @@ function Loadtexture(texture_path)
           texture.image = image;
           texture.needsUpdate = true;
         } );
- 
-}
 
-function Loadmodel(model_path)
-{
-        var loader = new THREE.OBJLoader(manager );
+        var loader = new THREE.OBJLoader(manager);
         var container = new THREE.Object3D();
         container.position.set(posx,posy,posz);
-    
-
         loader.load( model_path, function ( object )
         {
           object.traverse( function ( child ) 
@@ -54,8 +43,19 @@ function Loadmodel(model_path)
         return container;
 }
 
-function LoadmodelScale(model_path,x,y,z)
+function LoadmodelScale(texture_path,model_path,scale)
 {
+
+       var manager = new THREE.LoadingManager();
+       var  texture = new THREE.Texture();
+        console.log(texture_path);
+        var loader = new THREE.ImageLoader(manager);
+        loader.load( texture_path, function ( image ) 
+        {
+          texture.image = image;
+          texture.needsUpdate = true;
+        } );
+
         var loader = new THREE.OBJLoader(manager );
         var container = new THREE.Object3D();
         container.position.set(posx,posy,posz);
@@ -68,7 +68,7 @@ function LoadmodelScale(model_path,x,y,z)
             if ( child instanceof THREE.Mesh ) 
             {
               child.material.map = texture;
-              child.scale.set(x, y, z);
+              child.scale.set(scale,scale,scale);
             }
           });
         container.add(object);

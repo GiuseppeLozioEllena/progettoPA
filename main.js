@@ -5,13 +5,14 @@ $(function()
   var stats;
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
-  var loader,model;
   var navicella;
+
+  var flipdirection;
   
   var clock = new THREE.Clock();
   var textureFlare0, textureFlare2, textureFlare3;
   
-  var terra, fake_center;
+  var terra,luna_center,asteroid_center;
 
   function init()
   {
@@ -22,7 +23,7 @@ $(function()
 	scene.add(setSkybox());
 
    
-  renderer.setSize(window.innerWidth,window.innerHeight);
+  	renderer.setSize(window.innerWidth,window.innerHeight);
  
 	camera.position.x=40;
 	camera.position.y=50;
@@ -31,18 +32,18 @@ $(function()
 	   
 	container = document.getElementById("webGL-container");
 
-  spotLight=new THREE.SpotLight(0xffffff,4,40);
-  spotLight.castShadow=true;
-	//spotLight.position.set(20,30,40);
-	spotLight.position.set(40, 55, 10);
-	
-	scene.add(new THREE.SpotLightHelper(spotLight));
+  	spotLight=new THREE.SpotLight(0xffffff,4,40);
+  	spotLight.castShadow=true;
 
-  scene.add(spotLight);
+	spotLight.position.set(40, 55, 10);
+
+  	scene.add(spotLight);
    
-  caricaNavicella(); 
-  generaPianeta(41,50,10); 
-  generateLensFlares();
+  	caricaNavicella(40,50,15); 
+  	generaPianeta(41,50,10);
+  	generateAsteroid(60,50,10);
+  	
+  	generateLensFlares();
 
   
   function generateLensFlares()
@@ -135,21 +136,21 @@ function addLight( h, s, l, x, y, z ) {
   {
 
 
-    var m=new Model(x,y,z);
-    m.Loadtexture('textures/planet/moon.jpg');
-    terra = m.Loadmodel('model/earth.obj');
+    var model=new Model(x,y,z);
+    terra = model.LoadmodelScale('textures/planet/earth.jpg','model/earth.obj',10);
     scene.add(terra);
     generateMoon(x,y,z);
    
   }
+
 
    function generateMoon(x,y,z)
   {
   parent = new THREE.Object3D();
   parent.position.set(x,y,z);
   scene.add( parent );
-  fake_center = parent;
-  generateGenericPlanet(0, 1, 0);
+  luna_center = parent;
+  generateGenericPlanet(0, 10, 0);
 
   }
   
@@ -157,69 +158,52 @@ function addLight( h, s, l, x, y, z ) {
   {
     
     var model=new Model(x,y,z);
-    model.Loadtexture('textures/planet/earth.jpg');
-    luna = model.LoadmodelScale('model/earth.obj',0.16,0.16,0.16);
+    var luna = model.LoadmodelScale('textures/planet/moon.jpg','model/moon.obj',2.5);
     scene.add(luna);
     luna .rotation.z = 0;
-    fake_center.add(luna);
+    luna_center.add(luna);
     
+  }
+
+  function generateAsteroid(x,y,z)
+  {
+
+  flipdirection=1
+  parent = new THREE.Object3D();
+  parent.position.set(x,y,z);
+  scene.add( parent );
+  asteroid_center = parent;
+  var model=new Model(0,10,0);
+  var asteroid = model.LoadmodelScale('textures/planet/moon.jpg','model/Asteroid.obj',0.05);
+  scene.add(asteroid);
+  asteroid.rotation.z = 0;
+  asteroid_center.add(asteroid);
+
   }
 
 
   
-  function caricaNavicella()
+  function caricaNavicella(x,y,z)
   {
-		var manager = new THREE.LoadingManager();
-        var texture = new THREE.Texture();
+  
+    var model=new Model(x,y,z);
+    navicella = model.LoadmodelScale('textures/spaceship/diffuse.bmp','model/spaceship.obj',0.025);
+	navicella.rotation.set(0,0,0);
+	navicella.add(camera);
+    		
+	camera.position.set(0, 3, 20);
+	controls = new THREE.FlyControls(navicella);
+	controls.movementSpeed = 1000;
+	controls.domElement = container;
+	controls.rollSpeed = Math.PI / 24;
+	controls.autoForward = false;
+	controls.dragToLook = false;
 
-        var onError = function ( xhr ) {
-        };
+	var axis = new THREE.AxisHelper(5);
+	navicella.add(axis);
+		
+    scene.add(navicella);
 
-        var loader = new THREE.ImageLoader( manager );
-        loader.load( 'textures/spaceship/diffuse.bmp', function ( image ) {
-          texture.image = image;
-          texture.needsUpdate = true;
-        } );
-		
-        // model
-        var loader = new THREE.OBJLoader( manager );
-        loader.load( 'model/spaceship.obj', function ( object )
-        {
-          object.traverse( function ( child ) 
-          {
-            if ( child instanceof THREE.Mesh ) 
-            {
-              child.material.map = texture;
-			  child.scale.set( 0.005, 0.005, 0.005 );
-            }
-		  });
-		object.position.set(40,50,10);
-		object.rotation.set(0,0,0);
-		
-		camera.position.set(40, 45, 15); // FUNGE SENZA FIGLIO
-		//object.add(camera);	
-		
-		//camera.position.set(0, -0.25, 3); // FUNGE CON FIGLIO
-		//camera.lookAt(object.position);
-		
-		navicella = object;
-		
-		navicella.add(camera);
-		camera.position.set(0, 1, 3);
-		//camera.rotation.set(-90 * Math.PI / 180, 0, 0);
-		
-		controls = new THREE.FlyControls( navicella );
-		controls.movementSpeed = 1000;
-		controls.domElement = container;
-		controls.rollSpeed = Math.PI / 24;
-		controls.autoForward = false;
-		controls.dragToLook = false;
-		
-		var axis = new THREE.AxisHelper(5);
-		navicella.add(axis);
-		
-        scene.add( object );
-        },onError );
   }
 
 	guiControls=new function()
@@ -258,42 +242,34 @@ function addLight( h, s, l, x, y, z ) {
 		if (terra != null)
 			terra.rotation.z += 0.001;
 		
-		if (fake_center != null)
-			fake_center.rotation.z += 0.01;
+		if (luna_center != null)
+			luna_center.rotation.z += 0.01;
+
+
+		if(asteroid_center.position.z>=10.01)
+			flipdirection=0;
+		else
+		  if(asteroid_center.position.z<=-0.01)
+			 flipdirection=1;
+			
+   
+		if(asteroid_center!=null &&  flipdirection==1)
+			asteroid_center.position.z+=0.05;
+		else
+			if(asteroid_center!=null && flipdirection==0)
+			    asteroid_center.position.z-=0.05;
+
+
+		//console.log(asteroid_center.position.z);
+			
+
    }
    
    function seguiNavicella()
    {
-	   // X red, Y green , Z blue
-	   //camera.position.set(navicella.position.x, navicella.position.y - 5, navicella.position.z + 5); // FUNZIONA!!
-	   
-	   //camera.position.set(navicella.position.x, navicella.position.y - 5, navicella.position.z + 5);
-	   //camera.translateX(navicella.position.x);
-	   //camera.translateY(navicella.position.y - 5);
-	   //camera.translateZ(navicella.position.z + 5);
-	   
-	   /*
-	   var vector = new THREE.Vector3();
-	   navicella.getWorldDirection(vector);
-	   console.log(vector);
-	   */
-	   
-	   //camera.position.set(navicella.position.x, navicella.position.y - vector.y * 5 - 5, navicella.position.z + vector.z * 5);
-	
-	   //camera_father.position.set(navicella.position.x, navicella.position.y, navicella.position.z);
-	   //camera_father.rotation.set(navicella.rotation.x + ((240 * Math.PI) / 180)/*+ 90*/, -navicella.rotation.y, -navicella.rotation.z  + ((180 * Math.PI) / 180));
-	   //camera.position.set(navicella.position.x, navicella.position.y, navicella.position.z);
-	   
-	   //console.log(camera_father.position);
-	   //console.log(navicella.position);
 	   
 	   spotLight.position.set( navicella.position.x, navicella.position.y + 3, navicella.position.z);
-	   
-	   //var helper = new THREE.CameraHelper(spotLight.shadow.camera);
-		//sscene.add(helper);
-	   //spotLight.target.position.set(navicella.position);
-	   
-	   //camera.lookAt(navicella.position);
+	  
    }
 
    init();
