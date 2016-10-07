@@ -21,18 +21,13 @@ $(function()
 	
 	scene.add(setSkybox());
 
-    //renderer.setClearColor(0xdddddd);
-    renderer.setSize(window.innerWidth,window.innerHeight);
-    //renderer.shadowMap.enabled=true;
-    //renderer.shadowMap.soft=true;
-
-  	//controls=new THREE.OrbitControls(camera,renderer.domElement);
-    //controls.addEventListener('change',animate);
-
-	   camera.position.x=40;
-	   camera.position.y=50;
-	   camera.position.z=10;
-	   //camera.lookAt(scene.position);
+   
+  renderer.setSize(window.innerWidth,window.innerHeight);
+ 
+	camera.position.x=40;
+	camera.position.y=50;
+	camera.position.z=10;
+	
 	   
 	container = document.getElementById("webGL-container");
 
@@ -44,57 +39,11 @@ $(function()
 	scene.add(new THREE.SpotLightHelper(spotLight));
 
   scene.add(spotLight);
-  
-  
-  caricaNavicella();
-  /*
-  for (i = 0; i < 20; i++)
-  {
-	x = getRandomInt(-30,30); 
-	y = getRandomInt(-30,30); 
-	z = getRandomInt(-30,30); 
-	generaPianeta(x,y,z);
-  }
-  */
-  generaPianeta(41,50,10);
-  
+   
+  caricaNavicella(); 
+  generaPianeta(41,50,10); 
   generateLensFlares();
-  //generateAsteroids();
-  
-  function generateMoon(x,y,z)
-  {
-	// Parent
-	parent = new THREE.Object3D();
-	parent.position.set(x,y,z);
-	scene.add( parent );
-	fake_center = parent;
 
-	// pivots
-	//var pivot1 = new THREE.Object3D();
-
-	//pivot1.rotation.z = 0;
-	
-	//parent.add( pivot1 );
-	
-	generateGenericPlanet(0, 1, 0, "textures/planet/moon.jpg");
-
-	// mesh
-	//var mesh1 = new THREE.Mesh( geometry, material );
-
-	//mesh1.position.y = 5;
-
-	//pivot1.add( mesh1 );
-  }
-  
-  function createMoonCallBack(mesh)
-  {
-	  //mesh1.position.y = 5;
-  }
-  
-  function generateAstoroids()
-  {
-	  
-  }
   
   function generateLensFlares()
   {
@@ -184,72 +133,39 @@ function addLight( h, s, l, x, y, z ) {
   
   function generaPianeta(x,y,z)
   {
-        var manager = new THREE.LoadingManager();
-        var texture = new THREE.Texture();
 
-        var onError = function ( xhr ) {
-        };
 
-        var loader = new THREE.ImageLoader( manager );
-        loader.load( 'textures/planet/earth.jpg', function ( image ) {
-          texture.image = image;
-          texture.needsUpdate = true;
-        } );
-		
-        // model
-        var loader = new THREE.OBJLoader( manager );
-        loader.load( 'model/earth.obj', function ( object )
-        {
-          object.traverse( function ( child ) 
-          {
-            if ( child instanceof THREE.Mesh ) 
-            {
-              child.material.map = texture;
-			  
-            }
-		  });
-		object.position.set(x,y,z);
-        scene.add( object );
-		terra = object;
-		generateMoon(x,y,z);
-        },onError );
+    var m=new Model(x,y,z);
+    m.Loadtexture('textures/planet/moon.jpg');
+    terra = m.Loadmodel('model/earth.obj');
+    scene.add(terra);
+    generateMoon(x,y,z);
+   
+  }
+
+   function generateMoon(x,y,z)
+  {
+  parent = new THREE.Object3D();
+  parent.position.set(x,y,z);
+  scene.add( parent );
+  fake_center = parent;
+  generateGenericPlanet(0, 1, 0);
+
   }
   
-  function generateGenericPlanet(x,y,z, texture_path)
+  function generateGenericPlanet(x,y,z)
   {
-        var manager = new THREE.LoadingManager();
-        var texture = new THREE.Texture();
-
-        var onError = function ( xhr ) {
-        };
-
-        var loader = new THREE.ImageLoader( manager );
-        loader.load( texture_path, function ( image ) {
-          texture.image = image;
-          texture.needsUpdate = true;
-        } );
-		
-        // model
-        var loader = new THREE.OBJLoader( manager );
-        loader.load( 'model/earth.obj', function ( object )
-        {
-          object.traverse( function ( child ) 
-          {
-            if ( child instanceof THREE.Mesh ) 
-            {
-              child.material.map = texture;
-			  child.scale.set( 0.166, 0.166, 0.166 );
-            }
-		  });
-		object.position.set(x,y,z);
-        scene.add( object );
-
-		object.rotation.z = 0;
-		fake_center.add(object);
-		//terra.add( object );
-		
-        },onError );
+    
+    var model=new Model(x,y,z);
+    model.Loadtexture('textures/planet/earth.jpg');
+    luna = model.LoadmodelScale('model/earth.obj',0.16,0.16,0.16);
+    scene.add(luna);
+    luna .rotation.z = 0;
+    fake_center.add(luna);
+    
   }
+
+
   
   function caricaNavicella()
   {
