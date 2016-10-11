@@ -128,6 +128,7 @@ function addLight( h, s, l, x, y, z ) {
 	var skyGeometry = new THREE.CubeGeometry( 500, 500, 500 );
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+	skyBox.renderDepth = 1000.0;  
 	skyBox.rotation.x += Math.PI / 2;
 	return skyBox;
   }
@@ -231,7 +232,7 @@ function addLight( h, s, l, x, y, z ) {
 		requestAnimationFrame(animate);
 		stats.update();
    		renderer.render(scene,camera);
-		d = 2;
+		d = 10;
 		if (controls != null)
 		{
 			controls.movementSpeed = 0.33 * d;
@@ -243,10 +244,10 @@ function addLight( h, s, l, x, y, z ) {
 			terra.rotation.z += 0.001;
 		
 		if (luna_center != null)
-			luna_center.rotation.z += 0.01;
+			luna_center.rotation.z += 0.005;
 
 
-		if(asteroid_center.position.z>=10.01)
+		if(asteroid_center.position.z>=20.01)
 			flipdirection=0;
 		else
 		  if(asteroid_center.position.z<=-0.01)
