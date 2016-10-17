@@ -39,9 +39,10 @@ $(function()
   	scene.add(spotLight);
    
   	caricaNavicella(40,50,15); 
-  	//generaPianeta(41,50,10, "textures/planet/earth.jpg", "model/earth.obj", 10, 1);
-	var p = new Planet(41,50,10, "textures/planet/earth.jpg", "model/earth.obj", 10, 1);
-	scene.add(p.create());
+	terra = new Planet(41,50,10, "textures/planet/earth.jpg", "model/earth.obj", 10, 1);
+	scene.add(terra.create());
+	scene.add(terra.generateMoon(2));
+	
   	//generateAsteroid(60,50,10);
   	
   	generateLensFlares();
@@ -133,36 +134,6 @@ function addLight( h, s, l, x, y, z ) {
 	skyBox.rotation.x += Math.PI / 2;
 	return skyBox;
   }
-  
-  function generaPianeta(x,y,z, texture, modello, scale, luna)
-  {
-    var model=new Model(x,y,z);	
-	terra = model.LoadmodelScale(texture, modello, scale);
-    scene.add(terra);
-	if (luna > 0)
-		generateMoon(x,y,z);
-  }
-
-
-  function generateMoon(x,y,z)
-  {
-	parent = new THREE.Object3D();
-	parent.position.set(x,y,z);
-	scene.add( parent );
-	luna_center = parent;
-	generateGenericPlanet(0, 10, 0);
-  }
-  
-  function generateGenericPlanet(x,y,z)
-  {
-    
-    var model=new Model(x,y,z);
-    var luna = model.LoadmodelScale('textures/planet/moon.jpg','model/moon.obj',2.5);
-    scene.add(luna);
-    luna .rotation.z = 0;
-    luna_center.add(luna);
-    
-  }
 
   function generateAsteroid(x,y,z)
   {
@@ -238,11 +209,7 @@ function addLight( h, s, l, x, y, z ) {
 			seguiNavicella();
 		}
 		
-		if (terra != null)
-			terra.rotation.z += 0.001;
-		
-		if (luna_center != null)
-			luna_center.rotation.z += 0.005;
+		terra.update();
 
 
 		if(asteroid_center.position.z>=20.01)
