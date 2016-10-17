@@ -21,7 +21,6 @@ $(function()
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
 	scene.add(setSkybox());
-
    
   	renderer.setSize(window.innerWidth,window.innerHeight);
  
@@ -40,8 +39,10 @@ $(function()
   	scene.add(spotLight);
    
   	caricaNavicella(40,50,15); 
-  	generaPianeta(41,50,10);
-  	generateAsteroid(60,50,10);
+  	//generaPianeta(41,50,10, "textures/planet/earth.jpg", "model/earth.obj", 10, 1);
+	var p = new Planet(41,50,10, "textures/planet/earth.jpg", "model/earth.obj", 10, 1);
+	scene.add(p.create());
+  	//generateAsteroid(60,50,10);
   	
   	generateLensFlares();
 
@@ -133,26 +134,23 @@ function addLight( h, s, l, x, y, z ) {
 	return skyBox;
   }
   
-  function generaPianeta(x,y,z)
+  function generaPianeta(x,y,z, texture, modello, scale, luna)
   {
-
-
-    var model=new Model(x,y,z);
-    terra = model.LoadmodelScale('textures/planet/earth.jpg','model/earth.obj',10);
+    var model=new Model(x,y,z);	
+	terra = model.LoadmodelScale(texture, modello, scale);
     scene.add(terra);
-    generateMoon(x,y,z);
-   
+	if (luna > 0)
+		generateMoon(x,y,z);
   }
 
 
-   function generateMoon(x,y,z)
+  function generateMoon(x,y,z)
   {
-  parent = new THREE.Object3D();
-  parent.position.set(x,y,z);
-  scene.add( parent );
-  luna_center = parent;
-  generateGenericPlanet(0, 10, 0);
-
+	parent = new THREE.Object3D();
+	parent.position.set(x,y,z);
+	scene.add( parent );
+	luna_center = parent;
+	generateGenericPlanet(0, 10, 0);
   }
   
   function generateGenericPlanet(x,y,z)

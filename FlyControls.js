@@ -1,7 +1,3 @@
-/**
- * @author James Baicoianu / http://www.baicoianu.com/
- */
-
 THREE.FlyControls = function ( object, domElement ) {
 
 	this.object = object;
