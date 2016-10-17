@@ -41,11 +41,11 @@ $(function()
   	caricaNavicella(40,50,15); 
 	
 	planets_reference = [];
-	for (i = 0; i < 3; i++)
+	for (var i = 0; i < 2; i++)
 	{
-		var x = Math.random() * 10;
-		var y = Math.random() * 10;
-		var z = Math.random() * 10;
+		var x = Math.random() * 100;
+		var y = Math.random() * 100;
+		var z = Math.random() * 100;
 		var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
 		scene.add(p.create());
 		scene.add(p.generateMoon(1));
@@ -217,8 +217,8 @@ function addLight( h, s, l, x, y, z ) {
 			seguiNavicella();
 		}
 	
-		//for (i = 0; i < 10; i++)		
-			//planets_reference[i].update();
+		for (var i = 0; i < 2; i++)		
+			planets_reference[i].update();
 
 
 		/*
