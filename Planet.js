@@ -25,6 +25,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pi
 		this.generateMoon = generateMoon;
 		this.createMoon = createMoon;
 		this.update = update;
+		this.position=position;
 	
 
 	function update()
@@ -71,5 +72,11 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pi
 		parent.add(luna);
 		
 		this.master_reference.add(parent);
+	}
+
+	function position()
+	{
+		var pos=new THREE.Vector3( x, y,z);
+		return pos;
 	}
 }

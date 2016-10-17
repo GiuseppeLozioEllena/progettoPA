@@ -6,6 +6,7 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var navicella;
+  var number_planets=10;
 
   var flipdirection;
   
@@ -14,6 +15,9 @@ $(function()
   
   var planets_reference;
   var asteroid_center;
+
+  var range=50;
+
 
   function init()
   {
@@ -40,15 +44,18 @@ $(function()
    
   	caricaNavicella(40,50,15); 
 	
+
+  	raycaster = new THREE.Raycaster();
+
 	planets_reference = [];
-	for (var i = 0; i < 2; i++)
+	for (var i = 0; i < number_planets; i++)
 	{
-		var x = Math.random() * 100;
-		var y = Math.random() * 100;
-		var z = Math.random() * 100;
+		var x = Math.random() * range;
+		var y = Math.random() * range;
+		var z = Math.random() * range;
 		var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
 		scene.add(p.create());
-		scene.add(p.generateMoon(1));
+		scene.add(p.generateMoon(Math.random() * 5));
 		planets_reference.push(p);
 	}
   	//generateAsteroid(60,50,10);
@@ -217,8 +224,41 @@ function addLight( h, s, l, x, y, z ) {
 			seguiNavicella();
 		}
 	
-		for (var i = 0; i < 2; i++)		
+		for (var i = 0; i < number_planets; i++)		
 			planets_reference[i].update();
+
+
+		for(var j=0;j<number_planets;j++)
+			{
+
+				if(planets_reference[j].position().x<navicella.position.x-range || planets_reference[j].position().y<navicella.position.y-range || planets_reference[j].position().z<navicella.position.z-range) 
+				{
+					console.log("add new planet");
+					var x = Math.random() * range+(navicella.position.x-range);
+					var y = Math.random() * range+(navicella.position.y-range);
+					var z = Math.random() * range+(navicella.position.z-range);
+					var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
+					scene.add(p.create());
+					scene.add(p.generateMoon(Math.random() * 5));
+					scene.remove(planets_reference[j]);
+					planets_reference[j]=p;
+				}
+
+				if(planets_reference[j].position().x>navicella.position.x+range || planets_reference[j].position().y>navicella.position.y+range || planets_reference[j].position().z>navicella.position.z+range)
+                {
+                	console.log("add new planet");
+                	var x = Math.random() * range+navicella.position.x;
+					var y = Math.random() * range+navicella.position.y;
+					var z = Math.random() * range+navicella.position.z;
+					var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
+					scene.add(p.create());
+					scene.add(p.generateMoon(Math.random() * 5));
+					scene.remove(planets_reference[j]);
+					planets_reference[j]=p;
+					
+				}
+             
+			}
 
 
 		/*
