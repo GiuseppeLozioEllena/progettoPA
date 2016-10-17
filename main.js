@@ -234,9 +234,9 @@ function addLight( h, s, l, x, y, z ) {
 				if(planets_reference[j].position().x<navicella.position.x-range || planets_reference[j].position().y<navicella.position.y-range || planets_reference[j].position().z<navicella.position.z-range) 
 				{
 					console.log("add new planet");
-					var x = Math.random() * range+(navicella.position.x-range);
-					var y = Math.random() * range+(navicella.position.y-range);
-					var z = Math.random() * range+(navicella.position.z-range);
+					var x = (navicella.position.x-range/2)-Math.random() * range/2;
+					var y = (navicella.position.y-range/2)-Math.random() * range/2;
+					var z = (navicella.position.z-range/2)-Math.random() * range/2;
 					var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
 					scene.add(p.create());
 					scene.add(p.generateMoon(Math.random() * 5));
@@ -247,9 +247,9 @@ function addLight( h, s, l, x, y, z ) {
 				if(planets_reference[j].position().x>navicella.position.x+range || planets_reference[j].position().y>navicella.position.y+range || planets_reference[j].position().z>navicella.position.z+range)
                 {
                 	console.log("add new planet");
-                	var x = Math.random() * range+navicella.position.x;
-					var y = Math.random() * range+navicella.position.y;
-					var z = Math.random() * range+navicella.position.z;
+                	var x = Math.random() * range/2+(navicella.position.x+range/2);
+					var y = Math.random() * range/2+(navicella.position.y+range/2);
+					var z = Math.random() * range/2+(navicella.position.z+range/2);
 					var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
 					scene.add(p.create());
 					scene.add(p.generateMoon(Math.random() * 5));

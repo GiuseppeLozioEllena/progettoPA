@@ -76,7 +76,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pi
 
 	function position()
 	{
-		var pos=new THREE.Vector3( x, y,z);
+		var pos=new THREE.Vector3(this.x, this.y,this.z);
 		return pos;
 	}
 }
