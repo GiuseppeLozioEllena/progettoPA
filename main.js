@@ -12,7 +12,8 @@ $(function()
   var clock = new THREE.Clock();
   var textureFlare0, textureFlare2, textureFlare3;
   
-  var terra,luna_center,asteroid_center;
+  var planets_reference;
+  var asteroid_center;
 
   function init()
   {
@@ -28,7 +29,6 @@ $(function()
 	camera.position.y=50;
 	camera.position.z=10;
 	
-	   
 	container = document.getElementById("webGL-container");
 
   	spotLight=new THREE.SpotLight(0xffffff,4,40);
@@ -39,10 +39,18 @@ $(function()
   	scene.add(spotLight);
    
   	caricaNavicella(40,50,15); 
-	terra = new Planet(41,50,10, "textures/planet/earth.jpg", "model/earth.obj", 10, 1);
-	scene.add(terra.create());
-	scene.add(terra.generateMoon(2));
 	
+	planets_reference = [];
+	for (i = 0; i < 3; i++)
+	{
+		var x = Math.random() * 10;
+		var y = Math.random() * 10;
+		var z = Math.random() * 10;
+		var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
+		scene.add(p.create());
+		scene.add(p.generateMoon(1));
+		planets_reference.push(p);
+	}
   	//generateAsteroid(60,50,10);
   	
   	generateLensFlares();
@@ -208,10 +216,12 @@ function addLight( h, s, l, x, y, z ) {
 			controls.update( delta );
 			seguiNavicella();
 		}
-		
-		terra.update();
+	
+		//for (i = 0; i < 10; i++)		
+			//planets_reference[i].update();
 
 
+		/*
 		if(asteroid_center.position.z>=20.01)
 			flipdirection=0;
 		else
@@ -225,10 +235,9 @@ function addLight( h, s, l, x, y, z ) {
 			if(asteroid_center!=null && flipdirection==0)
 			    asteroid_center.position.z-=0.05;
 
-
 		//console.log(asteroid_center.position.z);
 			
-
+		*/
    }
    
    function seguiNavicella()
