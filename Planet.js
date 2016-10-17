@@ -1,4 +1,5 @@
 Planet = function ( x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pianeta, scala_pianeta ) {
+	/*
 	var x,y,z;
 	var numero_lune;
 	var lune;
@@ -9,16 +10,17 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pi
 
 	//var master_reference;
 	var moons_velocity;
+	*/
 
 //function Planet(x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pianeta, scala_pianeta)
 	
-		x = x_pianeta;
-		y = y_pianeta;
-		z = z_pianeta;
-		texture = texture_pianeta;
-		modello = modello_pianeta;
-		scala = scala_pianeta;
-		numero_lune = 0;
+		this.x = x_pianeta;
+		this.y = y_pianeta;
+		this.z = z_pianeta;
+		this.texture = texture_pianeta;
+		this.modello = modello_pianeta;
+		this.scala = scala_pianeta;
+		this.numero_lune = 0;
 		this.create = create;
 		this.generateMoon = generateMoon;
 		this.createMoon = createMoon;
@@ -29,31 +31,31 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pi
 	{
 		this.planet_reference.rotation.z += 0.001;
 		
-		for (i = 0; i < numero_lune; i++)
+		for (i = 0; i < this.numero_lune; i++)
 		{
-			this.master_reference.children[i].rotation.x += moons_velocity[i];
-			this.master_reference.children[i].rotation.y += moons_velocity[i];
+			this.master_reference.children[i].rotation.x += this.moons_velocity[i];
+			this.master_reference.children[i].rotation.y += this.moons_velocity[i];
 			//master_reference.children[i].rotation.z += 0.005;
 		}
 	}
 
 	function create()
 	{
-		var model = new Model(x,y,z);	
-		this.planet_reference = model.LoadmodelScale(texture, modello, scala);
+		var model = new Model(this.x,this.y,this.z);	
+		this.planet_reference = model.LoadmodelScale(this.texture, this.modello, this.scala);
 		return this.planet_reference;
 	}
 
 	function generateMoon(numero_lune_pianeta)
 	{
-		numero_lune = numero_lune_pianeta;
+		this.numero_lune = numero_lune_pianeta;
 		this.master_reference = new THREE.Object3D();
-		this.master_reference.position.set(x,y,z);
-		moons_velocity = []
-		for (i = 0; i < numero_lune; i++)
+		this.master_reference.position.set(this.x,this.y,this.z);
+		this.moons_velocity = []
+		for (i = 0; i < this.numero_lune; i++)
 		{
-			this.createMoon(x,y,z);
-			moons_velocity[i] = Math.random() / 100;
+			this.createMoon(this.x,this.y,this.z);
+			this.moons_velocity[i] = Math.random() / 100;
 		}
 		return this.master_reference;
 	}
