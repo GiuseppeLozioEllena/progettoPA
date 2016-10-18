@@ -4,7 +4,7 @@
 	$projection = array("Square", "Mercator", "Transverse Mercator", "Icosahedral", "Mollweide", "Sinusoidal", "Spherical", "Animated Globe", "Polar Orthographic", "Polar Stereographic", "Polar Gnomonic");
 	$palette = array("Olsson", "Mogensen", "Atlas", "Antique", "Barren", "Martian", "Chthonian", "Greyscale", "Landmask");
 	
-	for ($index = 80; $index <= 100; $index++)
+	for ($index = 124; $index <= 140; $index++)
 	{
 		$seed = Rand(1, 10000000000);
 		$palette_index = Rand(1, 7); // Evita l'ultima

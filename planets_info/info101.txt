@@ -1,0 +1,27 @@
+Annorc III
+SECTION=Physics
+Type=Small iron/silicate
+Radius=5062.46 km &nbsp; (0.79 x earth)
+Surface Area=3.22 x 10<sup>8</sup> km<sup>2</sup>
+Land Area=3.25 x 10<sup>8</sup> km<sup>2</sup> &nbsp; (2.18 x earth)
+Mass=2.95 x 10<sup>24</sup> kg &nbsp; (0.49 x earth)
+Density=5.44 g/cm<sup>3</sup> &nbsp; (0.99 x earth)
+Composition=42.3% iron, 24.4% oxygen, 18.9% silicon, 4.3% aluminum, 3.7% calcium, 4.2% other metals, 2.3% other elements
+SECTION=Gravimetry
+Gravity=7.66 m/s<sup>2</sup> &nbsp; (0.78 x earth)
+Escape Velocity=8.80 km/s
+SECTION=Rotation
+Period=20.56 hours
+Axis Tilt=20.74 &deg;
+SECTION=Hydrosphere
+Water=0 %
+Ice=0 %
+SECTION=Atmosphere
+Type=Thin corrosive
+Pressure=53.15 kPa &nbsp; (0.52 x earth)
+Composition=57.5% nitrogen, 25.2% ammonia, 14.2% hydrogen, 3.0% carbon dioxide, trace other gases
+SECTION=Climate
+Type=Standard
+Min Temp=172 K &nbsp; (-100 &deg;C)
+Avg Temp=301 K &nbsp; (28 &deg;C)
+Max Temp=369 K &nbsp; (96 &deg;C)
