@@ -6,7 +6,7 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var navicella;
-  var number_planets = 20;
+  var number_planets = 50;
 
   var flipdirection;
   
@@ -57,9 +57,14 @@ $(function()
 	planets_reference = [];
 	for (var i = 0; i < number_planets; i++)
 	{
-		var x = (Math.random() * (range * 2) - range) + navicella.position.x;
-		var y = (Math.random() * (range * 2) - range) + navicella.position.y;
-		var z = (Math.random() * (range * 2) - range) + navicella.position.z;
+		var x,y,z;
+		
+		do{
+			x = (Math.random() * (range * 2) - range) + navicella.position.x;
+			y = (Math.random() * (range * 2) - range) + navicella.position.y;
+			z = (Math.random() * (range * 2) - range) + navicella.position.z;
+		}while(!lontanoDaPianeti(x,y,z));
+		
 		var p = new Planet(x, y, z);
 		scene.add(p.create());
 		scene.add(p.generateMoon(Math.random() * 5));
@@ -300,19 +305,18 @@ function addLight( h, s, l, x, y, z ) {
    function aggiungi(p)
    {
 		console.log("add new planet");
-		/*
-		var x = (navicella.position.x-range/2)-Math.random() * range/2;
-		var y = (navicella.position.y-range/2)-Math.random() * range/2;
-		var z = (navicella.position.z-range/2)-Math.random() * range/2;
-		*/
 		
 		var pos = -1;
 		if (Math.random() * 100 < 50)
 			pos = 1;
 		
-		var x = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.x;
-		var y = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.y;
-		var z = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.z;
+		var x,y,z;
+		
+		do{
+			x = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.x;
+			y = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.y;
+			z = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.z;
+		}while(!lontanoDaPianeti(x,y,z));
 		
 		console.log("navicella x: " + navicella.position.x);
 		console.log("navicella y: " + navicella.position.y);
@@ -328,6 +332,14 @@ function addLight( h, s, l, x, y, z ) {
 		scene.add(p.generateMoon(Math.random() * 5));
 		return p;
    }
+   
+   function lontanoDaPianeti(x,y,z)
+   {
+	   for (var i = 0; i < planets_reference.length; i++)	 
+		   if (distanza(new THREE.Vector3(x,y,z), planets_reference[i].position()) < 500)
+			   return false;
+	   return true;
+   } 
    
    function distanza(p1, p2)
    {
