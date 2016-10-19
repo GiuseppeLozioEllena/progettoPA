@@ -53,7 +53,9 @@ $(function()
 		var x = Math.random() * range;
 		var y = Math.random() * range;
 		var z = Math.random() * range;
-		var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
+		var texture_name=	"textures/planets_downloaded/texture"+Math.round(Math.random() *100+1)+".jpg";
+		console.log(texture_name);
+		var p = new Planet(x,y,z, texture_name, "model/earth.obj", 10);
 		scene.add(p.create());
 		scene.add(p.generateMoon(Math.random() * 5));
 		planets_reference.push(p);
@@ -237,7 +239,8 @@ function addLight( h, s, l, x, y, z ) {
 					var x = (navicella.position.x-range/2)-Math.random() * range/2;
 					var y = (navicella.position.y-range/2)-Math.random() * range/2;
 					var z = (navicella.position.z-range/2)-Math.random() * range/2;
-					var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
+					var texture_name=	"textures/planets_downloaded/texture"+Math.round(Math.random() *100+1)+".jpg";
+					var p = new Planet(x,y,z, texture_name, "model/earth.obj", 10);
 					scene.add(p.create());
 					scene.add(p.generateMoon(Math.random() * 5));
 					scene.remove(planets_reference[j]);
@@ -250,7 +253,8 @@ function addLight( h, s, l, x, y, z ) {
                 	var x = Math.random() * range/2+(navicella.position.x+range/2);
 					var y = Math.random() * range/2+(navicella.position.y+range/2);
 					var z = Math.random() * range/2+(navicella.position.z+range/2);
-					var p = new Planet(x,y,z, "textures/planet/earth.jpg", "model/earth.obj", 10);
+					var texture_name=	"textures/planets_downloaded/texture"+Math.round(Math.random() *100+1)+".jpg";
+					var p = new Planet(x,y,z, texture_name, "model/earth.obj", 10);
 					scene.add(p.create());
 					scene.add(p.generateMoon(Math.random() * 5));
 					scene.remove(planets_reference[j]);
