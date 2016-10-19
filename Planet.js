@@ -52,8 +52,8 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		parent = new THREE.Object3D();
 		parent.position.set(0,0,0);
 		
-		var model = new Model(0, Math.random() * 10 + 10, 0);
-		var luna = model.LoadmodelScale('textures/planet/moon.jpg','model/moon.obj',2.5);
+		var model = new Model(0, Math.random() * 20 + 70, 0);
+		var luna = model.LoadmodelScale('textures/planet/moon.jpg','model/moon.obj',2.5 * (Math.random() * 2 + 6));
 		luna.rotation.z = 0;
 		parent.add(luna);
 		

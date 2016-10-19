@@ -6,7 +6,7 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var navicella;
-  var number_planets=10;
+  var number_planets = 5;
 
   var flipdirection;
   
