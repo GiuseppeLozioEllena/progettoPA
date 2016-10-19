@@ -6,7 +6,7 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var navicella;
-  var number_planets = 5;
+  var number_planets = 20;
 
   var flipdirection;
   
@@ -19,12 +19,18 @@ $(function()
   var range = 500;
 
   var skybox;
+  
+  var lensflares;
+  
+  var index_planets_update;
 
   function init()
   {
     scene=new THREE.Scene();
-    camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,500);
+    camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,5000000);
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+	
+	index_planets_update = 0;
 	
 	skybox = setSkybox();
 	scene.add(skybox);
@@ -51,9 +57,9 @@ $(function()
 	planets_reference = [];
 	for (var i = 0; i < number_planets; i++)
 	{
-		var x = (Math.random() * range - range / 2) + navicella.position.x;
-		var y = (Math.random() * range - range / 2) + navicella.position.y;
-		var z = (Math.random() * range - range / 2) + navicella.position.z;
+		var x = (Math.random() * (range * 2) - range) + navicella.position.x;
+		var y = (Math.random() * (range * 2) - range) + navicella.position.y;
+		var z = (Math.random() * (range * 2) - range) + navicella.position.z;
 		var p = new Planet(x, y, z);
 		scene.add(p.create());
 		scene.add(p.generateMoon(Math.random() * 5));
@@ -66,15 +72,16 @@ $(function()
   
   function generateLensFlares()
   {
+	lensFlares = [];
 	var textureLoader = new THREE.TextureLoader();
 
 	textureFlare0 = textureLoader.load( "textures/lensflare/lensflare0.png" );
 	textureFlare2 = textureLoader.load( "textures/lensflare/lensflare2.png" );
 	textureFlare3 = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
-	addLight( 0.55, 0.9, 0.5, 50, 0, 10 );
-	addLight( 0.08, 0.8, 0.5,    0, 0, 10 );
-	addLight( 0.995, 0.5, 0.9, 40, 50, 10 );
+	addLight( 0.55, 0.9, 0.5, 250, 0, -30 );
+	addLight( 0.08, 0.8, 0.5,    0, 0, 0 );
+	addLight( 0.995, 0.5, 0.9, 40, -250, 30 );
   }
     
  function lensFlareUpdateCallback( object ) {
@@ -124,6 +131,8 @@ function addLight( h, s, l, x, y, z ) {
 	lensFlare.customUpdateCallback = lensFlareUpdateCallback;
 	lensFlare.position.copy( light.position );
 
+	lensFlares.push(lensFlare);
+	
 	scene.add( lensFlare );
 }
   
@@ -217,7 +226,7 @@ function addLight( h, s, l, x, y, z ) {
 		requestAnimationFrame(animate);
 		stats.update();
    		renderer.render(scene,camera);
-		d = 10;
+		d = 100;
 		if (controls != null)
 		{
 			controls.movementSpeed = 0.33 * d;
@@ -232,39 +241,42 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
+		if (distanza(planets_reference[index_planets_update].position(), navicella.position) > range * range * 3)
+		{
+			var pos = planets_reference[index_planets_update].position();
+			scene.remove(planets_reference[index_planets_update]);
+			planets_reference[index_planets_update] = aggiungi(pos);
+		}
 
-		for(var j=0;j<number_planets;j++)
-			{
+		/*
+		if (planets_reference[index_planets_update].position().x  < navicella.position.x-range || planets_reference[index_planets_update].position().y < navicella.position.y - range || planets_reference[index_planets_update].position().z < navicella.position.z-range) 
+		{
+			console.log("add new planet");
+			var x = (navicella.position.x-range/2)-Math.random() * range/2;
+			var y = (navicella.position.y-range/2)-Math.random() * range/2;
+			var z = (navicella.position.z-range/2)-Math.random() * range/2;
+			var p = new Planet(x, y, z);
+			scene.add(p.create());
+			scene.add(p.generateMoon(Math.random() * 5));
+			scene.remove(planets_reference[index_planets_update]);
+			planets_reference[index_planets_update]=p;
+		}
 
-				if(planets_reference[j].position().x<navicella.position.x-range || planets_reference[j].position().y<navicella.position.y-range || planets_reference[j].position().z<navicella.position.z-range) 
-				{
-					console.log("add new planet");
-					var x = (navicella.position.x-range/2)-Math.random() * range/2;
-					var y = (navicella.position.y-range/2)-Math.random() * range/2;
-					var z = (navicella.position.z-range/2)-Math.random() * range/2;
-					var p = new Planet(x, y, z);
-					scene.add(p.create());
-					scene.add(p.generateMoon(Math.random() * 5));
-					scene.remove(planets_reference[j]);
-					planets_reference[j]=p;
-				}
-
-				if(planets_reference[j].position().x>navicella.position.x+range || planets_reference[j].position().y>navicella.position.y+range || planets_reference[j].position().z>navicella.position.z+range)
-                {
-                	console.log("add new planet");
-                	var x = Math.random() * range/2+(navicella.position.x+range/2);
-					var y = Math.random() * range/2+(navicella.position.y+range/2);
-					var z = Math.random() * range/2+(navicella.position.z+range/2);
-					var p = new Planet(x, y, z);
-					scene.add(p.create());
-					scene.add(p.generateMoon(Math.random() * 5));
-					scene.remove(planets_reference[j]);
-					planets_reference[j]=p;
-					
-				}
-             
-			}
-
+		if(planets_reference[index_planets_update].position().x>navicella.position.x + range || planets_reference[index_planets_update].position().y > navicella.position.y + range || planets_reference[index_planets_update].position().z>navicella.position.z+range)
+		{
+			console.log("add new planet");
+			var x = Math.random() * range / 2 + (navicella.position.x + range / 2);
+			var y = Math.random() * range / 2 + (navicella.position.y + range / 2);
+			var z = Math.random() * range / 2 + (navicella.position.z + range / 2);
+			var p = new Planet(x, y, z);
+			scene.add(p.create());
+			scene.add(p.generateMoon(Math.random() * 5));
+			scene.remove(planets_reference[index_planets_update]);
+			planets_reference[index_planets_update]=p;				
+		}
+		*/
+		
+		index_planets_update = (index_planets_update + 1) % number_planets;
 
 		/*
 		if(asteroid_center.position.z>=20.01)
@@ -283,6 +295,43 @@ function addLight( h, s, l, x, y, z ) {
 		//console.log(asteroid_center.position.z);
 			
 		*/
+   }
+   
+   function aggiungi(p)
+   {
+		console.log("add new planet");
+		/*
+		var x = (navicella.position.x-range/2)-Math.random() * range/2;
+		var y = (navicella.position.y-range/2)-Math.random() * range/2;
+		var z = (navicella.position.z-range/2)-Math.random() * range/2;
+		*/
+		
+		var pos = -1;
+		if (Math.random() * 100 < 50)
+			pos = 1;
+		
+		var x = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.x;
+		var y = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.y;
+		var z = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.z;
+		
+		console.log("navicella x: " + navicella.position.x);
+		console.log("navicella y: " + navicella.position.y);
+		console.log("navicella z: " + navicella.position.z);
+		
+		console.log("pianeta x: " + x);
+		console.log("pianeta y: " + y);
+		console.log("pianeta z: " + z);
+		
+		
+		var p = new Planet(x, y, z);
+		scene.add(p.create());
+		scene.add(p.generateMoon(Math.random() * 5));
+		return p;
+   }
+   
+   function distanza(p1, p2)
+   {
+	   return Math.pow(p1.x - p2.x,2) + Math.pow(p1.y - p2.y,2) + Math.pow(p1.z - p2.z,2);
    }
    
    function seguiNavicella()
