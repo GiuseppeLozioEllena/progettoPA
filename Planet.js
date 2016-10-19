@@ -1,36 +1,18 @@
-Planet = function ( x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pianeta, scala_pianeta ) {
-	/*
-	var x,y,z;
-	var numero_lune;
-	var lune;
-	var nome, descrizione;
-	var texture, modello, scala;
-
-	//var planet_reference;
-
-	//var master_reference;
-	var moons_velocity;
-	*/
-
-//function Planet(x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pianeta, scala_pianeta)
-	
-		this.x = x_pianeta;
-		this.y = y_pianeta;
-		this.z = z_pianeta;
-		this.texture = texture_pianeta;
-		this.modello = modello_pianeta;
-		this.scala = scala_pianeta;
-		this.numero_lune = 0;
-		this.create = create;
-		this.generateMoon = generateMoon;
-		this.createMoon = createMoon;
-		this.update = update;
-		this.position=position;
+Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
+	this.x = x_pianeta;
+	this.y = y_pianeta;
+	this.z = z_pianeta;
+	this.numero_lune = 0;
+	this.create = create;
+	this.generateMoon = generateMoon;
+	this.createMoon = createMoon;
+	this.update = update;
+	this.position=position;
 	
 
 	function update()
 	{
-		this.planet_reference.rotation.z += 0.001;
+		this.planet_reference.rotation.z += 0.003;
 		
 		for (i = 0; i < this.numero_lune; i++)
 		{
@@ -42,6 +24,10 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta, texture_pianeta, modello_pi
 
 	function create()
 	{
+		this.texture = "textures/planets_downloaded/texture" + Math.round(Math.random() *100+1) + ".jpg";
+		this.modello = "model/earth.obj";
+		this.scala = Math.random() * 20 + 80;
+	
 		var model = new Model(this.x,this.y,this.z);	
 		this.planet_reference = model.LoadmodelScale(this.texture, this.modello, this.scala);
 		return this.planet_reference;

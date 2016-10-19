@@ -16,8 +16,9 @@ $(function()
   var planets_reference;
   var asteroid_center;
 
-  var range=50;
+  var range = 500;
 
+  var skybox;
 
   function init()
   {
@@ -25,7 +26,8 @@ $(function()
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,500);
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
-	scene.add(setSkybox());
+	skybox = setSkybox();
+	scene.add(skybox);
    
   	renderer.setSize(window.innerWidth,window.innerHeight);
  
@@ -44,18 +46,15 @@ $(function()
    
   	caricaNavicella(40,50,15); 
 	
-
   	raycaster = new THREE.Raycaster();
 
 	planets_reference = [];
 	for (var i = 0; i < number_planets; i++)
 	{
-		var x = Math.random() * range;
-		var y = Math.random() * range;
-		var z = Math.random() * range;
-		var texture_name=	"textures/planets_downloaded/texture"+Math.round(Math.random() *100+1)+".jpg";
-		console.log(texture_name);
-		var p = new Planet(x,y,z, texture_name, "model/earth.obj", 10);
+		var x = (Math.random() * range - range / 2) + navicella.position.x;
+		var y = (Math.random() * range - range / 2) + navicella.position.y;
+		var z = (Math.random() * range - range / 2) + navicella.position.z;
+		var p = new Planet(x, y, z);
 		scene.add(p.create());
 		scene.add(p.generateMoon(Math.random() * 5));
 		planets_reference.push(p);
@@ -228,7 +227,11 @@ function addLight( h, s, l, x, y, z ) {
 	
 		for (var i = 0; i < number_planets; i++)		
 			planets_reference[i].update();
-
+		
+		skybox.position.x = navicella.position.x;
+		skybox.position.y = navicella.position.y;
+		skybox.position.z = navicella.position.z;
+		
 
 		for(var j=0;j<number_planets;j++)
 			{
@@ -239,8 +242,7 @@ function addLight( h, s, l, x, y, z ) {
 					var x = (navicella.position.x-range/2)-Math.random() * range/2;
 					var y = (navicella.position.y-range/2)-Math.random() * range/2;
 					var z = (navicella.position.z-range/2)-Math.random() * range/2;
-					var texture_name=	"textures/planets_downloaded/texture"+Math.round(Math.random() *100+1)+".jpg";
-					var p = new Planet(x,y,z, texture_name, "model/earth.obj", 10);
+					var p = new Planet(x, y, z);
 					scene.add(p.create());
 					scene.add(p.generateMoon(Math.random() * 5));
 					scene.remove(planets_reference[j]);
@@ -253,8 +255,7 @@ function addLight( h, s, l, x, y, z ) {
                 	var x = Math.random() * range/2+(navicella.position.x+range/2);
 					var y = Math.random() * range/2+(navicella.position.y+range/2);
 					var z = Math.random() * range/2+(navicella.position.z+range/2);
-					var texture_name=	"textures/planets_downloaded/texture"+Math.round(Math.random() *100+1)+".jpg";
-					var p = new Planet(x,y,z, texture_name, "model/earth.obj", 10);
+					var p = new Planet(x, y, z);
 					scene.add(p.create());
 					scene.add(p.generateMoon(Math.random() * 5));
 					scene.remove(planets_reference[j]);
