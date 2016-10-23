@@ -218,8 +218,8 @@ function addLight( h, s, l, x, y, z ) {
 	controls.autoForward = false;
 	controls.dragToLook = false;
 
-	var axis = new THREE.AxisHelper(5);
-	navicella.add(axis);
+	//var axis = new THREE.AxisHelper(5);
+	//navicella.add(axis);
 		
     scene.add(navicella);
 
