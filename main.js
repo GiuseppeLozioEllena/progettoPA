@@ -6,7 +6,8 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var navicella;
-  var number_planets = 50;
+  var number_planets = 30;
+  var MAX_MOONS_NUMBER = 3;
 
   var flipdirection;
   
@@ -16,7 +17,7 @@ $(function()
   var planets_reference;
   var asteroid_center;
 
-  var range = 500;
+  var range = 1000;
 
   var skybox;
   
@@ -67,7 +68,7 @@ $(function()
 		
 		var p = new Planet(x, y, z);
 		scene.add(p.create());
-		scene.add(p.generateMoon(Math.random() * 5));
+		scene.add(p.generateMoon(Math.round(Math.random() * MAX_MOONS_NUMBER)));
 		planets_reference.push(p);
 	}
   	//generateAsteroid(60,50,10);
@@ -157,12 +158,23 @@ function addLight( h, s, l, x, y, z ) {
 		materialArray.push( new THREE.MeshBasicMaterial({
 	map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
 	side: THREE.BackSide}));
-	var skyGeometry = new THREE.CubeGeometry( 500, 500, 500 );
+	var skyGeometry = new THREE.CubeGeometry( 2000, 2000, 2000 );
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
-	skyBox.renderDepth = 1000.0;  
+	skyBox.renderDepth = 5000.0;  
 	skyBox.rotation.x += Math.PI / 2;
 	return skyBox;
+	
+	/*
+	var starGeometry = new THREE.SphereGeometry(1000, 50, 50);
+	var starMaterial = new THREE.MeshPhongMaterial({
+	  map: new THREE.ImageUtils.loadTexture("/skybox/skybox-xpos.png"),
+	  side: THREE.DoubleSide,
+	  shininess: 0
+	});
+	var starField = new THREE.Mesh(starGeometry, starMaterial);
+	return starField;
+	*/
   }
 
   function generateAsteroid(x,y,z)
