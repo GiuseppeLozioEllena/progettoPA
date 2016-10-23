@@ -16,7 +16,7 @@ function Loadmodel(texture_path,model_path)
 {
      var manager = new THREE.LoadingManager();
      var  texture = new THREE.Texture();
-        console.log(texture_path);
+        //console.log(texture_path);
         var loader = new THREE.ImageLoader(manager);
         loader.load( texture_path, function ( image ) 
         {
@@ -48,7 +48,7 @@ function LoadmodelScale(texture_path,model_path,scale)
 
        var manager = new THREE.LoadingManager();
        var  texture = new THREE.Texture();
-        console.log(texture_path);
+        //console.log(texture_path);
         var loader = new THREE.ImageLoader(manager);
         loader.load( texture_path, function ( image ) 
         {

@@ -68,6 +68,7 @@ $(function()
 		
 		var p = new Planet(x, y, z);
 		scene.add(p.create());
+		scene.add(p.createClouds());
 		scene.add(p.generateMoon(Math.round(Math.random() * MAX_MOONS_NUMBER)));
 		planets_reference.push(p);
 	}

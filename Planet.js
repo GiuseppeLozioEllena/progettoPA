@@ -4,15 +4,19 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	this.z = z_pianeta;
 	this.numero_lune = 0;
 	this.create = create;
+	this.createClouds = createClouds;
 	this.generateMoon = generateMoon;
 	this.createMoon = createMoon;
 	this.update = update;
 	this.position=position;
 	
+	var SCALA_MINIMA = 40;
+	var SCALA_VARIAZIONE_MASSIMA = 20;
 
 	function update()
 	{
-		this.planet_reference.rotation.z += 0.003;
+		this.planet_reference.rotation.z += 0.001;
+		this.clouds.rotation.z -= .00025;
 		
 		for (i = 0; i < this.numero_lune; i++)
 		{
@@ -25,12 +29,46 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	function create()
 	{
 		this.texture = "textures/planets_downloaded/texture" + Math.round(Math.random() *100+1) + ".jpg";
+		this.scala = Math.random() * SCALA_VARIAZIONE_MASSIMA + SCALA_MINIMA;
+		/*
+		
 		this.modello = "model/earth.obj";
-		this.scala = Math.random() * 20 + 80;
 	
 		var model = new Model(this.x,this.y,this.z);	
 		this.planet_reference = model.LoadmodelScale(this.texture, this.modello, this.scala);
 		return this.planet_reference;
+		*/
+		
+		var earthGeometry = new THREE.SphereGeometry( this.scala, 50, 50 );
+		var earthMaterial = new THREE.MeshPhongMaterial({
+		  map: new THREE.ImageUtils.loadTexture(this.texture),
+		  color: 0xaaaaaa,
+		  specular: 0x333333,
+		  shininess: 25
+		});
+
+		this.planet_reference = new THREE.Mesh(earthGeometry, earthMaterial);
+		this.planet_reference.position.x = this.x;
+		this.planet_reference.position.y = this.y;
+		this.planet_reference.position.z = this.z;
+	
+		return this.planet_reference;
+	}
+	
+	function createClouds()
+	{
+		var cloudGeometry = new THREE.SphereGeometry(this.scala + 2.5,  50, 50);
+		var cloudMaterial = new THREE.MeshPhongMaterial({
+		  map: new THREE.ImageUtils.loadTexture("textures/clouds/clouds_2.jpg"),
+		  transparent: true,
+		  opacity: 0.1
+		});
+
+		this.clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
+		this.clouds.position.x = x_pianeta;
+		this.clouds.position.y = y_pianeta;
+		this.clouds.position.z = z_pianeta;
+		return this.clouds;
 	}
 
 	function generateMoon(numero_lune_pianeta)
