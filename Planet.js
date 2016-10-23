@@ -16,7 +16,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	function update()
 	{
 		this.planet_reference.rotation.z += 0.001;
-		this.clouds.rotation.z -= .00025;
+		//this.clouds.rotation.z -= .00025;
 		
 		for (i = 0; i < this.numero_lune; i++)
 		{
@@ -90,11 +90,23 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		parent = new THREE.Object3D();
 		parent.position.set(0,0,0);
 		
+		/*
 		var model = new Model(0, Math.random() * 20 + 70, 0);
 		var luna = model.LoadmodelScale('textures/planet/moon.jpg','model/moon.obj',2.5 * (Math.random() * 2 + 6));
 		luna.rotation.z = 0;
 		parent.add(luna);
 		
+		this.master_reference.add(parent);
+		*/
+		
+		var moonGeometry = new THREE.SphereGeometry(2.5 * (Math.random() * 2 + 4), 50,50);
+		var moonMaterial = new THREE.MeshPhongMaterial({
+		  map: THREE.ImageUtils.loadTexture("textures/planet/moon.jpg")
+		});
+		var moon = new THREE.Mesh(moonGeometry, moonMaterial);
+		moon.position.set(0, Math.random() * 20 + 100, 0);
+		
+		parent.add(moon);
 		this.master_reference.add(parent);
 	}
 
