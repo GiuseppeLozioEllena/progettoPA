@@ -6,22 +6,24 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var navicella;
-  var number_planets = 30;
-  var MAX_MOONS_NUMBER = 3;
+  
 
   var flipdirection;
   
   var clock = new THREE.Clock();
-  var textureFlare0, textureFlare2, textureFlare3;
   
-  var planets_reference;
   var asteroid_center;
 
-  var range = 1000;
-
-  var skybox;
+  var planets_reference; // Array con i riferimenti ai pianeti
+  var skybox; // Skybox, viene spostato con la navicella
+  var lensflares; // Array con i riferimenti alle lensflares
+  var textureFlare1, textureFlare2, textureFlare3; // Texture dei lansflares
   
-  var lensflares;
+  // Parametri
+  var LENS_FLARES_NUMBER = 8;
+  var MAX_MOONS_NUMBER = 3;
+  var PLANETS_NUMBER = 30;
+  var RANGE = 1000;
   
   var index_planets_update;
 
@@ -56,14 +58,14 @@ $(function()
   	raycaster = new THREE.Raycaster();
 
 	planets_reference = [];
-	for (var i = 0; i < number_planets; i++)
+	for (var i = 0; i < PLANETS_NUMBER; i++)
 	{
 		var x,y,z;
 		
 		do{
-			x = (Math.random() * (range * 2) - range) + navicella.position.x;
-			y = (Math.random() * (range * 2) - range) + navicella.position.y;
-			z = (Math.random() * (range * 2) - range) + navicella.position.z;
+			x = (Math.random() * (RANGE * 2) - RANGE) + navicella.position.x;
+			y = (Math.random() * (RANGE * 2) - RANGE) + navicella.position.y;
+			z = (Math.random() * (RANGE * 2) - RANGE) + navicella.position.z;
 		}while(!lontanoDaPianeti(x,y,z));
 		
 		var p = new Planet(x, y, z);
@@ -82,13 +84,17 @@ $(function()
 	lensFlares = [];
 	var textureLoader = new THREE.TextureLoader();
 
-	textureFlare0 = textureLoader.load( "textures/lensflare/lensflare0.png" );
+	textureFlare1 = textureLoader.load( "textures/lensflare/lensflare0.png" );
 	textureFlare2 = textureLoader.load( "textures/lensflare/lensflare2.png" );
 	textureFlare3 = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
-	addLight( 0.55, 0.9, 0.5, 250, 0, -30 );
-	addLight( 0.08, 0.8, 0.5,    0, 0, 0 );
-	addLight( 0.995, 0.5, 0.9, 40, -250, 30 );
+	for (var i = 0; i < LENS_FLARES_NUMBER; i++)
+		addLight(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), random(-RANGE, RANGE), random(-RANGE, RANGE), random(-RANGE, RANGE));
+  }
+  
+  function random(min, max)
+  {
+	  return Math.random() * (max - min) + min;
   }
     
  function lensFlareUpdateCallback( object ) {
@@ -125,7 +131,7 @@ function addLight( h, s, l, x, y, z ) {
 	var flareColor = new THREE.Color( 0xffffff );
 	flareColor.setHSL( h, s, l + 0.5 );
 
-	var lensFlare = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
+	var lensFlare = new THREE.LensFlare( textureFlare1, 700, 0.0, THREE.AdditiveBlending, flareColor );
 
 	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
@@ -259,41 +265,13 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
-		if (distanza(planets_reference[index_planets_update].position(), navicella.position) > range * range * 3)
+		if (distanza(planets_reference[index_planets_update].position(), navicella.position) > RANGE * RANGE * 3)
 		{
 			var pos = planets_reference[index_planets_update].position();
 			scene.remove(planets_reference[index_planets_update]);
 			planets_reference[index_planets_update] = aggiungi(pos);
 		}
 
-		/*
-		if (planets_reference[index_planets_update].position().x  < navicella.position.x-range || planets_reference[index_planets_update].position().y < navicella.position.y - range || planets_reference[index_planets_update].position().z < navicella.position.z-range) 
-		{
-			console.log("add new planet");
-			var x = (navicella.position.x-range/2)-Math.random() * range/2;
-			var y = (navicella.position.y-range/2)-Math.random() * range/2;
-			var z = (navicella.position.z-range/2)-Math.random() * range/2;
-			var p = new Planet(x, y, z);
-			scene.add(p.create());
-			scene.add(p.generateMoon(Math.random() * 5));
-			scene.remove(planets_reference[index_planets_update]);
-			planets_reference[index_planets_update]=p;
-		}
-
-		if(planets_reference[index_planets_update].position().x>navicella.position.x + range || planets_reference[index_planets_update].position().y > navicella.position.y + range || planets_reference[index_planets_update].position().z>navicella.position.z+range)
-		{
-			console.log("add new planet");
-			var x = Math.random() * range / 2 + (navicella.position.x + range / 2);
-			var y = Math.random() * range / 2 + (navicella.position.y + range / 2);
-			var z = Math.random() * range / 2 + (navicella.position.z + range / 2);
-			var p = new Planet(x, y, z);
-			scene.add(p.create());
-			scene.add(p.generateMoon(Math.random() * 5));
-			scene.remove(planets_reference[index_planets_update]);
-			planets_reference[index_planets_update]=p;				
-		}
-		*/
-		
 		index_planets_update = (index_planets_update + 1) % number_planets;
 
 		/*
@@ -326,9 +304,9 @@ function addLight( h, s, l, x, y, z ) {
 		var x,y,z;
 		
 		do{
-			x = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.x;
-			y = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.y;
-			z = (Math.random() * (range / 2) + (range / 2)) * pos + navicella.position.z;
+			x = (Math.random() * (RANGE / 2) + (RANGE / 2)) * pos + navicella.position.x;
+			y = (Math.random() * (RANGE / 2) + (RANGE / 2)) * pos + navicella.position.y;
+			z = (Math.random() * (RANGE / 2) + (RANGE / 2)) * pos + navicella.position.z;
 		}while(!lontanoDaPianeti(x,y,z));
 		
 		console.log("navicella x: " + navicella.position.x);
