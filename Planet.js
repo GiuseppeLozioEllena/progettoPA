@@ -9,6 +9,9 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	this.createMoon = createMoon;
 	this.update = update;
 	this.position=position;
+	this.getPlanet = getPlanet;
+	this.getMoons = getMoons;
+	this.getClouds = getClouds;	
 	
 	var SCALA_MINIMA = 40;
 	var SCALA_VARIAZIONE_MASSIMA = 20;
@@ -42,9 +45,9 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		var earthGeometry = new THREE.SphereGeometry( this.scala, 50, 50 );
 		var earthMaterial = new THREE.MeshPhongMaterial({
 		  map: new THREE.ImageUtils.loadTexture(this.texture),
-		  color: 0xaaaaaa,
+		  color: 0x99FF99,
 		  specular: 0x333333,
-		  shininess: 25
+		  shininess: 50
 		});
 
 		this.planet_reference = new THREE.Mesh(earthGeometry, earthMaterial);
@@ -114,5 +117,20 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	{
 		var pos=new THREE.Vector3(this.x, this.y,this.z);
 		return pos;
+	}
+
+	function getPlanet()
+	{
+		return this.planet_reference;
+	}
+
+	function getMoons()
+	{
+		return this.master_reference;
+	}
+
+	function getClouds()
+	{
+		return this.clouds;
 	}
 }

@@ -22,7 +22,7 @@ $(function()
   // Parametri
   var LENS_FLARES_NUMBER = 8;
   var MAX_MOONS_NUMBER = 3;
-  var PLANETS_NUMBER = 30;
+  var PLANETS_NUMBER = 5;
   var RANGE = 1000;
   
   var index_planets_update;
@@ -30,7 +30,7 @@ $(function()
   function init()
   {
     scene=new THREE.Scene();
-    camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,5000000);
+    camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
 	index_planets_update = 0;
@@ -165,7 +165,7 @@ function addLight( h, s, l, x, y, z ) {
 		materialArray.push( new THREE.MeshBasicMaterial({
 	map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
 	side: THREE.BackSide}));
-	var skyGeometry = new THREE.CubeGeometry( 2000, 2000, 2000 );
+	var skyGeometry = new THREE.CubeGeometry(10000,10000, 10000 );
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	skyBox.renderDepth = 5000.0;  
@@ -268,9 +268,15 @@ function addLight( h, s, l, x, y, z ) {
 		if (distanza(planets_reference[index_planets_update].position(), navicella.position) > RANGE * RANGE * 3)
 		{
 			var pos = planets_reference[index_planets_update].position();
-			scene.remove(planets_reference[index_planets_update]);
+			console.log("elimina pianeta");
+			//scene.remove(planets_reference[index_planets_update]);
+			scene.remove(planets_reference[index_planets_update].getPlanet());
+			scene.remove(planets_reference[index_planets_update].getMoons());
+			scene.remove(planets_reference[index_planets_update].getClouds());
 			planets_reference[index_planets_update] = aggiungi(pos);
 		}
+
+		console.log(scene.children.length);
 
 		index_planets_update = (index_planets_update + 1) % PLANETS_NUMBER;
 
