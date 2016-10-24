@@ -258,7 +258,7 @@ function addLight( h, s, l, x, y, z ) {
 			seguiNavicella();
 		}
 	
-		for (var i = 0; i < number_planets; i++)		
+		for (var i = 0; i < PLANETS_NUMBER; i++)		
 			planets_reference[i].update();
 		
 		skybox.position.x = navicella.position.x;
@@ -272,7 +272,7 @@ function addLight( h, s, l, x, y, z ) {
 			planets_reference[index_planets_update] = aggiungi(pos);
 		}
 
-		index_planets_update = (index_planets_update + 1) % number_planets;
+		index_planets_update = (index_planets_update + 1) % PLANETS_NUMBER;
 
 		/*
 		if(asteroid_center.position.z>=20.01)
