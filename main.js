@@ -205,7 +205,7 @@ function addLight( h, s, l, x, y, z ) {
   function caricaNavicella(x,y,z)
   {
   
-    var model=new Model(x,y,z);
+    var model = new Model(x,y,z);
     navicella = model.LoadmodelScale('textures/spaceship/diffuse.bmp','model/spaceship.obj',0.025);
 	navicella.rotation.set(0,0,0);
 	navicella.add(camera);
@@ -218,12 +218,73 @@ function addLight( h, s, l, x, y, z ) {
 	controls.autoForward = false;
 	controls.dragToLook = false;
 
+					var material = new THREE.SpriteMaterial( {
+					map: new THREE.CanvasTexture( generateSprite() ),
+					blending: THREE.AdditiveBlending
+				} );
+
+				for ( var i = 0; i < 1000; i++ ) {
+
+					particle = new THREE.Sprite( material );
+
+					initParticle( particle, i * 10 );
+
+					scene.add( particle );
+				}
+	
 	//var axis = new THREE.AxisHelper(5);
 	//navicella.add(axis);
 		
     scene.add(navicella);
 
   }
+  
+
+			function generateSprite() {
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 16;
+				canvas.height = 16;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0, 'rgba(255,255,255,1)' );
+				gradient.addColorStop( 0.2, 'rgba(0,255,255,1)' );
+				gradient.addColorStop( 0.4, 'rgba(0,0,64,1)' );
+				gradient.addColorStop( 1, 'rgba(0,0,0,1)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				return canvas;
+
+			}
+
+			function initParticle( particle, delay ) {
+
+				var particle = this instanceof THREE.Sprite ? this : particle;
+				var delay = delay !== undefined ? delay : 0;
+
+				particle.position.set( 0, 0, 0 );
+				particle.scale.x = particle.scale.y = Math.random() * 32 + 16;
+
+				new TWEEN.Tween( particle )
+					.delay( delay )
+					.to( {}, 10000 )
+					.onComplete( initParticle )
+					.start();
+
+				new TWEEN.Tween( particle.position )
+					.delay( delay )
+					.to( { x: Math.random() * 100, y: Math.random() * 50 - 25, z: Math.random() * 100 }, 10000 )
+					.start();
+
+				new TWEEN.Tween( particle.scale )
+					.delay( delay )
+					.to( { x: 0.01, y: 0.01 }, 10000 )
+					.start();
+
+			}  
 
 	guiControls=new function()
 	{
@@ -276,10 +337,10 @@ function addLight( h, s, l, x, y, z ) {
 			planets_reference[index_planets_update] = aggiungi(pos);
 		}
 
-		console.log(scene.children.length);
-
 		index_planets_update = (index_planets_update + 1) % PLANETS_NUMBER;
 
+		TWEEN.update();
+		
 		/*
 		if(asteroid_center.position.z>=20.01)
 			flipdirection=0;
