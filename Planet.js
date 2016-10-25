@@ -32,12 +32,13 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	function create()
 	{
 		this.texture = "textures/planets_downloaded/texture" + Math.round(Math.random() *100+1) + ".jpg";
+		//this.texture = "textures/planet/earth_texture_2.jpg";
 		this.scala = Math.random() * SCALA_VARIAZIONE_MASSIMA + SCALA_MINIMA;
 		var model=new Model(this.x,this.y,this.z);
 		var modelM = new THREE.MeshPhongMaterial({
-          color: 0x99FF99,
+          color: 0xaaaaaa,
           specular: 0x333333,
-          shininess: 50});
+          shininess: 25});
 		this.planet_reference = model.loadModelTexture(this.texture,this.scala,modelM);
 		
 	
@@ -76,8 +77,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		
 		var model=new Model(0, Math.random() * 20 + 100, 0);
 	     var modelM = new THREE.MeshPhongMaterial({
-          specular: 0x333333,
-          shininess: 50});
+          });
 		this.moon =  model.loadModelTexture("textures/planet/moon.jpg",2.5 * (Math.random() * 2 + 4),modelM);
 		
 		parent.add(this.moon);
