@@ -22,7 +22,7 @@ $(function()
   // Parametri
   var LENS_FLARES_NUMBER = 8;
   var MAX_MOONS_NUMBER = 3;
-  var PLANETS_NUMBER = 5;
+  var PLANETS_NUMBER = 15;
   var RANGE = 1000;
   
   var index_planets_update;

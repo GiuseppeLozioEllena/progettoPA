@@ -33,44 +33,25 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	{
 		this.texture = "textures/planets_downloaded/texture" + Math.round(Math.random() *100+1) + ".jpg";
 		this.scala = Math.random() * SCALA_VARIAZIONE_MASSIMA + SCALA_MINIMA;
-		/*
+		var model=new Model(this.x,this.y,this.z);
+		var modelM = new THREE.MeshPhongMaterial({
+          color: 0x99FF99,
+          specular: 0x333333,
+          shininess: 50});
+		this.planet_reference = model.loadModelTexture(this.texture,this.scala,modelM);
 		
-		this.modello = "model/earth.obj";
-	
-		var model = new Model(this.x,this.y,this.z);	
-		this.planet_reference = model.LoadmodelScale(this.texture, this.modello, this.scala);
-		return this.planet_reference;
-		*/
-		
-		var earthGeometry = new THREE.SphereGeometry( this.scala, 50, 50 );
-		var earthMaterial = new THREE.MeshPhongMaterial({
-		  map: new THREE.ImageUtils.loadTexture(this.texture),
-		  color: 0x99FF99,
-		  specular: 0x333333,
-		  shininess: 50
-		});
-
-		this.planet_reference = new THREE.Mesh(earthGeometry, earthMaterial);
-		this.planet_reference.position.x = this.x;
-		this.planet_reference.position.y = this.y;
-		this.planet_reference.position.z = this.z;
 	
 		return this.planet_reference;
 	}
 	
 	function createClouds()
 	{
-		var cloudGeometry = new THREE.SphereGeometry(this.scala + 2.5,  50, 50);
-		var cloudMaterial = new THREE.MeshPhongMaterial({
-		  map: new THREE.ImageUtils.loadTexture("textures/clouds/clouds_2.jpg"),
-		  transparent: true,
-		  opacity: 0.1
-		});
-
-		this.clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
-		this.clouds.position.x = x_pianeta;
-		this.clouds.position.y = y_pianeta;
-		this.clouds.position.z = z_pianeta;
+		var model=new Model(this.x,this.y,this.z);
+		var modelM = new THREE.MeshPhongMaterial({
+          transparent: true,
+          opacity: 0.1});
+		this.clouds =  model.loadModelTexture("textures/clouds/clouds_2.jpg",this.scala + 2.5,modelM);
+		
 		return this.clouds;
 	}
 
@@ -93,23 +74,13 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		parent = new THREE.Object3D();
 		parent.position.set(0,0,0);
 		
-		/*
-		var model = new Model(0, Math.random() * 20 + 70, 0);
-		var luna = model.LoadmodelScale('textures/planet/moon.jpg','model/moon.obj',2.5 * (Math.random() * 2 + 6));
-		luna.rotation.z = 0;
-		parent.add(luna);
+		var model=new Model(0, Math.random() * 20 + 100, 0);
+	     var modelM = new THREE.MeshPhongMaterial({
+          specular: 0x333333,
+          shininess: 50});
+		this.moon =  model.loadModelTexture("textures/planet/moon.jpg",2.5 * (Math.random() * 2 + 4),modelM);
 		
-		this.master_reference.add(parent);
-		*/
-		
-		var moonGeometry = new THREE.SphereGeometry(2.5 * (Math.random() * 2 + 4), 50,50);
-		var moonMaterial = new THREE.MeshPhongMaterial({
-		  map: THREE.ImageUtils.loadTexture("textures/planet/moon.jpg")
-		});
-		var moon = new THREE.Mesh(moonGeometry, moonMaterial);
-		moon.position.set(0, Math.random() * 20 + 100, 0);
-		
-		parent.add(moon);
+		parent.add(this.moon);
 		this.master_reference.add(parent);
 	}
 
