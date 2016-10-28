@@ -30,6 +30,8 @@ $(function()
 
 
   var index_planets_update;
+  
+  var lastRotationY = 0;
 
   function init()
   {
@@ -242,6 +244,7 @@ function addLight( h, s, l, x, y, z ) {
     var model = new Model(x,y,z);
     navicella = model.LoadmodelScale('textures/spaceship/diffuse.bmp','model/spaceship.obj',0.025);
 	navicella.rotation.set(0,0,0);
+	
 	navicella.add(camera);
     		
 	camera.position.set(0, 3, 20);
@@ -313,6 +316,29 @@ function addLight( h, s, l, x, y, z ) {
 			controls.movementSpeed = 0.33 * d;
 			controls.update( delta );
 			seguiNavicella();
+			//console.log(camera.rotation);
+			
+			//if (controls.isPressed())
+				//camera.rotation.x = -(controls.getRotation().y - lastRotationY);
+			//else
+			//{				
+				//camera.rotation.z = -controls.getRotation().y;
+				/*
+				if (camera.rotation.z >= 0.1)
+					camera.rotation.z -= 0.1;
+				if (camera.rotation.z <= -0.1)
+					camera.rotation.z += 0.1;
+				
+				lastRotationY = controls.getRotation().y;
+				*/
+			//}
+			
+			/*
+			if (camera.rotation.z < -90)
+				camera.rotation.z = 90;
+			if (camera.rotation.z > 90)
+				camera.rotation.z = 90;
+			*/
 		}
 	
 		for (var i = 0; i < PLANETS_NUMBER; i++)		
@@ -338,7 +364,7 @@ function addLight( h, s, l, x, y, z ) {
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
-		
+
 		/*
 		if(asteroid_center.position.z>=20.01)
 			flipdirection=0;
@@ -404,9 +430,7 @@ function addLight( h, s, l, x, y, z ) {
    
    function seguiNavicella()
    {
-	   
 	   spotLight.position.set( navicella.position.x, navicella.position.y + 3, navicella.position.z);
-	  
    }
 
    init();

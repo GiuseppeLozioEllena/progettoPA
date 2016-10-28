@@ -1,6 +1,9 @@
 THREE.FlyControls = function ( object, domElement ) {
 
 	this.object = object;
+	
+	this.presssed = false;
+	this.lastAngle = 0;
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 	if ( domElement ) this.domElement.setAttribute( 'tabindex', - 1 );
@@ -61,8 +64,8 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 38: /*up*/ this.moveState.pitchUp = 1; break;
 			case 40: /*down*/ this.moveState.pitchDown = 1; break;
 
-			case 37: /*left*/ this.moveState.yawLeft = 1; break;
-			case 39: /*right*/ this.moveState.yawRight = 1; break;
+			case 37: /*left*/ this.moveState.yawLeft = 1; this.pressed = true; break;
+			case 39: /*right*/ this.moveState.yawRight = 1; this.pressed = true; break;
 
 			case 81: /*Q*/ this.moveState.rollLeft = 1; break;
 			case 69: /*E*/ this.moveState.rollRight = 1; break;
@@ -92,8 +95,8 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 38: /*up*/ this.moveState.pitchUp = 0; break;
 			case 40: /*down*/ this.moveState.pitchDown = 0; break;
 
-			case 37: /*left*/ this.moveState.yawLeft = 0; break;
-			case 39: /*right*/ this.moveState.yawRight = 0; break;
+			case 37: /*left*/ this.moveState.yawLeft = 0; this.pressed = false; this.lastAngle = this.object.rotation.y; break;
+			case 39: /*right*/ this.moveState.yawRight = 0; this.pressed = false; break;
 
 			case 81: /*Q*/ this.moveState.rollLeft = 0; break;
 			case 69: /*E*/ this.moveState.rollRight = 0; break;
@@ -189,16 +192,32 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		this.object.translateX( this.moveVector.x * moveMult );
 		this.object.translateY( this.moveVector.y * moveMult );
-		this.object.translateZ( this.moveVector.z * moveMult );
-
+		this.object.translateZ( this.moveVector.z * moveMult );	
+		
 		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
 		this.object.quaternion.multiply( this.tmpQuaternion );
-
+		
+		//if (!this.pressed)
+		//	this.object.rotation.y *= 0.9;
+		
 		// expose the rotation vector for convenience
 		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
-
-
 	};
+	
+	this.isPressed = function()
+	{
+		return this.pressed;
+	}
+	
+	this.getRotation = function()
+	{
+		return this.object.rotation;
+	}
+	
+	this.getLastAngle = function()
+	{
+		return this.lastAngle;
+	}
 
 	this.updateMovementVector = function() {
 
