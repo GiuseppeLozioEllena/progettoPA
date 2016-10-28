@@ -26,8 +26,7 @@ $(function()
 
 
   var clock;
-  var fire; 
-
+  var fireSx, fireDx;
 
 
   var index_planets_update;
@@ -65,29 +64,43 @@ $(function()
   	caricaNavicella(40,50,15); 
 
 
-  	var fireWidth  = 2;
-	var fireHeight = 4;
-	var fireDepth  = 2;
-	var sliceSpacing = 0.5;
+  	var fireWidth  = 0.75;
+	var fireHeight = 1;
+	var fireDepth  = 1.5;
+	var sliceSpacing = 0.25;
 
-	fire = new VolumetricFire(
- 	 fireWidth,
-  	fireHeight,
-  	fireDepth,
-  	sliceSpacing,
-  	camera
+	fireDx = new VolumetricFire(
+		fireWidth,
+		fireHeight,
+		fireDepth,
+		sliceSpacing,
+		camera
 	);
-	scene.add( fire.mesh );
+	
+	fireSx = new VolumetricFire(
+		fireWidth,
+		fireHeight,
+		fireDepth,
+		sliceSpacing,
+		camera
+	);
+	
+	scene.add( fireDx.mesh );
+	scene.add( fireSx.mesh );
 	// you can set position, rotation and scale
 	// fire.mesh accepts THREE.mesh features
 
-	fire.mesh.rotation.x=90;
-	fire.mesh.position.z=navicella.position.z-5;
-	navicella.add(fire.mesh);
-
-
-
+	fireSx.mesh.rotation.x = 90;
+	fireSx.mesh.position.x -= 0.73;
+	fireSx.mesh.position.z = navicella.position.z - 9.5;
+	navicella.add(fireSx.mesh);
 	
+	fireDx.mesh.rotation.x = 90;
+	fireDx.mesh.position.x += 0.73;
+	fireDx.mesh.position.z = navicella.position.z - 9.5;
+	navicella.add(fireDx.mesh);
+
+
   	raycaster = new THREE.Raycaster();
 
 	planets_reference = [];
@@ -340,9 +353,8 @@ function addLight( h, s, l, x, y, z ) {
 		
 
 		var elapsed = clock.getElapsedTime();
-		fire.update( elapsed );
-
-		//fire.mesh.position.set(navicella.position.x,navicella.position.y,navicella.position.z+3);
+		fireSx.update( elapsed );
+		fireDx.update( elapsed );
 		
 		/*
 		if(asteroid_center.position.z>=20.01)
