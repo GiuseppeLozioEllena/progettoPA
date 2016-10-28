@@ -32,6 +32,16 @@ $(function()
   var index_planets_update;
   
   var lastRotationY = 0;
+  
+    var text2 = document.createElement('div');
+	text2.style.position = 'absolute';
+	//text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
+	text2.style.width = 300;
+	text2.style.height = 300;
+	text2.innerHTML = "<font color='white'>4708 Mrigashirsha VI<br/>Type=Small iron/silicate<br/>Radius=2457.46 km &nbsp; (0.39 x earth)<br/>Surface Area=7.59 x 10<sup>7</sup> km<sup>2</sup><br/>Land Area=3.11 x 10<sup>7</sup> km<sup>2</sup> &nbsp; (0.21 x earth)<br/>Mass=3.19 x 10<sup>23</sup> kg &nbsp; (0.05 x earth)<br/>Density=5.14 g/cm<sup>3</sup> &nbsp; (0.93 x earth)<br/>Composition=39.8% oxygen, 34.4% iron, 15.7% silicon, 5.0% aluminum, 5.0% other metals, trace other elements<br/>Gravity=3.51 m/s<sup>2</sup> &nbsp; (0.36 x earth)<br/>Escape Velocity=4.15 km/s<br/>Period=36.09 hours<br/>Axis Tilt=24.51 &deg;<br/>Water=60 %<br/>Ice=9 %<br/>Type=Thin toxic<br/>Pressure=11.67 kPa &nbsp; (0.12 x earth)<br/>Composition=44.8% carbon dioxide, 32.7% nitrogen, 17.5% sulfur dioxide, 3.2% methane, 1.7% argon, trace other gases<br/>Type=Standard<br/>Min Temp=126 K &nbsp; (-146 &deg;C)<br/>Avg Temp=292 K &nbsp; (19 &deg;C)<br/>Max Temp=371 K &nbsp; (97 &deg;C)<br/>Chemistry=Nitrogen-phosphorous<br/>Lifeforms=Microbes, algae, sentient animals<br/>Type=Alien Homeworld<br/>Population=16.24 million<br/>Society=Military Dictatorship<br/>Tech Level=Iron Age (water power, iron tools and weapons)<br/>Features=Ruins of an ancient civilization</font>";
+	text2.style.bottom = 0 + 'px';
+	text2.style.left = 0 + 'px';
+	document.body.appendChild(text2);
 
   function init()
   {
@@ -56,14 +66,28 @@ $(function()
 	
 	container = document.getElementById("webGL-container");
 
-  	spotLight=new THREE.SpotLight(0xffffff,4,40);
+  	spotLight=new THREE.SpotLight(0xffffff);
   	spotLight.castShadow=true;
+	spotLight.angle = 1	;
+	spotLight.intensity = 2;	
+	spotLight.distance = 50;
+	spotLight.penumbra = 0;
+	
+	//spotLight.rotation.set(0, 0, 0);
 
-	spotLight.position.set(40, 55, 10);
-
-  	//scene.add(spotLight);
-   
+	spotLight.position.set(0, 0, 20);
+	
   	caricaNavicella(40,50,15); 
+	camera.add(spotLight);
+	//navicella.add(spotLight);
+	
+	spotLight.target = navicella;
+	
+	//navicella.add(spotLight);
+	
+	//scene.add(spotLight);
+	var s = new THREE.SpotLightHelper(spotLight);
+	scene.add(s);
 
 
   	var fireWidth  = 1.25;
@@ -315,7 +339,7 @@ function addLight( h, s, l, x, y, z ) {
 		{
 			controls.movementSpeed = 0.33 * d;
 			controls.update( delta );
-			seguiNavicella();
+			//seguiNavicella();
 			//console.log(camera.rotation);
 			
 			//if (controls.isPressed())
@@ -430,7 +454,7 @@ function addLight( h, s, l, x, y, z ) {
    
    function seguiNavicella()
    {
-	   spotLight.position.set( navicella.position.x, navicella.position.y + 3, navicella.position.z);
+	   spotLight.position.set( navicella.position.x, navicella.position.y, navicella.position.z);
    }
 
    init();

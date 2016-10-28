@@ -50,7 +50,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		var model=new Model(this.x,this.y,this.z);
 		var modelM = new THREE.MeshPhongMaterial({
           transparent: true,
-          opacity: 0.1});
+          opacity: 0.3});
 		this.clouds =  model.loadModelTexture("textures/clouds/clouds_2.jpg",this.scala + 2.5,modelM);
 		
 		return this.clouds;
