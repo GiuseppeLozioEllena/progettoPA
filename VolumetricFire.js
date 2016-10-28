@@ -284,14 +284,9 @@
 
     this._viewVector = new THREE.Vector3();
 
-
-    // TODO
-    // still did not figure out, how many vertexes should be...
-    // three.jsでは可変にできない、ひとまず多めに用意
-
-    var index    = new Uint16Array ( ( width + height + depth ) * 30 );
-    var position = new Float32Array( ( width + height + depth ) * 30 * 3 );
-    var tex      = new Float32Array( ( width + height + depth ) * 30 * 3 );
+    var index    = new Uint16Array (parseInt((width + height + depth) * 30));
+    var position = new Float32Array(parseInt((width + height + depth) * 30 * 3));
+    var tex      = new Float32Array(parseInt((width + height + depth ) * 30 * 3));
 
     var geometry = new THREE.BufferGeometry();
     geometry.dynamic = true;
@@ -332,12 +327,6 @@
   }
 
   VolumetricFire.prototype.updateViewVector = function () {
-
-    // TODO
-    // MVMatrixが前回と同じなら、アップデートしないようにする
-    //
-    // つまり、カメラの位置とオブジェクトの位置に変化なければ
-    // アップデートしないようにする
 
     var modelViewMatrix = new THREE.Matrix4();
 
