@@ -9,8 +9,7 @@ $(function()
   
 
   var flipdirection;
-  
-  var clock = new THREE.Clock();
+
   
   var asteroid_center;
 
@@ -24,11 +23,21 @@ $(function()
   var MAX_MOONS_NUMBER = 3;
   var PLANETS_NUMBER = 15;
   var RANGE = 1000;
-  
+
+
+  var clock;
+  var fire; 
+
+
+
   var index_planets_update;
 
   function init()
   {
+
+  	clock = new THREE.Clock();
+
+
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
@@ -54,6 +63,30 @@ $(function()
   	scene.add(spotLight);
    
   	caricaNavicella(40,50,15); 
+
+
+  	var fireWidth  = 2;
+	var fireHeight = 4;
+	var fireDepth  = 2;
+	var sliceSpacing = 0.5;
+
+	fire = new VolumetricFire(
+ 	 fireWidth,
+  	fireHeight,
+  	fireDepth,
+  	sliceSpacing,
+  	camera
+	);
+	scene.add( fire.mesh );
+	// you can set position, rotation and scale
+	// fire.mesh accepts THREE.mesh features
+
+	fire.mesh.rotation.x=90;
+	fire.mesh.position.z=navicella.position.z-5;
+	navicella.add(fire.mesh);
+
+
+
 	
   	raycaster = new THREE.Raycaster();
 
@@ -87,6 +120,10 @@ $(function()
 	textureFlare1 = textureLoader.load( "textures/lensflare/lensflare0.png" );
 	textureFlare2 = textureLoader.load( "textures/lensflare/lensflare2.png" );
 	textureFlare3 = textureLoader.load( "textures/lensflare/lensflare3.png" );
+
+	textureFlare1.minFilter = THREE.LinearFilter;
+	textureFlare2.minFilter = THREE.LinearFilter;
+	textureFlare3.minFilter = THREE.LinearFilter;
 
 	for (var i = 0; i < LENS_FLARES_NUMBER; i++)
 		addLight(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), random(-RANGE, RANGE), random(-RANGE, RANGE), random(-RANGE, RANGE));
@@ -131,13 +168,13 @@ function addLight( h, s, l, x, y, z ) {
 	var flareColor = new THREE.Color( 0xffffff );
 	flareColor.setHSL( h, s, l + 0.5 );
 
-	var lensFlare = new THREE.LensFlare( textureFlare1, 700, 0.0, THREE.AdditiveBlending, flareColor );
+	var lensFlare = new THREE.LensFlare( textureFlare1, 500, 0.0, THREE.AdditiveBlending, flareColor );
 
 	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
 
-	lensFlare.add( textureFlare3, 60, 0.6, THREE.AdditiveBlending );
+	lensFlare.add( textureFlare3, 50, 0.6, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare3, 70, 0.7, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
@@ -218,23 +255,9 @@ function addLight( h, s, l, x, y, z ) {
 	controls.autoForward = false;
 	controls.dragToLook = false;
 
-					var material = new THREE.SpriteMaterial( {
-					map: new THREE.CanvasTexture( generateSprite() ),
-					blending: THREE.AdditiveBlending
-				} );
-
-				for ( var i = 0; i < 1000; i++ ) {
-
-					particle = new THREE.Sprite( material );
-
-					initParticle( particle, i * 10 );
-
-					scene.add( particle );
-				}
-	
+		
 	//var axis = new THREE.AxisHelper(5);
 	//navicella.add(axis);
-		
     scene.add(navicella);
 
   }
@@ -260,31 +283,7 @@ function addLight( h, s, l, x, y, z ) {
 
 			}
 
-			function initParticle( particle, delay ) {
-
-				var particle = this instanceof THREE.Sprite ? this : particle;
-				var delay = delay !== undefined ? delay : 0;
-
-				particle.position.set( 0, 0, 0 );
-				particle.scale.x = particle.scale.y = Math.random() * 32 + 16;
-
-				new TWEEN.Tween( particle )
-					.delay( delay )
-					.to( {}, 10000 )
-					.onComplete( initParticle )
-					.start();
-
-				new TWEEN.Tween( particle.position )
-					.delay( delay )
-					.to( { x: Math.random() * 100, y: Math.random() * 50 - 25, z: Math.random() * 100 }, 10000 )
-					.start();
-
-				new TWEEN.Tween( particle.scale )
-					.delay( delay )
-					.to( { x: 0.01, y: 0.01 }, 10000 )
-					.start();
-
-			}  
+			
 
 	guiControls=new function()
 	{
@@ -338,8 +337,12 @@ function addLight( h, s, l, x, y, z ) {
 		}
 
 		index_planets_update = (index_planets_update + 1) % PLANETS_NUMBER;
+		
 
-		TWEEN.update();
+		var elapsed = clock.getElapsedTime();
+		fire.update( elapsed );
+
+		//fire.mesh.position.set(navicella.position.x,navicella.position.y,navicella.position.z+3);
 		
 		/*
 		if(asteroid_center.position.z>=20.01)
