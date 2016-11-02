@@ -278,7 +278,6 @@ function addLight( h, s, l, x, y, z ) {
 	controls.rollSpeed = Math.PI / 24;
 	controls.autoForward = false;
 	controls.dragToLook = false;
-
 		
 	//var axis = new THREE.AxisHelper(5);
 	//navicella.add(axis);
@@ -287,27 +286,25 @@ function addLight( h, s, l, x, y, z ) {
   }
   
 
-			function generateSprite() {
+	function generateSprite() {
 
-				var canvas = document.createElement( 'canvas' );
-				canvas.width = 16;
-				canvas.height = 16;
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = 16;
+		canvas.height = 16;
 
-				var context = canvas.getContext( '2d' );
-				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
-				gradient.addColorStop( 0, 'rgba(255,255,255,1)' );
-				gradient.addColorStop( 0.2, 'rgba(0,255,255,1)' );
-				gradient.addColorStop( 0.4, 'rgba(0,0,64,1)' );
-				gradient.addColorStop( 1, 'rgba(0,0,0,1)' );
+		var context = canvas.getContext( '2d' );
+		var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+		gradient.addColorStop( 0, 'rgba(255,255,255,1)' );
+		gradient.addColorStop( 0.2, 'rgba(0,255,255,1)' );
+		gradient.addColorStop( 0.4, 'rgba(0,0,64,1)' );
+		gradient.addColorStop( 1, 'rgba(0,0,0,1)' );
 
-				context.fillStyle = gradient;
-				context.fillRect( 0, 0, canvas.width, canvas.height );
+		context.fillStyle = gradient;
+		context.fillRect( 0, 0, canvas.width, canvas.height );
 
-				return canvas;
+		return canvas;
 
-			}
-
-			
+	}
 
 	guiControls=new function()
 	{
@@ -377,7 +374,7 @@ function addLight( h, s, l, x, y, z ) {
 			var pos = planets_reference[index_planets_update].position();
 			console.log("elimina pianeta");
 			//scene.remove(planets_reference[index_planets_update]);
-			scene.remove(planets_reference[index_planets_update].getPlanet());
+			scene.remove(planets_reference[index_planets_update].getPlanet()); 
 			scene.remove(planets_reference[index_planets_update].getMoons());
 			scene.remove(planets_reference[index_planets_update].getClouds());
 			planets_reference[index_planets_update] = aggiungi(pos);
@@ -385,6 +382,7 @@ function addLight( h, s, l, x, y, z ) {
 
 		index_planets_update = (index_planets_update + 1) % PLANETS_NUMBER;
 		
+		applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
@@ -406,6 +404,54 @@ function addLight( h, s, l, x, y, z ) {
 		//console.log(asteroid_center.position.z);
 			
 		*/
+   }
+   
+   function applyForces()
+   {
+	   var imin = -1, min = 99999999;
+	   for (var i = 0; i < planets_reference.length; i++)
+	   {
+		   var distanza = (planets_reference[i].position().x - navicella.position.x) * (planets_reference[i].position().x - navicella.position.x) +
+							(planets_reference[i].position().y - navicella.position.y) * (planets_reference[i].position().y - navicella.position.y) +
+							(planets_reference[i].position().z - navicella.position.z) * (planets_reference[i].position().z - navicella.position.z);
+			
+			if (distanza < min)
+			{
+				min = distanza;
+				imin = i;
+			}
+	   }	
+	   
+	   //	console.log(distanza + " -> " + Math.pow(RANGE, 2));
+		if (min < Math.pow(RANGE, 2))
+		{
+			// Fisica fa effetto
+			var direzione = new THREE.Vector3(planets_reference[imin].position().x - navicella.position.x,
+												planets_reference[imin].position().y - navicella.position.y,
+												planets_reference[imin].position().z - navicella.position.z);
+		
+			//console.log("Direzione: " + direzione.x + ", " + direzione.y + ", " + direzione.z);
+			var forza =  (1000000 - distanza) * 0.00000001;
+			console.log("Distanza: " + forza);
+			if (forza > 0)
+			{
+				//console.log("Forza: " + forza);
+				var np = new THREE.Vector3(navicella.position.x + direzione.x * forza,
+											navicella.position.y + direzione.y * forza,
+											navicella.position.z + direzione.z * forza);
+				//console.log(np.x + ", " + np.y + ", " + np.z);				
+				
+				//console.log("Vecchia posizione: " + printVector3(navicella.position));
+				navicella.position.set(np.x, np.y, np.z);
+				//console.log("Nuova posizione: " + printVector3(navicella.position));
+			}
+		}
+
+   }
+   
+   function printVector3(v)
+   {
+	   return "(" + v.x + ";" + v.y + ";" + v.z + ")";
    }
    
    function aggiungi(p)

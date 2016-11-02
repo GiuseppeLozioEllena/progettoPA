@@ -1,7 +1,6 @@
 
 function Model(x_pianeta,y_pianeta,z_pianeta) 
 {
-
        this.x = x_pianeta;
        this.y = y_pianeta;
        this.z = z_pianeta;
@@ -15,7 +14,6 @@ function Model(x_pianeta,y_pianeta,z_pianeta)
 
 function LoadmodelScale(texture_path,model_path,scale)
 {
-
        var manager = new THREE.LoadingManager();
        var  texture = new THREE.Texture();
         //console.log(texture_path);
@@ -33,11 +31,11 @@ function LoadmodelScale(texture_path,model_path,scale)
 
         loader.load(model_path, function ( object )
         {
-          object.traverse( function ( child ) 
+		  object.traverse( function ( child ) 
           {
             if ( child instanceof THREE.Mesh ) 
             {
-              child.material.map = texture;
+			  child.material.map = texture;
               child.scale.set(scale,scale,scale);
             }
           });
@@ -51,8 +49,6 @@ function LoadmodelScale(texture_path,model_path,scale)
 
 function loadModelTexture(texture_path,scale,material)
 {
-
-      
        var container = new THREE.Object3D();
        var loader = new THREE.TextureLoader();
        container.position.set(this.x,this.y,this.z);
