@@ -32,7 +32,9 @@ $(function()
   var index_planets_update;
   
   var lastRotationY = 0;
+  var lastSettedY = 0;
   
+  /*
     var text2 = document.createElement('div');
 	text2.style.position = 'absolute';
 	//text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
@@ -42,6 +44,7 @@ $(function()
 	text2.style.bottom = 0 + 'px';
 	text2.style.left = 0 + 'px';
 	document.body.appendChild(text2);
+	*/
 
   function init()
   {
@@ -282,7 +285,6 @@ function addLight( h, s, l, x, y, z ) {
 	//var axis = new THREE.AxisHelper(5);
 	//navicella.add(axis);
     scene.add(navicella);
-
   }
   
 
@@ -340,7 +342,19 @@ function addLight( h, s, l, x, y, z ) {
 			//console.log(camera.rotation);
 			
 			//if (controls.isPressed())
-				//camera.rotation.x = -(controls.getRotation().y - lastRotationY);
+				//camera.rotation.z = -(controls.getRotation().y - lastRotationY);
+			if (controls.isPressed())
+			{
+				camera.rotation.z = -(controls.getRotation().y + lastRotationY);
+				lastSettedY = controls.getRotation().y + lastRotationY;
+				//console.log("1Camera rotation z: " + camera.rotation.z + ", lastSetted: " + lastSettedY);
+			}
+			else	
+			{
+				lastRotationY = lastSettedY - controls.getRotation().y;
+				//console.log("1lastRotationY: " + lastRotationY);
+			}
+			//console.log("z: " + controls.getRotation().x + ", " + controls.getRotation().y + ", " + controls.getRotation().z);
 			//else
 			//{				
 				//camera.rotation.z = -controls.getRotation().y;
@@ -382,7 +396,7 @@ function addLight( h, s, l, x, y, z ) {
 
 		index_planets_update = (index_planets_update + 1) % PLANETS_NUMBER;
 		
-		applyForces();
+		//applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);

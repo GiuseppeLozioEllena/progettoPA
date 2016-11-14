@@ -27,7 +27,6 @@ function LoadmodelScale(texture_path,model_path,scale)
         var loader = new THREE.OBJLoader(manager );
         var container = new THREE.Object3D();
         container.position.set(this.x,this.y,this.z);
-   
 
         loader.load(model_path, function ( object )
         {

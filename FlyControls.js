@@ -1,5 +1,8 @@
 THREE.FlyControls = function ( object, domElement ) {
 
+	MAX_Y = 26;
+	MIN_Y = -26;
+
 	this.object = object;
 	
 	this.presssed = false;
@@ -64,11 +67,11 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 38: /*up*/ this.moveState.pitchUp = 1; break;
 			case 40: /*down*/ this.moveState.pitchDown = 1; break;
 
-			case 37: /*left*/ this.moveState.yawLeft = 1; this.pressed = true; break;
-			case 39: /*right*/ this.moveState.yawRight = 1; this.pressed = true; break;
+			case 37: /*left*/ this.moveState.yawLeft = 1; this.moveState.rollLeft = 1; this.pressed = true; break;
+			case 39: /*right*/ this.moveState.yawRight = 1; this.moveState.rollRight = 1; this.pressed = true; break;
 
-			case 81: /*Q*/ this.moveState.rollLeft = 1; break;
-			case 69: /*E*/ this.moveState.rollRight = 1; break;
+			//case 81: /*Q*/ this.moveState.rollLeft = 1; break;
+			//case 69: /*E*/ this.moveState.rollRight = 1; break;
 
 		}
 
@@ -95,11 +98,11 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 38: /*up*/ this.moveState.pitchUp = 0; break;
 			case 40: /*down*/ this.moveState.pitchDown = 0; break;
 
-			case 37: /*left*/ this.moveState.yawLeft = 0; this.pressed = false; this.lastAngle = this.object.rotation.y; break;
-			case 39: /*right*/ this.moveState.yawRight = 0; this.pressed = false; break;
+			case 37: /*left*/ this.moveState.yawLeft = 0; this.pressed = false; this.moveState.rollLeft = 0; this.lastAngle = this.object.rotation.y; break;
+			case 39: /*right*/ this.moveState.yawRight = 0; this.moveState.rollRight = 0; this.pressed = false; break;
 
-			case 81: /*Q*/ this.moveState.rollLeft = 0; break;
-			case 69: /*E*/ this.moveState.rollRight = 0; break;
+			//case 81: /*Q*/ this.moveState.rollLeft = 0; break;
+			//case 69: /*E*/ this.moveState.rollRight = 0; break;
 
 		}
 
@@ -189,19 +192,39 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		var moveMult = delta * this.movementSpeed;
 		var rotMult = delta * this.rollSpeed;
-
+		
 		this.object.translateX( this.moveVector.x * moveMult );
 		this.object.translateY( this.moveVector.y * moveMult );
 		this.object.translateZ( this.moveVector.z * moveMult );	
+			
+		var angoloInGradi = this.object.rotation.y * 180 / Math.PI;
 		
-		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
-		this.object.quaternion.multiply( this.tmpQuaternion );
-		
-		//if (!this.pressed)
-		//	this.object.rotation.y *= 0.9;
-		
-		// expose the rotation vector for convenience
-		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+		var canModifyY = 0;
+		if (angoloInGradi >= MIN_Y && angoloInGradi <= MAX_Y || 
+			(angoloInGradi >= MAX_Y && this.moveState.yawRight != 0) ||
+			(angoloInGradi <= MIN_Y && this.moveState.yawLeft != 0))
+			canModifyY = 1;
+			
+		if (canModifyY == 1)
+		{
+			//console.log("ruoto di: " + this.rotationVector.x * rotMult + ", " + this.rotationVector.y * rotMult + ", " + this.rotationVector.z * rotMult);
+			this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
+			//console.log("ruoto di1: " + this.tmpQuaternion.x + ", " + this.tmpQuaternion.y + ", " + this.tmpQuaternion.z);
+			this.object.quaternion.multiply( this.tmpQuaternion );
+			/*
+			this.object.quaternion.set( this.object.rotation.x + this.rotationVector.x * rotMult, 
+											 this.object.rotation.y + this.rotationVector.y * rotMult, 
+											 this.object.rotation.z + this.rotationVector.z * rotMult, 1 );
+			*/
+			//console.log("ruoto di2: " + this.object.quaternion.x + ", " + this.object.quaternion.y + ", " + this.object.quaternion.z);
+			this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+		}
+		else
+		{
+			this.tmpQuaternion.set( this.rotationVector.x * rotMult, 0, 0, 1 ).normalize();
+			this.object.quaternion.multiply( this.tmpQuaternion );
+			this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+		}
 	};
 	
 	this.isPressed = function()
