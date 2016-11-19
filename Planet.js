@@ -12,6 +12,8 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	this.getPlanet = getPlanet;
 	this.getMoons = getMoons;
 	this.getClouds = getClouds;	
+	this.getMass = getMass;
+	this.isVisible = isVisible;
 	
 	var SCALA_MINIMA = 40;
 	var SCALA_VARIAZIONE_MASSIMA = 20;
@@ -34,6 +36,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		this.texture = "textures/planets_downloaded/texture" + Math.round(Math.random() *100+1) + ".jpg";
 		//this.texture = "textures/planet/earth_texture_2.jpg";
 		this.scala = Math.random() * SCALA_VARIAZIONE_MASSIMA + SCALA_MINIMA;
+		this.mass = this.scala;
 		var model=new Model(this.x,this.y,this.z);
 		var modelM = new THREE.MeshPhongMaterial({
           color: 0xaaaaaa,
@@ -103,5 +106,15 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	function getClouds()
 	{
 		return this.clouds;
+	}
+	
+	function getMass()
+	{
+		return this.mass;
+	}
+	
+	function isVisible()
+	{
+		return true;
 	}
 }
