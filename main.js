@@ -20,10 +20,12 @@ $(function()
   
   // Parametri
   var LENS_FLARES_NUMBER = 8;
-  var MAX_MOONS_NUMBER = 3;
   var PLANETS_NUMBER = 15;
   var RANGE = 1000;
-
+  var PLANETS_TOTAL_NUMBER = 1000;
+  var DISTANZA_MINIMA_TRA_PIANETI = 30000;
+  var SOGLIA_VISUALE_NAVICELLA = 1000000;
+  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
 
   var clock;
   var fire;
@@ -36,6 +38,9 @@ $(function()
   
   var G = 6.67408 * 0.01; // Costante di gravitazione universale (cambiata la scala rispetto all'origianale, sorry Newton)
   var MASSA_NAVICELLA = 1;
+  
+  var universeInfo;
+  var planetsInfo;
   
   /*
     var text2 = document.createElement('div');
@@ -118,28 +123,46 @@ $(function()
 	//fire.mesh.position.x += 0.73;
 	fire.mesh.position.z = navicella.position.z - 10.5;
 	navicella.add(fire.mesh);
-
-	planets_reference = [];
-	for (var i = 0; i < PLANETS_NUMBER; i++)
-	{
-		var x,y,z;
-		
+	
+	populate_universe(PLANETS_TOTAL_NUMBER);
+	
+  	//generateAsteroid(60,50,10);
+  	
+  	generateLensFlares();
+	
+  function populate_universe(n)
+  {
+	 planets_reference = [];
+	 planetsInfo = [];
+	 for (var i = 0; i < n; i++)
+	 {
+	   var x,y,z;
+	   
 		do{
-			x = (Math.random() * (RANGE * 2) - RANGE) + navicella.position.x;
-			y = (Math.random() * (RANGE * 2) - RANGE) + navicella.position.y;
-			z = (Math.random() * (RANGE * 2) - RANGE) + navicella.position.z;
-		}while(!lontanoDaPianeti(x,y,z));
+		  x = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.x;
+		  y = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.y;
+		  z = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.z;
+		}while(!lontanoDaPianeti(planetsInfo, x,y,z));
+		var pos = new THREE.Vector3();
+		pos.set(x,y,z);
 		
-		var p = new Planet(x, y, z);
+		var p_info = new PlanetInfo(pos);
+		p_info.setScale(p_info.generateScale());
+		p_info.setTextureNumber(p_info.generateTextureNumber());
+		p_info.setMoonNumber(p_info.generateMoonNumber());
+		p_info.setMoonVelocities(p_info.generateMoonVelocities());
+		p_info.setMoonPositions(p_info.generateMoonPositions());
+		p_info.setMoonScales(p_info.generateMoonScales());
+		planetsInfo.push(p_info);
+		/*
 		scene.add(p.create());
 		scene.add(p.createClouds());
 		scene.add(p.generateMoon(Math.round(Math.random() * MAX_MOONS_NUMBER)));
 		planets_reference.push(p);
-	}
-  	//generateAsteroid(60,50,10);
-  	
-  	generateLensFlares();
-
+		*/
+	 }
+  }
+	
   
   function generateLensFlares()
   {
@@ -332,11 +355,14 @@ function addLight( h, s, l, x, y, z ) {
 
    function animate()
    {
-   		var delta = clock.getDelta();
+		var delta = clock.getDelta();
 		requestAnimationFrame(animate);
 		stats.update();
    		renderer.render(scene,camera);
 		d = 100;
+		
+		showPlanets(navicella.position);
+		
 		if (controls != null)
 		{
 			controls.movementSpeed = 0.33 * d;
@@ -379,25 +405,30 @@ function addLight( h, s, l, x, y, z ) {
 			*/
 		}
 	
-		for (var i = 0; i < PLANETS_NUMBER; i++)		
+		for (var i = 0; i < planets_reference.length; i++)		
 			planets_reference[i].update();
 		
 		skybox.position.x = navicella.position.x;
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
-		if (distanza(planets_reference[index_planets_update].position(), navicella.position) > RANGE * RANGE * 3)
+		/*
+		if (index_planets_update < planets_reference.length)
 		{
-			var pos = planets_reference[index_planets_update].position();
-			console.log("elimina pianeta");
-			//scene.remove(planets_reference[index_planets_update]);
-			scene.remove(planets_reference[index_planets_update].getPlanet()); 
-			scene.remove(planets_reference[index_planets_update].getMoons());
-			scene.remove(planets_reference[index_planets_update].getClouds());
-			planets_reference[index_planets_update] = aggiungi(pos);
+			if (distanza(planets_reference[index_planets_update].position(), navicella.position) > RANGE * RANGE * 3)
+			{
+				var pos = planets_reference[index_planets_update].position();
+				console.log("elimina pianeta");
+				//scene.remove(planets_reference[index_planets_update]);
+				scene.remove(planets_reference[index_planets_update].getPlanet()); 
+				scene.remove(planets_reference[index_planets_update].getMoons());
+				scene.remove(planets_reference[index_planets_update].getClouds());
+				planets_reference[index_planets_update] = aggiungi(pos);
+			}
 		}
 
-		index_planets_update = (index_planets_update + 1) % PLANETS_NUMBER;
+		index_planets_update = (index_planets_update + 1) % planets_reference.length;
+		*/
 		
 		applyForces();
 
@@ -424,8 +455,56 @@ function addLight( h, s, l, x, y, z ) {
    }
    
    /*
+    * showPlanets
+	* Data in input la posizione della navicella mostra i pianeti che hanno una distanza entro SOGLIA_VISUALE_NAVICELLA
+	* e nasconde quelli oltre questa soglia
+	*/
+   function showPlanets(nav_position)
+   {
+	   for (var i = 0; i < planets_reference.length; i++)
+		   if (distance(planets_reference[i].position(), nav_position) >= SOGLIA_VISUALE_NAVICELLA)
+		   {
+				planets_reference[i].removeFromScene(scene);
+		   }
+		   
+	   for (var i = 0; i < PLANETS_TOTAL_NUMBER; i++)
+	   {
+		   if (distance(planetsInfo[i].getPosition(), nav_position) < SOGLIA_VISUALE_NAVICELLA)
+		   {
+			   if (!planetsInfo[i].isVisible())
+			   {
+				 var p = new Planet(planetsInfo[i].getPosition().x, planetsInfo[i].getPosition().y, planetsInfo[i].getPosition().z);
+				 p.create(planetsInfo[i].getScale(), planetsInfo[i].getTextureNumber());
+				 p.createClouds();
+				 p.generateMoon(planetsInfo[i].getMoonNumber(), planetsInfo[i].getMoonVelocities(), planetsInfo[i].getMoonPositions(), planetsInfo[i].getMoonScales());
+				 p.addToScene(scene);
+				 planets_reference.push(p);
+				 
+				 planetsInfo[i].setVisibility(true);
+			   }	
+		   }
+		   else
+		   {
+			   planetsInfo[i].setVisibility(false);
+		   }
+	   }
+   }
+   
+   /*
+    * distance
+	* Dati due THREE.Vector3 calcola la distanza al quadrato tra i due
+	* (non viene eseguita la radice per essere più veloce)
+	*/
+   function distance(p1, p2)
+   {
+	   return (p1.x - p2.x) * (p1.x - p2.x) +
+				(p1.y - p2.y) * (p1.y - p2.y) +
+				(p1.z - p2.z) * (p1.z - p2.z);
+   }
+   
+   /*
     * applyForces
-	* Applica la costante di gravitazione universale di Netwon
+	* Applica la legge di gravitazione universale di Netwon
 	* Applicata solo sulla navicella (si presume che lo spostamento che la gravità della navicella influisce sui pianeti sia trascurabile)
 	* Calcola le singole forze di attrazione dei pianeti e applica la forza totale risultante
     */
@@ -434,24 +513,21 @@ function addLight( h, s, l, x, y, z ) {
 		var finalForce = new THREE.Vector3();
 		for (var i = 0; i < planets_reference.length; i++)
 	    {
-		   if (planets_reference[i].isVisible())
-		   {
-				var distanza = (planets_reference[i].position().x - navicella.position.x) * (planets_reference[i].position().x - navicella.position.x) +
-							(planets_reference[i].position().y - navicella.position.y) * (planets_reference[i].position().y - navicella.position.y) +
-							(planets_reference[i].position().z - navicella.position.z) * (planets_reference[i].position().z - navicella.position.z);
-				
-				var direzione = new THREE.Vector3(planets_reference[i].position().x - navicella.position.x,
-												planets_reference[i].position().y - navicella.position.y,
-												planets_reference[i].position().z - navicella.position.z);
-				
-				var m1 = planets_reference[i].getMass();
-				var m2 = MASSA_NAVICELLA;
-				var forza = G * (m1 * m2) / distanza;
-				
-				finalForce.x += forza * direzione.x;
-				finalForce.y += forza * direzione.y;
-				finalForce.z += forza * direzione.z;
-		   }
+			var distanza = (planets_reference[i].position().x - navicella.position.x) * (planets_reference[i].position().x - navicella.position.x) +
+						(planets_reference[i].position().y - navicella.position.y) * (planets_reference[i].position().y - navicella.position.y) +
+						(planets_reference[i].position().z - navicella.position.z) * (planets_reference[i].position().z - navicella.position.z);
+			
+			var direzione = new THREE.Vector3(planets_reference[i].position().x - navicella.position.x,
+											planets_reference[i].position().y - navicella.position.y,
+											planets_reference[i].position().z - navicella.position.z);
+			
+			var m1 = planets_reference[i].getMass();
+			var m2 = MASSA_NAVICELLA;
+			var forza = G * (m1 * m2) / distanza;
+			
+			finalForce.x += forza * direzione.x;
+			finalForce.y += forza * direzione.y;
+			finalForce.z += forza * direzione.z;
 		   
 		   var np = new THREE.Vector3(navicella.position.x + finalForce.x,
 											navicella.position.y + finalForce.y,
@@ -497,10 +573,10 @@ function addLight( h, s, l, x, y, z ) {
 		return p;
    }
    
-   function lontanoDaPianeti(x,y,z)
+   function lontanoDaPianeti(planetsInfo, x,y,z)
    {
-	   for (var i = 0; i < planets_reference.length; i++)	 
-		   if (distanza(new THREE.Vector3(x,y,z), planets_reference[i].position()) < 500)
+	   for (var i = 0; i < planetsInfo.length; i++)	 
+		   if (distanza(new THREE.Vector3(x,y,z), planetsInfo[i].getPosition()) < DISTANZA_MINIMA_TRA_PIANETI)
 			   return false;
 	   return true;
    } 

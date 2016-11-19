@@ -13,10 +13,8 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	this.getMoons = getMoons;
 	this.getClouds = getClouds;	
 	this.getMass = getMass;
-	this.isVisible = isVisible;
-	
-	var SCALA_MINIMA = 40;
-	var SCALA_VARIAZIONE_MASSIMA = 20;
+	this.addToScene = addToScene;
+	this.removeFromScene = removeFromScene;
 
 	function update()
 	{
@@ -30,12 +28,26 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 			//master_reference.children[i].rotation.z += 0.005;
 		}
 	}
-
-	function create()
+	
+	function addToScene(scene)
 	{
-		this.texture = "textures/planets_downloaded/texture" + Math.round(Math.random() *100+1) + ".jpg";
-		//this.texture = "textures/planet/earth_texture_2.jpg";
-		this.scala = Math.random() * SCALA_VARIAZIONE_MASSIMA + SCALA_MINIMA;
+		scene.add(this.planet_reference);
+		scene.add(this.clouds);
+		scene.add(this.master_reference);
+	}
+	
+	function removeFromScene(scene)
+	{
+		scene.remove(this.planet_reference);
+		scene.remove(this.clouds);
+		scene.remove(this.master_reference);
+	}
+
+	function create(scalaPianeta, numeroTexture)
+	{
+		this.scala = scalaPianeta;
+		this.texture = "textures/planets_downloaded/texture" + numeroTexture + ".jpg";
+		//this.texture = "textures/planet/earth_texture_2.jpg";		
 		this.mass = this.scala;
 		var model=new Model(this.x,this.y,this.z);
 		var modelM = new THREE.MeshPhongMaterial({
@@ -44,7 +56,6 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
           shininess: 25});
 		this.planet_reference = model.loadModelTexture(this.texture,this.scala,modelM);
 		
-	
 		return this.planet_reference;
 	}
 	
@@ -59,29 +70,29 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		return this.clouds;
 	}
 
-	function generateMoon(numero_lune_pianeta)
+	function generateMoon(numero_lune_pianeta, velocity, positions, scales)
 	{
 		this.numero_lune = numero_lune_pianeta;
 		this.master_reference = new THREE.Object3D();
 		this.master_reference.position.set(this.x,this.y,this.z);
-		this.moons_velocity = []
+		this.moons_velocity = [];
 		for (i = 0; i < this.numero_lune; i++)
 		{
-			this.createMoon(this.x,this.y,this.z);
-			this.moons_velocity[i] = Math.random() / 100;
+			this.createMoon(positions[i], scales[i]);
+			this.moons_velocity[i] = velocity[i];
 		}
 		return this.master_reference;
 	}
 
-	function createMoon()
+	function createMoon(position, scale)
 	{	
 		parent = new THREE.Object3D();
 		parent.position.set(0,0,0);
 		
-		var model=new Model(0, Math.random() * 20 + 100, 0);
+		var model=new Model(0, position, 0);
 	     var modelM = new THREE.MeshPhongMaterial({
           });
-		this.moon =  model.loadModelTexture("textures/planet/moon.jpg",2.5 * (Math.random() * 2 + 4),modelM);
+		this.moon =  model.loadModelTexture("textures/planet/moon.jpg", scale, modelM);
 		
 		parent.add(this.moon);
 		this.master_reference.add(parent);
@@ -89,7 +100,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 
 	function position()
 	{
-		var pos=new THREE.Vector3(this.x, this.y,this.z);
+		var pos = new THREE.Vector3(this.x, this.y,this.z);
 		return pos;
 	}
 
@@ -111,10 +122,5 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	function getMass()
 	{
 		return this.mass;
-	}
-	
-	function isVisible()
-	{
-		return true;
 	}
 }
