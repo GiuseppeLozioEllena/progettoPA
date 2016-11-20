@@ -1,3 +1,7 @@
+/*
+ * Planet
+ * Classe per la creazione e update dei pianeti
+ */
 Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	this.x = x_pianeta;
 	this.y = y_pianeta;
@@ -61,7 +65,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	
 	function createClouds()
 	{
-		var model=new Model(this.x,this.y,this.z);
+		var model = new Model(this.x,this.y,this.z);
 		var modelM = new THREE.MeshPhongMaterial({
           transparent: true,
           opacity: 0.3});

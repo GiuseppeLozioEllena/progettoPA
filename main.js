@@ -6,12 +6,6 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var navicella;
-  
-
-  var flipdirection;
-
-  
-  var asteroid_center;
 
   var planets_reference; // Array con i riferimenti ai pianeti
   var skybox; // Skybox, viene spostato con la navicella
@@ -26,12 +20,10 @@ $(function()
   var DISTANZA_MINIMA_TRA_PIANETI = 30000;
   var SOGLIA_VISUALE_NAVICELLA = 1000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
+  var ASTEROIDS_NUMBER = 5; // Numero di asteroidi contemporaneamente presenti in scena
 
   var clock;
   var fire;
-
-
-  var index_planets_update;
   
   var lastRotationY = 0;
   var lastSettedY = 0;
@@ -41,6 +33,7 @@ $(function()
   
   var universeInfo;
   var planetsInfo;
+  var asteroids_reference;
   
   /*
     var text2 = document.createElement('div');
@@ -63,8 +56,6 @@ $(function()
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-	
-	index_planets_update = 0;
 	
 	skybox = setSkybox();
 	scene.add(skybox);
@@ -126,43 +117,59 @@ $(function()
 	
 	populate_universe(PLANETS_TOTAL_NUMBER);
 	
-  	//generateAsteroid(60,50,10);
+	generateAsteroids(ASTEROIDS_NUMBER);
   	
   	generateLensFlares();
 	
-  function populate_universe(n)
-  {
-	 planets_reference = [];
-	 planetsInfo = [];
-	 for (var i = 0; i < n; i++)
-	 {
-	   var x,y,z;
-	   
-		do{
-		  x = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.x;
-		  y = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.y;
-		  z = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.z;
-		}while(!lontanoDaPianeti(planetsInfo, x,y,z));
-		var pos = new THREE.Vector3();
-		pos.set(x,y,z);
+	/*
+	 * populate_universe
+	 * Dato il numero totale di pianeti dell'universo genera le loro
+	 * caratteristiche (vedere classe PlanetInfo per vedere cosa viene generato)
+	 */
+	function populate_universe(n)
+	{
+		planets_reference = [];
+		planetsInfo = [];
+		for (var i = 0; i < n; i++)
+		{
+			var x,y,z;
 		
-		var p_info = new PlanetInfo(pos);
-		p_info.setScale(p_info.generateScale());
-		p_info.setTextureNumber(p_info.generateTextureNumber());
-		p_info.setMoonNumber(p_info.generateMoonNumber());
-		p_info.setMoonVelocities(p_info.generateMoonVelocities());
-		p_info.setMoonPositions(p_info.generateMoonPositions());
-		p_info.setMoonScales(p_info.generateMoonScales());
-		planetsInfo.push(p_info);
-		/*
-		scene.add(p.create());
-		scene.add(p.createClouds());
-		scene.add(p.generateMoon(Math.round(Math.random() * MAX_MOONS_NUMBER)));
-		planets_reference.push(p);
-		*/
-	 }
-  }
+			do{
+				x = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.x;
+				y = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.y;
+				z = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.z;
+			}while(!lontanoDaPianeti(planetsInfo, x,y,z));
+			
+			var pos = new THREE.Vector3();
+			pos.set(x,y,z);
+			
+			var p_info = new PlanetInfo(pos);
+			p_info.setScale(p_info.generateScale());
+			p_info.setTextureNumber(p_info.generateTextureNumber());
+			p_info.setMoonNumber(p_info.generateMoonNumber());
+			p_info.setMoonVelocities(p_info.generateMoonVelocities());
+			p_info.setMoonPositions(p_info.generateMoonPositions());
+			p_info.setMoonScales(p_info.generateMoonScales());
+			planetsInfo.push(p_info);
+		}
+	}
 	
+	/*
+	 * generateAsteroid
+	 * Genera un numero di asteroidi pari a quello che gli 
+	 * viene passato in input
+	 */
+	function generateAsteroids(n)
+	{
+		asteroids_reference = [];
+		for (var i = 0; i < n; i++)
+		{
+			var asteroid = new Asteroid();
+			asteroid.create(navicella.position, SOGLIA_VISUALE_NAVICELLA);
+			asteroid.addToScene(scene);
+			asteroids_reference.push(asteroid);
+		}
+	}
   
   function generateLensFlares()
   {
@@ -272,24 +279,6 @@ function addLight( h, s, l, x, y, z ) {
 	return starField;
 	*/
   }
-
-  function generateAsteroid(x,y,z)
-  {
-
-  flipdirection=1
-  parent = new THREE.Object3D();
-  parent.position.set(x,y,z);
-  scene.add( parent );
-  asteroid_center = parent;
-  var model=new Model(0,10,0);
-  var asteroid = model.LoadmodelScale('textures/planet/moon.jpg','model/Asteroid.obj',0.05);
-  scene.add(asteroid);
-  asteroid.rotation.z = 0;
-  asteroid_center.add(asteroid);
-
-  }
-
-
   
   function caricaNavicella(x,y,z)
   {
@@ -404,6 +393,9 @@ function addLight( h, s, l, x, y, z ) {
 				camera.rotation.z = 90;
 			*/
 		}
+
+		for (var i = 0; i < asteroids_reference.length; i++)
+			asteroids_reference[i].update(calcolateWorldTotalForceOnPosition(asteroids_reference[i].getPosition()));
 	
 		for (var i = 0; i < planets_reference.length; i++)		
 			planets_reference[i].update();
@@ -412,46 +404,19 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
-		/*
-		if (index_planets_update < planets_reference.length)
-		{
-			if (distanza(planets_reference[index_planets_update].position(), navicella.position) > RANGE * RANGE * 3)
-			{
-				var pos = planets_reference[index_planets_update].position();
-				console.log("elimina pianeta");
-				//scene.remove(planets_reference[index_planets_update]);
-				scene.remove(planets_reference[index_planets_update].getPlanet()); 
-				scene.remove(planets_reference[index_planets_update].getMoons());
-				scene.remove(planets_reference[index_planets_update].getClouds());
-				planets_reference[index_planets_update] = aggiungi(pos);
-			}
-		}
-
-		index_planets_update = (index_planets_update + 1) % planets_reference.length;
-		*/
-		
 		applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
-
-		/*
-		if(asteroid_center.position.z>=20.01)
-			flipdirection=0;
-		else
-		  if(asteroid_center.position.z<=-0.01)
-			 flipdirection=1;
-			
+   }
    
-		if(asteroid_center!=null &&  flipdirection==1)
-			asteroid_center.position.z+=0.05;
-		else
-			if(asteroid_center!=null && flipdirection==0)
-			    asteroid_center.position.z-=0.05;
-
-		//console.log(asteroid_center.position.z);
-			
-		*/
+   /*
+    * calcolateWorldTotalForceOnPosition
+	* Dato un punto dell'universo calcola le forze gravitazionali che agiscono su quel punto
+	*/
+   function calcolateWorldTotalForceOnPosition(position)
+   {
+	   return new THREE.Vector3(0,0,0);
    }
    
    /*
