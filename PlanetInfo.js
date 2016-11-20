@@ -8,6 +8,7 @@ PlanetInfo = function (position, scale, visibility) {
 	var SCALA_VARIAZIONE_MASSIMA = 20;
 	var MAX_MOONS_NUMBER = 3;
 	var TEXTURES_NUMBER = 100;
+	var DISTANZA_MINIMA_LUNE = 10;
 	
 	this.position = position;
 	this.scale = scale;
@@ -42,6 +43,8 @@ PlanetInfo = function (position, scale, visibility) {
 	
 	this.isVisible = isVisible;
 	this.setVisibility = setVisibility;
+	
+	this.moonDistantFromOtherMoons = moonDistantFromOtherMoons;
 	
 	function getPosition()
 	{
@@ -135,8 +138,22 @@ PlanetInfo = function (position, scale, visibility) {
 	{
 		moonPositions = [];
 		for (var i = 0; i < this.moonNumber; i++)
-			moonPositions.push(Math.random() * 20 + 100);
+		{
+			var pos;
+			do{
+				pos = Math.random() * 160 + 20;
+			}while(!this.moonDistantFromOtherMoons(moonPositions, pos));
+			moonPositions.push(pos);
+		}
 		return moonPositions;
+	}
+	
+	function moonDistantFromOtherMoons(moons, pos)
+	{
+		for (var i = 0; i < moons.length; i++)
+			if (Math.abs(moons[i], pos) < DISTANZA_MINIMA_LUNE)
+				return false;
+		return true;
 	}
 	
 	function generateMoonScales()

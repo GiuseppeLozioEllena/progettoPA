@@ -93,9 +93,8 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		parent = new THREE.Object3D();
 		parent.position.set(0,0,0);
 		
-		var model=new Model(0, position, 0);
-	     var modelM = new THREE.MeshPhongMaterial({
-          });
+		var model = new Model(0, position, 0);
+	    var modelM = new THREE.MeshPhongMaterial({ });
 		this.moon =  model.loadModelTexture("textures/planet/moon.jpg", scale, modelM);
 		
 		parent.add(this.moon);
