@@ -14,6 +14,7 @@ Asteroid = function ()
 	
 	this.update = update;
 	this.addToScene = addToScene;
+	this.removeFromScene = removeFromScene;
 	
 	this.generateOrigin = generateOrigin;
 	this.generateDirection = generateDirection;
@@ -61,6 +62,11 @@ Asteroid = function ()
 	function addToScene(scene)
 	{
 		scene.add(this.asteroid);
+	}
+	
+	function removeFromScene(scene)
+	{
+		scene.remove(this.asteroid);
 	}
 	
 	function generateOrigin(navPosition, minimumDistance)

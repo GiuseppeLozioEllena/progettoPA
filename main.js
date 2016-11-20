@@ -395,7 +395,18 @@ function addLight( h, s, l, x, y, z ) {
 		}
 
 		for (var i = 0; i < asteroids_reference.length; i++)
+		{
 			asteroids_reference[i].update(calcolateWorldTotalForceOnPosition(asteroids_reference[i].getPosition()));
+			if (distance(navicella.position, asteroids_reference[i].getPosition()) > SOGLIA_VISUALE_NAVICELLA)
+			{
+				// Asteroide troppo lontano, va eliminato e creato uno nuovo
+				asteroids_reference[i].removeFromScene(scene);
+				var asteroid = new Asteroid();
+				asteroid.create(navicella.position, SOGLIA_VISUALE_NAVICELLA);
+				asteroid.addToScene(scene);
+				asteroids_reference[i] = asteroid;
+			}
+		}
 	
 		for (var i = 0; i < planets_reference.length; i++)		
 			planets_reference[i].update();
@@ -416,7 +427,7 @@ function addLight( h, s, l, x, y, z ) {
 	*/
    function calcolateWorldTotalForceOnPosition(position)
    {
-	   return new THREE.Vector3(0,0,0);
+	   return new THREE.Vector3(0,0,0); // Per ora non applico le forze dei pianeti
    }
    
    /*
