@@ -71,7 +71,7 @@ Asteroid = function ()
 	
 	function generateOrigin(navPosition, minimumDistance)
 	{
-		var randomDirection = new THREE.Vector3(Math.random() * 10, Math.random() * 10, Math.random() * 10);
+		var randomDirection = new THREE.Vector3(Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10);
 		var randomPoint = new THREE.Vector3(0,0,0);
 		
 		randomPoint = new THREE.Vector3(navPosition.x + randomDirection.x,
@@ -89,7 +89,7 @@ Asteroid = function ()
 	
 	function generateDirection(navPosition)
 	{
-		var randomDirection = new THREE.Vector3(Math.random() * 50 + 30, Math.random() * 50 + 30, Math.random() * 50 + 30);
+		var randomDirection = new THREE.Vector3(Math.random() * 50 - 25, Math.random() * 50 - 25, Math.random() * 50 - 25);
 		var internalPoint = new THREE.Vector3(navPosition.x + randomDirection.x,
 									navPosition.y + randomDirection.y,
 									navPosition.z + randomDirection.z);
