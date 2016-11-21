@@ -17,7 +17,7 @@ $(function()
   var PLANETS_NUMBER = 15;
   var RANGE = 1000;
   var PLANETS_TOTAL_NUMBER = 1000;
-  var DISTANZA_MINIMA_TRA_PIANETI = 30000;
+  var DISTANZA_MINIMA_TRA_PIANETI = 60000;
   var SOGLIA_VISUALE_NAVICELLA = 1000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
   var ASTEROIDS_NUMBER = 5; // Numero di asteroidi contemporaneamente presenti in scena

@@ -5,10 +5,10 @@
 PlanetInfo = function (position, scale, visibility) {
 	
 	var SCALA_MINIMA = 40;
-	var SCALA_VARIAZIONE_MASSIMA = 20;
+	var SCALA_VARIAZIONE_MASSIMA = 15;
 	var MAX_MOONS_NUMBER = 3;
 	var TEXTURES_NUMBER = 100;
-	var DISTANZA_MINIMA_LUNE = 10;
+	var DISTANZA_MINIMA_LUNE = 25;
 	
 	this.position = position;
 	this.scale = scale;
@@ -141,7 +141,7 @@ PlanetInfo = function (position, scale, visibility) {
 		{
 			var pos;
 			do{
-				pos = Math.random() * 160 + 20;
+				pos = Math.random() * 130 + 70;
 			}while(!this.moonDistantFromOtherMoons(moonPositions, pos));
 			moonPositions.push(pos);
 		}
