@@ -55,7 +55,7 @@ Asteroid = function ()
 		this.direction = d;
 		this.force = f;
 		var model = new Model(this.origin.x, this.origin.y, this.origin.z);
-		this.asteroid = model.LoadmodelScale('textures/planet/moon.jpg','model/Asteroid.obj', Math.random());
+		this.asteroid = model.LoadmodelScale('textures/planet/asteroid.png','model/Asteroid.obj', Math.random());
 		return this.asteroid;
 	}
 	
