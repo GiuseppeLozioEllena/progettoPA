@@ -48,20 +48,18 @@ function LoadmodelScale(texture_path,model_path,scale)
 
 function loadModelTexture(texture_path,scale,material)
 {
-       var container = new THREE.Object3D();
-       var loader = new THREE.TextureLoader();
-       container.position.set(this.x,this.y,this.z);
+   var container = new THREE.Object3D();
+   var loader = new THREE.TextureLoader();
+   container.position.set(this.x,this.y,this.z);
 
-        loader.load( texture_path, function ( texture ) 
-        {
-          var modelG = new THREE.SphereGeometry(scale,50,50);
-          var modelM = material;
-          modelM.map=texture;
-          var mesh=new THREE.Mesh(modelG,modelM);
-          container.add(mesh);
-        } );
+	loader.load( texture_path, function ( texture ) 
+	{
+	  var modelG = new THREE.SphereGeometry(scale,50,50);
+	  var modelM = material;
+	  modelM.map=texture;
+	  var mesh=new THREE.Mesh(modelG,modelM);
+	  container.add(mesh);
+	} );
 
-
-        return container;
-
+	return container;
 }

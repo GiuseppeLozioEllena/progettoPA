@@ -35,6 +35,8 @@ $(function()
   var planetsInfo;
   var asteroids_reference;
   
+  var e; // Esplosione
+  
   /*
     var text2 = document.createElement('div');
 	text2.style.position = 'absolute';
@@ -46,12 +48,25 @@ $(function()
 	text2.style.left = 0 + 'px';
 	document.body.appendChild(text2);
 	*/
+	
+	
+	window.addEventListener( 'mousedown', onclick, false );
+	
+	function onclick()
+	{
+		/*
+		e = new Explosion();
+		e.esplodi(navicella.position.x, navicella.position.y, navicella.position.z, scene);
+		*/
+		//e = new ParticlesExplosion(navicella.position.x, navicella.position.y, navicella.position.z);
+		e = new ParticlesExplosion();
+		e.init(scene, navicella.position.x, navicella.position.y, navicella.position.z);
+	}
+	
 
   function init()
   {
-
   	clock = new THREE.Clock();
-
 
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
@@ -350,6 +365,9 @@ function addLight( h, s, l, x, y, z ) {
    		renderer.render(scene,camera);
 		d = 100;
 		
+		if (e != null)
+			e.animate();
+		
 		showPlanets(navicella.position);
 		
 		if (controls != null)
@@ -415,7 +433,7 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
-		applyForces();
+		//applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
