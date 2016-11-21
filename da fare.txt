@@ -1,0 +1,14 @@
+menu 
+nuova partita e ricomincia
+
+nome del pianeta selezionabili solo quelli dentro un raggio una volta
+informazioni sul pianeta
+
+
+tuning esplosione
+collisione pianeta e asteroide
+rifare controller camera
+tuning fisica
+aggiunta accelerazione navicella
+aggiunta suoni
+modifica atmosfera pianeti
