@@ -80,6 +80,18 @@ $(function()
 	camera.position.y=50;
 	camera.position.z=10;
 	
+	var listener = new THREE.AudioListener();
+	camera.add( listener );
+	
+	var audioLoader = new THREE.AudioLoader();
+
+	var sound1 = new THREE.PositionalAudio( listener );
+	audioLoader.load( 'sounds/358232_j_s_song.ogg', function( buffer ) {
+		sound1.setBuffer( buffer );
+		sound1.setRefDistance( 20 );
+		sound1.play();
+	});
+	
 	container = document.getElementById("webGL-container");
 
   	spotLight=new THREE.SpotLight(0xffffff);
@@ -95,6 +107,8 @@ $(function()
 	
   	caricaNavicella(40,50,15); 
 	camera.add(spotLight);
+	
+	navicella.add( sound1 );
 	//navicella.add(spotLight);
 	
 	spotLight.target = navicella;
