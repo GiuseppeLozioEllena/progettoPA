@@ -20,7 +20,7 @@ $(function()
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
   var SOGLIA_VISUALE_NAVICELLA = 1000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
-  var ASTEROIDS_NUMBER = 0; //5; // Numero di asteroidi contemporaneamente presenti in scena
+  var ASTEROIDS_NUMBER = 5; // Numero di asteroidi contemporaneamente presenti in scena
 
   var clock;
   var fire;
@@ -444,20 +444,27 @@ function addLight( h, s, l, x, y, z ) {
 	
 		//console.log(navicella.children[1].matrix);
 	
-		var direction = new THREE.Vector3( 0, 0, 1 );
-		direction.applyMatrix4(matrix);	
+		var directionZ = new THREE.Vector3(0, 0, 1);
+		directionZ.applyMatrix4(matrix);	
 		
-		console.log("Navicella: " + printVector3(navicella.position));
-		console.log("Direzione: " + printVector3(direction));
+		var directionY = new THREE.Vector3(0, 0.5, 0);
+		directionY.applyMatrix4(matrix);	
 		
-		camera.position.set(navicella.position.x + direction.x * 15,
-							navicella.position.y + direction.y * 15,
-							navicella.position.z + direction.z * 15);
+		//console.log("Navicella: " + printVector3(navicella.position));
+		//console.log("Direzione: " + printVector3(direction));
+		
+		camera.position.set(navicella.position.x + directionZ.x * 15 + directionY.x * 0,
+							navicella.position.y + directionZ.y * 15 + directionY.y * 0,
+							navicella.position.z + directionZ.z * 15 + directionY.z * 0);
 							
-		console.log("Camera: " + printVector3(camera.position));
+		//console.log("Camera: " + printVector3(camera.position));
 		
-							
-		camera.lookAt(navicella.position);
+		var lookAtPosition = new THREE.Vector3(navicella.position.x + + 0, /*directionY.x * 5, */
+												navicella.position.y + 5, /* directionY.y * 5, */
+												navicella.position.z + 0 /* directionY.z * 5 */);
+		camera.lookAt(lookAtPosition);
+			
+		//console.log(navicella.rotation);
    }
    
    /*
