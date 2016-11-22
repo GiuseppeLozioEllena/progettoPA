@@ -388,6 +388,8 @@ function addLight( h, s, l, x, y, z ) {
 		
 		showPlanets(navicella.position);
 		
+		checkCollisions();
+		
 		if (controls != null)
 		{
 			controls.movementSpeed = 0.33 * d;
@@ -451,7 +453,7 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
-		//applyForces();
+		applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
@@ -482,6 +484,35 @@ function addLight( h, s, l, x, y, z ) {
 		camera.lookAt(lookAtPosition);
 			
 		//console.log(navicella.rotation);
+   }
+   
+   /*
+    * checkCollisions
+	* Controlla se vi sono collisioni tra la navicella e pianeti o asteroidi
+	*/
+   function checkCollisions()
+   {
+	   var inCollision = false;
+	   for (var i = 0; i < planets_reference.length && !inCollision; i++)
+	   {
+			if (planets_reference[i].inCollision(navicella.position))
+			{
+				explode();
+				inCollision = true;
+			}
+	   }
+	  
+   }
+   
+   /*
+    * explode
+	* Chiamata in caso di collisione tra navicella e pianeti/asteroidi
+	* La navicella esplode e si viene riportati al menu
+	*/
+   function explode()
+   {
+	   // Da implementare
+	   console.log("BOOOOOOOOOOM");
    }
    
    /*

@@ -2,7 +2,8 @@
  * Planet
  * Classe per la creazione e update dei pianeti
  */
-Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
+Planet = function ( x_pianeta, y_pianeta, z_pianeta ) 
+{	
 	this.x = x_pianeta;
 	this.y = y_pianeta;
 	this.z = z_pianeta;
@@ -12,11 +13,12 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 	this.generateMoon = generateMoon;
 	this.createMoon = createMoon;
 	this.update = update;
-	this.position=position;
+	this.position = position;
 	this.getPlanet = getPlanet;
 	this.getMoons = getMoons;
 	this.getClouds = getClouds;	
 	this.getMass = getMass;
+	this.inCollision = inCollision;
 	this.addToScene = addToScene;
 	this.removeFromScene = removeFromScene;
 
@@ -122,8 +124,23 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta ) {
 		return this.clouds;
 	}
 	
+	function inCollision(navPosition)
+	{
+		if (distance(navPosition, new THREE.Vector3(this.x, this.y, this.z)) < this.scala * this.scala)
+			return true;
+		else
+			return false;
+	}
+	
 	function getMass()
 	{
 		return this.mass;
 	}
+	
+    function distance(p1, p2)
+    {
+	    return (p1.x - p2.x) * (p1.x - p2.x) +
+				(p1.y - p2.y) * (p1.y - p2.y) +
+				(p1.z - p2.z) * (p1.z - p2.z);
+    }
 }
