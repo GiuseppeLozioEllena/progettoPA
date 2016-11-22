@@ -31,6 +31,8 @@ $(function()
   var G = 6.67408 * 0.01; // Costante di gravitazione universale (cambiata la scala rispetto all'origianale, sorry Newton)
   var MASSA_NAVICELLA = 1;
   
+  var listener;
+  
   var universeInfo;
   var planetsInfo;
   var asteroids_reference;
@@ -80,13 +82,14 @@ $(function()
 	camera.position.y=50;
 	camera.position.z=10;
 	
-	var listener = new THREE.AudioListener();
+	listener = new THREE.AudioListener();
 	camera.add( listener );
 	
 	var audioLoader = new THREE.AudioLoader();
 
 	var sound1 = new THREE.PositionalAudio( listener );
 	audioLoader.load( 'sounds/358232_j_s_song.ogg', function( buffer ) {
+		sound1.setLoop(true);
 		sound1.setBuffer( buffer );
 		sound1.setRefDistance( 20 );
 		sound1.play();

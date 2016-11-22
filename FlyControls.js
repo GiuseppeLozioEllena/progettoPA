@@ -1,11 +1,22 @@
 THREE.FlyControls = function ( object, domElement ) {
 
+	var TURBO_MULTIPLIER = 10;
+	var TURBO_MAX_DURATION = 3;
+	var TURBO_SLEEP_TIME = 6; // Si può richiamare solo dopo x secondi che lo si è usato
+	
+	this.listener = null;
+	this.usable = true;
+	
 	MAX_Y = 26;
 	MIN_Y = -26;
+	
+	this.clock = new THREE.Clock();
+	this.turboDuration = -1;
+	this.lastTurboUsedTime = -1;
 
 	this.object = object;
 	
-	this.presssed = false;
+	this.pressed = false;
 	this.lastAngle = 0;
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -27,7 +38,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.mouseStatus = 0;
 
-	this.moveState = { up: 0, down: 0, left: 0, right: 0, forward: 0, back: 0, pitchUp: 0, pitchDown: 0, yawLeft: 0, yawRight: 0, rollLeft: 0, rollRight: 0 };
+	this.moveState = { up: 0, down: 0, left: 0, right: 0, forward: 0, back: 0, pitchUp: 0, pitchDown: 0, yawLeft: 0, yawRight: 0, rollLeft: 0, rollRight: 0, turbo: 0 };
 	this.moveVector = new THREE.Vector3( 0, 0, 0 );
 	this.rotationVector = new THREE.Vector3( 0, 0, 0 );
 
@@ -60,14 +71,40 @@ THREE.FlyControls = function ( object, domElement ) {
 			//case 68: /*D*/ this.moveState.right = 1; break;
 
 			//case 83: /*S*/ this.moveState.back = 1; break;
-			case 87: /*W*/ this.moveState.forward = 10; break;
+			case 87: /*W*/ this.moveState.forward = 1; break;
 
 			case 38: /*up*/ this.moveState.pitchUp = 2; break;
 			case 40: /*down*/ this.moveState.pitchDown = 2; break;
 
 			case 37: /*left*/ this.moveState.yawLeft = 0; this.moveState.rollLeft = 15; this.pressed = true; break;
 			case 39: /*right*/ this.moveState.yawRight = 0; this.moveState.rollRight = 15; this.pressed = true; break;
+			
+			case 81: /*Q*/  if (this.usable)
+							{
+								this.moveState.turbo = 1; 
+								this.moveState.forward = 1;
+								if (this.turboDuration == -1)
+								{
+									this.turboDuration = 0;
+									var audioLoader = new THREE.AudioLoader();
 
+									if (this.listener == null)
+									{
+										this.listener = new THREE.AudioListener();
+										this.object.add( this.listener );
+									}
+									
+									var sound1 = new THREE.PositionalAudio( this.listener );
+									audioLoader.load( 'sounds/propulsion.wav', function( buffer ) {
+										sound1.setBuffer( buffer );
+										sound1.setRefDistance( 20 );
+										sound1.play();
+									});
+									
+									this.object.add(sound1);
+								}
+							}
+						    break; 
 			//case 81: /*Q*/ this.moveState.rollLeft = 1; break;
 			//case 69: /*E*/ this.moveState.rollRight = 1; break;
 
@@ -98,6 +135,8 @@ THREE.FlyControls = function ( object, domElement ) {
 
 			case 37: /*left*/ this.moveState.yawLeft = 0; this.pressed = false; this.moveState.rollLeft = 0; this.lastAngle = this.object.rotation.y; break;
 			case 39: /*right*/ this.moveState.yawRight = 0; this.moveState.rollRight = 0; this.pressed = false; break;
+			
+			case 81: /*Q*/ this.moveState.turbo = 0; this.moveState.forward = 0; break;
 
 			//case 81: /*Q*/ this.moveState.rollLeft = 0; break;
 			//case 69: /*E*/ this.moveState.rollRight = 0; break;
@@ -191,9 +230,47 @@ THREE.FlyControls = function ( object, domElement ) {
 		var moveMult = delta * this.movementSpeed;
 		var rotMult = delta * this.rollSpeed;
 		
+		var turboZ = (this.moveState.turbo == 1) ? TURBO_MULTIPLIER : 1;
+		
+		var delta = this.clock.getDelta();
+		if (this.usable)
+		{
+			if (this.turboDuration >= 0)
+				this.turboDuration += delta;
+		}
+
+		if (this.moveState.turbo == 1 && this.usable)
+		{
+			if (this.turboDuration >= TURBO_MAX_DURATION)
+			{
+				console.log("dentro");
+				this.usable = false;
+				turboZ = 1;
+				this.lastTurboUsedTime = 0;
+			}
+			else
+				this.usable = true;
+		}
+		else
+		{
+			if (this.usable == false)
+			{
+				this.lastTurboUsedTime += delta;
+				if (this.lastTurboUsedTime >= TURBO_SLEEP_TIME)
+				{
+					this.turboDuration = -1;
+					this.lastTurboUsedTime = -1;
+					this.usable = true;
+				}
+			}
+		}
+		
+		if (!this.usable)
+			turboZ = 1;
+		
 		this.object.translateX( this.moveVector.x * moveMult );
 		this.object.translateY( this.moveVector.y * moveMult );
-		this.object.translateZ( this.moveVector.z * moveMult );	
+		this.object.translateZ( this.moveVector.z * moveMult * turboZ);	
 			
 		var angoloInGradi = this.object.rotation.y * 180 / Math.PI;
 		
