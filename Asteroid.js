@@ -4,8 +4,10 @@
  */
 Asteroid = function () 
 {	
-	var MIN_FORCE = 0.001;
-	var MAX_FORCE = 0.01;
+	var MIN_FORCE = 0.0005;
+	var MAX_FORCE = 0.005;
+	
+	var ASTEROID_SIZE = 3000; // Forse da abbassare un po'
 	
 	this.create = create;
 	this.createWithParameters = createWithParameters;
@@ -19,6 +21,8 @@ Asteroid = function ()
 	this.generateOrigin = generateOrigin;
 	this.generateDirection = generateDirection;
 	this.generateForce = generateForce;
+	
+	this.inCollision = inCollision;
 	
 	this.distance = distance;
 	
@@ -54,8 +58,9 @@ Asteroid = function ()
 		this.origin = o;
 		this.direction = d;
 		this.force = f;
+		this.scala = Math.random();
 		var model = new Model(this.origin.x, this.origin.y, this.origin.z);
-		this.asteroid = model.LoadmodelScale('textures/planet/asteroid.png','model/Asteroid.obj', Math.random());
+		this.asteroid = model.LoadmodelScale('textures/planet/asteroid.png','model/Asteroid.obj', this.scala);
 		return this.asteroid;
 	}
 	
@@ -101,6 +106,14 @@ Asteroid = function ()
 	function generateForce()
 	{
 		return Math.random() * (MAX_FORCE - MIN_FORCE) + MIN_FORCE;
+	}
+	
+	function inCollision(navPosition)
+	{
+		if (distance(navPosition, this.asteroid.position) < ASTEROID_SIZE * this.scala)
+			return true;
+		else
+			return false;
 	}
 	
 	/*

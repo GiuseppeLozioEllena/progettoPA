@@ -453,7 +453,7 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
-		applyForces();
+		//applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
@@ -490,19 +490,41 @@ function addLight( h, s, l, x, y, z ) {
     * checkCollisions
 	* Controlla se vi sono collisioni tra la navicella e pianeti o asteroidi
 	*/
-   function checkCollisions()
-   {
-	   var inCollision = false;
-	   for (var i = 0; i < planets_reference.length && !inCollision; i++)
-	   {
+	function checkCollisions()
+	{
+		var inCollision = false;
+		for (var i = 0; i < planets_reference.length && !inCollision; i++)
+		{
 			if (planets_reference[i].inCollision(navicella.position))
 			{
 				explode();
 				inCollision = true;
 			}
-	   }
+		}
+		
+		/*
+		var imin = -1, min = 9999999;
+		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
+		{
+			var d = distance(navicella.position, asteroids_reference[i].getPosition());
+			if (d < min)
+			{
+				min = d;
+				imin = i;
+			}
+		}
+		console.log("distanza minima: " + min);
+		*/
 	  
-   }
+		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
+		{
+			if (asteroids_reference[i].inCollision(navicella.position))
+			{
+				explode();
+				inCollision = true;
+			}
+		}
+	}
    
    /*
     * explode

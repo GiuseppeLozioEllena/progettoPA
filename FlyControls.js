@@ -243,7 +243,6 @@ THREE.FlyControls = function ( object, domElement ) {
 		{
 			if (this.turboDuration >= TURBO_MAX_DURATION)
 			{
-				console.log("dentro");
 				this.usable = false;
 				turboZ = 1;
 				this.lastTurboUsedTime = 0;
