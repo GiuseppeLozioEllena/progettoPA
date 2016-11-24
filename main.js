@@ -37,6 +37,8 @@ $(function()
   var planetsInfo;
   var asteroids_reference;
   
+  var planetInfoManager;
+  
   var e; // Esplosione
   
   /*
@@ -68,6 +70,9 @@ $(function()
   function init()
   {
   	clock = new THREE.Clock();
+	
+	planetInfoManager = new PlanetInfoManager();
+	planetInfoManager.loadInfoFromFile("./planets_info/info1.txt");
 
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
@@ -399,6 +404,7 @@ function addLight( h, s, l, x, y, z ) {
 			
 			//if (controls.isPressed())
 				//camera.rotation.z = -(controls.getRotation().y - lastRotationY);
+
 			if (controls.isPressed())
 			{
 				camera.rotation.z = -(controls.getRotation().y + lastRotationY);
@@ -453,7 +459,7 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
-		//applyForces();
+		applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
@@ -501,20 +507,6 @@ function addLight( h, s, l, x, y, z ) {
 				inCollision = true;
 			}
 		}
-		
-		/*
-		var imin = -1, min = 9999999;
-		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
-		{
-			var d = distance(navicella.position, asteroids_reference[i].getPosition());
-			if (d < min)
-			{
-				min = d;
-				imin = i;
-			}
-		}
-		console.log("distanza minima: " + min);
-		*/
 	  
 		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
 		{
