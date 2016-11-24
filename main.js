@@ -72,7 +72,12 @@ $(function()
   	clock = new THREE.Clock();
 	
 	planetInfoManager = new PlanetInfoManager();
+	planetInfoManager.hideAll();
+	
+	/*
 	planetInfoManager.loadInfoFromFile("./planets_info/info1.txt");
+	planetInfoManager.show();
+	*/
 
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);

@@ -11,10 +11,13 @@ PlanetInfoManager = function()
 	this.store = store;	
 	this.sezioni = [];
 	
-	/*
-	 * Informazioni sul pianeta
-	 */
+	this.show = show;
+	
 	this.name = "";
+	
+	this.showPlanetName = showPlanetName;
+	
+	this.hideAll = hideAll;
 	
 	function hideDiv(divName)
 	{
@@ -47,21 +50,59 @@ PlanetInfoManager = function()
 	function store(planet_info)
 	{
 		var righe = planet_info.split("\n"); 
-		this.name = righe[0];
+		name = righe[0];
 		var sezione = null;
-		if (this.sezioni == null)
-			this.sezioni = [];
+		sezioni = [];
 		for (var i = 1; i < righe.length; i++)
 		{
 			if (righe[i].startsWith("SECTION"))
 			{
 				if (sezione != null)
-					this.sezioni.push(sezione);
+					sezioni.push(sezione);
 				var fields = righe[i].split('=');
-				sezione = new PlanetInfoSection(fields[0]);
+				sezione = new PlanetInfoSection(fields[1]);
 			}
 			else
 				sezione.addInfo(righe[i]);
 		}
+	}
+	
+	function show()
+	{
+		showPlanetName(name);
+		showPanelInfo("bottomRight", "Climate|Civilization");
+		showPanelInfo("bottomLeft", "Atmosphere|Hydrosphere|Rotation");
+	}
+	
+	function showPlanetName(name)
+	{
+		showDiv("planetName");
+		document.getElementById("planetName").innerHTML = name;
+	}
+	
+	function showPanelInfo(panelName, sectionName)
+	{
+		showDiv(panelName);
+		var fields = sectionName.split("|");
+		var html = "";
+		for (var i = 0; i < sezioni.length; i++)
+		{
+			if (fields.indexOf(sezioni[i].sectionName) != -1)
+			{
+				html += "<div id=\"header\">" + sezioni[i].sectionName + "</div>";
+				html += "<div id=\"content\">";
+				for (var j = 0; j < sezioni[i].info.length; j++)
+					html += sezioni[i].info[j] + ": " + sezioni[i].value[j] + "<br/>";
+				html += "</div>";
+			}
+		}
+		document.getElementById(panelName).innerHTML = html;
+	}
+	
+	function hideAll()
+	{
+		hideDiv('planetName');
+		hideDiv('bottomLeft');
+		hideDiv('bottomRight');
 	}
 }
