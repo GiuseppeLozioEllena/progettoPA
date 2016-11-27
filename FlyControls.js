@@ -29,6 +29,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.dragToLook = false;
 	this.autoForward = false;
+	this.play=false;
 
 	// disable default target object behavior
 
@@ -63,6 +64,9 @@ THREE.FlyControls = function ( object, domElement ) {
 		switch ( event.keyCode ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
+			case 32: this.play=true ;
+			console.log("space bar");
+			break;
 
 			//case 87: /*W*/ this.moveState.forward = 1; break;
 			//case 83: /*S*/ this.moveState.back = 1; break;
@@ -121,6 +125,8 @@ THREE.FlyControls = function ( object, domElement ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = 1; break;
 
+			
+			  //space bar
 			//case 87: /*W*/ this.moveState.forward = 0; break;
 			//case 83: /*S*/ this.moveState.back = 0; break;
 

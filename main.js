@@ -38,6 +38,8 @@ $(function()
   var asteroids_reference;
   
   var planetInfoManager;
+
+  var PlayText;
   
   var e; // Esplosione
   
@@ -118,7 +120,8 @@ $(function()
 
 	spotLight.position.set(0, 0, 20);
 	
-  	caricaNavicella(40,50,15); 
+  	caricaNavicella(40,50,15);
+  	LoadMenu();
 	camera.add(spotLight);
 	
 	navicella.add( sound1 );
@@ -400,8 +403,10 @@ function addLight( h, s, l, x, y, z ) {
 		
 		checkCollisions();
 		
-		if (controls != null)
+		if (controls != null && controls.play)
 		{
+
+			scene.remove(PlayText);
 			controls.movementSpeed = 0.33 * d;
 			controls.update( delta );
 			//seguiNavicella();
@@ -464,7 +469,7 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
 		
-		applyForces();
+		//applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
@@ -679,6 +684,66 @@ function addLight( h, s, l, x, y, z ) {
    {
 	   spotLight.position.set( navicella.position.x, navicella.position.y, navicella.position.z);
    }
+
+   function LoadMenu()
+   {
+   		        height = 1,
+				size = 10,
+				hover = 30,
+				curveSegments = 20,
+				bevelEnabled = false,
+				font = undefined,
+				fontName = "optimer", // helvetiker, optimer, gentilis, droid sans, droid serif
+				fontWeight = "bold"; // normal bold
+
+				material = new THREE.MultiMaterial( [
+					new THREE.MeshPhongMaterial( { color: 0xff0000} ), // front
+					new THREE.MeshPhongMaterial( { color: 0xff0000 } ) // side
+				] );
+				loadFont();
+
+
+   }
+
+
+   function loadFont() {
+				var loader = new THREE.FontLoader();
+				loader.load( './fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
+					font = response;
+				createText();
+				} );
+
+        }
+
+        function createText() 
+        {
+				textGeo = new THREE.TextGeometry("Press space  to start", {
+					font: font,
+					size: size,
+					height: height,
+					curveSegments: curveSegments,
+					bevelEnabled: bevelEnabled,
+					material: 0,
+					extrudeMaterial: 1
+				});
+				textGeo.computeBoundingBox();
+				textGeo.computeVertexNormals();
+
+				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+				PlayText = new THREE.Mesh( textGeo, material );
+                
+				PlayText.position.x=navicella.position.x-50;
+				PlayText.position.y=navicella.position.y+20;
+				PlayText.position.z=navicella.position.z-80;
+
+
+				scene.add(PlayText);
+
+		
+		}
+
+
+
 
    init();
    animate(); 
