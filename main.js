@@ -491,7 +491,7 @@ function addLight( h, s, l, x, y, z ) {
 		}
 	
 		for (var i = 0; i < planets_reference.length; i++)		
-			planets_reference[i].update();
+			planets_reference[i].update(camera);
 		
 		skybox.position.x = navicella.position.x;
 		skybox.position.y = navicella.position.y;
@@ -585,9 +585,7 @@ function addLight( h, s, l, x, y, z ) {
    {
 	   for (var i = 0; i < planets_reference.length; i++)
 		   if (distance(planets_reference[i].position(), nav_position) >= SOGLIA_VISUALE_NAVICELLA)
-		   {
 				planets_reference[i].removeFromScene(scene);
-		   }
 		   
 	   for (var i = 0; i < PLANETS_TOTAL_NUMBER; i++)
 	   {

@@ -12,6 +12,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	this.createClouds = createClouds;
 	this.generateMoon = generateMoon;
 	this.createMoon = createMoon;
+	this.createGlow = createGlow;
 	this.update = update;
 	this.position = position;
 	this.getPlanet = getPlanet;
@@ -23,7 +24,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	this.removeFromScene = removeFromScene;	
 	this.getPlanetReference = getPlanetReference;
 
-	function update()
+	function update(camera)
 	{
 		this.planet_reference.rotation.z += 0.001;
 		//this.clouds.rotation.z -= .00025;
@@ -34,6 +35,9 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 			this.master_reference.children[i].rotation.y += this.moons_velocity[i];
 			//master_reference.children[i].rotation.z += 0.005;
 		}
+		
+		if (this.planetGlow != null)
+			this.planetGlow.material.uniforms.viewVector.value =  new THREE.Vector3().subVectors( camera.position, this.planetGlow.position );
 	}
 	
 	function getPlanetReference()
@@ -44,14 +48,18 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	function addToScene(scene)
 	{
 		scene.add(this.planet_reference);
-		scene.add(this.clouds);
+		if (this.clouds != null)
+			scene.add(this.clouds);
 		scene.add(this.master_reference);
+		if (this.glow != null)
+			scene.add(this.glow);
 	}
 	
 	function removeFromScene(scene)
 	{
 		scene.remove(this.planet_reference);
-		scene.remove(this.clouds);
+		if (this.clouds != null)
+			scene.remove(this.clouds);
 		scene.remove(this.master_reference);
 	}
 
@@ -66,7 +74,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
           color: 0xaaaaaa,
           specular: 0x333333,
           shininess: 25});
-		this.planet_reference = model.loadModelTexture(this.texture,this.scala,modelM);
+		this.planet_reference = model.loadModelTexture(this.texture, this.scala, modelM);
 		
 		return this.planet_reference;
 	}
@@ -77,9 +85,36 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		var modelM = new THREE.MeshPhongMaterial({
           transparent: true,
           opacity: 0.3});
+		 		  
 		this.clouds =  model.loadModelTexture("textures/clouds/clouds_2.jpg",this.scala + 2.5,modelM);
 		
 		return this.clouds;
+	}
+	
+	function createGlow(camera)
+	{
+		var customMaterial = new THREE.ShaderMaterial( 
+		{
+			uniforms: 
+			{ 
+				"c":   { type: "f", value: 1.0 },
+				"p":   { type: "f", value: 1.4 },
+				glowColor: { type: "c", value: new THREE.Color(0xffffff) },
+				viewVector: { type: "v3", value: camera.position }
+			},
+			vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+			side: THREE.FrontSide,
+			blending: THREE.AdditiveBlending,
+			transparent: true
+		}   );
+		
+		var ballGeometry = new THREE.SphereGeometry( this.scala + 7.5, 64, 64 );
+		this.clouds = new THREE.Mesh( ballGeometry, customMaterial );
+		
+		this.clouds.position.set(this.x, this.y, this.z);
+		
+		this.planetGlow = this.clouds;	
 	}
 
 	function generateMoon(numero_lune_pianeta, velocity, positions, scales)
