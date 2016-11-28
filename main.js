@@ -22,6 +22,7 @@ $(function()
   var SOGLIA_VISUALE_NAVICELLA = 1000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
   var ASTEROIDS_NUMBER = 5; // Numero di asteroidi contemporaneamente presenti in scena
+  var SHOW_INFO_BUTTON = 13; // Invio
 
   var clock;
   var fire;
@@ -76,11 +77,6 @@ $(function()
 	
 	planetInfoManager = new PlanetInfoManager();
 	planetInfoManager.hideAll();
-	
-	/*
-	planetInfoManager.loadInfoFromFile("./planets_info/info1.txt");
-	planetInfoManager.show();
-	*/
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
@@ -424,13 +420,6 @@ function addLight( h, s, l, x, y, z ) {
 		
 		checkCollisions();
 		
-		var vis = 0;
-		
-		
-		for (var i = 0; i < planets_reference.length; i++)
-			if (isVisibleFromCamera(planets_reference[i].getPlanetReference()))
-				vis++;
-		
 		if (controls != null && controls.play)
 		{
 
@@ -768,8 +757,63 @@ function addLight( h, s, l, x, y, z ) {
 		
 		}
 
+	this.keydown = function( event ) {
 
+		if ( event.altKey ) {
 
+			return;
+
+		}
+		
+		console.log("premuto: " + event.keyCode);
+		
+		if (event.keyCode == SHOW_INFO_BUTTON)
+		{
+			if (!planetInfoManager.active)
+			{
+				var visiblePlanets = getVisiblePlanets();
+				if (visiblePlanets.length != 0)
+				{
+					visiblePlanets[0].createGlow(camera, scene);
+					planetInfoManager.selectedPlanet = visiblePlanets[0];
+					planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
+					planetInfoManager.show();
+				}
+			}
+			else
+			{
+				planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
+				planetInfoManager.selectedPlanet = null;
+				planetInfoManager.hideAll();
+			}
+		}
+	};
+	
+	var _keydown = bind( this, this.keydown );
+	window.addEventListener( 'keydown', _keydown, false );
+	
+	function bind( scope, fn ) {
+
+		return function () {
+			if (fn != null)
+				fn.apply( scope, arguments );
+		};
+		
+	}
+	
+	/*
+	 * getVisiblePlanets
+	 * Ritorna un array con i pianeti visibili
+	 */
+	function getVisiblePlanets()
+	{
+		var vis = [];
+		for (var i = 0; i < planets_reference.length; i++)
+			if (isVisibleFromCamera(planets_reference[i].getPlanetReference()))
+				vis.push(planets_reference[i]);
+		return vis;
+	}
+		
 
    init();
    animate(); 

@@ -4,6 +4,8 @@
  */
 PlanetInfoManager = function()
 {
+	this.selectedPlanet = null;
+	this.active = false;
 	this.hideDiv = hideDiv;
 	this.showDiv = showDiv;
 	
@@ -16,7 +18,6 @@ PlanetInfoManager = function()
 	this.name = "";
 	
 	this.showPlanetName = showPlanetName;
-	
 	this.hideAll = hideAll;
 	
 	function hideDiv(divName)
@@ -72,6 +73,7 @@ PlanetInfoManager = function()
 		showPlanetName(name);
 		showPanelInfo("bottomRight", "Climate|Civilization");
 		showPanelInfo("bottomLeft", "Atmosphere|Hydrosphere|Rotation");
+		this.active = true;
 	}
 	
 	function showPlanetName(name)
@@ -104,5 +106,6 @@ PlanetInfoManager = function()
 		hideDiv('planetName');
 		hideDiv('bottomLeft');
 		hideDiv('bottomRight');
+		this.active = false;
 	}
 }

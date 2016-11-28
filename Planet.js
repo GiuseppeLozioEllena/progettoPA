@@ -22,6 +22,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	this.inCollision = inCollision;
 	this.addToScene = addToScene;
 	this.removeFromScene = removeFromScene;	
+	this.removeGlowFromScene = removeGlowFromScene;
 	this.getPlanetReference = getPlanetReference;
 
 	function update(camera)
@@ -67,6 +68,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	{
 		this.scala = scalaPianeta;
 		this.texture = "textures/planets_downloaded/texture" + numeroTexture + ".jpg";
+		this.textureNumber = numeroTexture;
 		//this.texture = "textures/planet/earth_texture_2.jpg";		
 		this.mass = this.scala;
 		var model=new Model(this.x,this.y,this.z);
@@ -91,7 +93,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		return this.clouds;
 	}
 	
-	function createGlow(camera)
+	function createGlow(camera, scene)
 	{
 		var customMaterial = new THREE.ShaderMaterial( 
 		{
@@ -110,11 +112,17 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		}   );
 		
 		var ballGeometry = new THREE.SphereGeometry( this.scala + 7.5, 64, 64 );
-		this.clouds = new THREE.Mesh( ballGeometry, customMaterial );
+		this.planetGlow = new THREE.Mesh( ballGeometry, customMaterial );
 		
-		this.clouds.position.set(this.x, this.y, this.z);
+		this.planetGlow.position.set(this.x, this.y, this.z);
 		
-		this.planetGlow = this.clouds;	
+		scene.add(this.planetGlow);
+	}
+	
+	function removeGlowFromScene(scene)
+	{
+		scene.remove(this.planetGlow);
+		this.planetGlow = null;
 	}
 
 	function generateMoon(numero_lune_pianeta, velocity, positions, scales)
