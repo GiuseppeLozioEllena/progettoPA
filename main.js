@@ -792,7 +792,7 @@ function addLight( h, s, l, x, y, z ) {
 		{
 			if (event.keyCode == SHOW_INFO_FORWARD)
 			{
-				var visiblePlanets = getVisiblePlanets();
+				var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
 				if (visiblePlanets.length != 0)
 				{
 					planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
@@ -808,7 +808,7 @@ function addLight( h, s, l, x, y, z ) {
 			
 			if (event.keyCode == SHOW_INFO_BACKWARD)
 			{
-				var visiblePlanets = getVisiblePlanets();
+				var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
 				if (visiblePlanets.length != 0)
 				{
 					planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
@@ -850,7 +850,35 @@ function addLight( h, s, l, x, y, z ) {
 				vis.push(planets_reference[i]);
 		return vis;
 	}
+	
+	/*
+	 * ordinaPerDistanza
+	 * Dati in input i pianeti visibili li ordina per distanza
+	 */
+	function ordinaPerDistanza(pianeti)
+	{
+		var distanze = []
+		for (var i = 0; i < pianeti.length; i++)
+			distanze.push(distanza(navicella.position, pianeti[i].position()));
 		
+		var pianetiOrdinati = [];
+		for (var i = 0; i < pianeti.length; i++)
+		{
+			var distMin = 0, iMin = -1;
+			for (var j = 0; j < distanze.length; j++)
+				if (distanze[i] >= distMin || iMin == -1)
+				{
+					distMin = distanze[i];
+					iMin = i;
+				}
+				
+			distanze[iMin] = -1;
+			pianetiOrdinati.push(pianeti[iMin]);
+		}
+		
+		return pianetiOrdinati;
+	}
+	
 
    init();
    animate(); 
