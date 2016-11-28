@@ -20,7 +20,8 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	this.getMass = getMass;
 	this.inCollision = inCollision;
 	this.addToScene = addToScene;
-	this.removeFromScene = removeFromScene;
+	this.removeFromScene = removeFromScene;	
+	this.getPlanetReference = getPlanetReference;
 
 	function update()
 	{
@@ -33,6 +34,11 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 			this.master_reference.children[i].rotation.y += this.moons_velocity[i];
 			//master_reference.children[i].rotation.z += 0.005;
 		}
+	}
+	
+	function getPlanetReference()
+	{
+		return this.planet_reference.children[0];
 	}
 	
 	function addToScene(scene)

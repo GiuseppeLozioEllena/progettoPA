@@ -6,6 +6,7 @@ $(function()
   var spotLight,hemi;
   var SCREEN_WIDTH,SCREEN_HEIGHT;
   var navicella;
+  var camera;
 
   var planets_reference; // Array con i riferimenti ai pianeti
   var skybox; // Skybox, viene spostato con la navicella
@@ -81,8 +82,8 @@ $(function()
 	planetInfoManager.show();
 	*/
 
-    scene=new THREE.Scene();
-    camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
 	skybox = setSkybox();
@@ -387,6 +388,26 @@ function addLight( h, s, l, x, y, z ) {
         stats.domElement.style.top = '0px';     
         $("#webGL-container").append( stats.domElement );    
  }
+ 
+ 	/*
+	 * isVisibleFromCamera
+	 * Ritorna true se l'oggetto passato è visibile dalla camera, false altrimenti
+	 */
+	function isVisibleFromCamera(object)
+	{
+		var frustum = new THREE.Frustum();
+		var cameraViewProjectionMatrix = new THREE.Matrix4();
+
+		camera.updateMatrixWorld();
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+		cameraViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		frustum.setFromMatrix( cameraViewProjectionMatrix );
+		
+		if (object != null)
+			return frustum.intersectsObject(object);
+		else
+			return null;
+	}
 
    function animate()
    {
@@ -402,6 +423,13 @@ function addLight( h, s, l, x, y, z ) {
 		showPlanets(navicella.position);
 		
 		checkCollisions();
+		
+		var vis = 0;
+		
+		
+		for (var i = 0; i < planets_reference.length; i++)
+			if (isVisibleFromCamera(planets_reference[i].getPlanetReference()))
+				vis++;
 		
 		if (controls != null && controls.play)
 		{
