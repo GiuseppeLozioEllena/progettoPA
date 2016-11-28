@@ -770,7 +770,7 @@ function addLight( h, s, l, x, y, z ) {
 		{
 			if (!planetInfoManager.active)
 			{
-				var visiblePlanets = getVisiblePlanets();
+				var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
 				if (visiblePlanets.length != 0)
 				{
 					planetInfoManager.selectedIndex = 0;
@@ -866,16 +866,16 @@ function addLight( h, s, l, x, y, z ) {
 		{
 			var distMin = 0, iMin = -1;
 			for (var j = 0; j < distanze.length; j++)
-				if (distanze[i] >= distMin || iMin == -1)
+				if ((distanze[j] <= distMin || iMin == -1) && distanze[j] >= 0)
 				{
-					distMin = distanze[i];
-					iMin = i;
+					distMin = distanze[j];
+					iMin = j;
 				}
 				
 			distanze[iMin] = -1;
 			pianetiOrdinati.push(pianeti[iMin]);
 		}
-		
+	
 		return pianetiOrdinati;
 	}
 	
