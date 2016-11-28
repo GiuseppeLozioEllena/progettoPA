@@ -22,7 +22,11 @@ $(function()
   var SOGLIA_VISUALE_NAVICELLA = 1000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
   var ASTEROIDS_NUMBER = 5; // Numero di asteroidi contemporaneamente presenti in scena
+  
+  // Tasti per visualizzare info pianeti
   var SHOW_INFO_BUTTON = 13; // Invio
+  var SHOW_INFO_FORWARD = 88; // X
+  var SHOW_INFO_BACKWARD = 90; // Z
 
   var clock;
   var fire;
@@ -758,14 +762,9 @@ function addLight( h, s, l, x, y, z ) {
 		}
 
 	this.keydown = function( event ) {
-
 		if ( event.altKey ) {
-
 			return;
-
 		}
-		
-		console.log("premuto: " + event.keyCode);
 		
 		if (event.keyCode == SHOW_INFO_BUTTON)
 		{
@@ -774,8 +773,9 @@ function addLight( h, s, l, x, y, z ) {
 				var visiblePlanets = getVisiblePlanets();
 				if (visiblePlanets.length != 0)
 				{
-					visiblePlanets[0].createGlow(camera, scene);
-					planetInfoManager.selectedPlanet = visiblePlanets[0];
+					planetInfoManager.selectedIndex = 0;
+					planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
+					planetInfoManager.selectedPlanet.createGlow(camera, scene);
 					planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
 					planetInfoManager.show();
 				}
@@ -785,6 +785,43 @@ function addLight( h, s, l, x, y, z ) {
 				planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
 				planetInfoManager.selectedPlanet = null;
 				planetInfoManager.hideAll();
+			}
+		}
+		
+		if (planetInfoManager.active)
+		{
+			if (event.keyCode == SHOW_INFO_FORWARD)
+			{
+				var visiblePlanets = getVisiblePlanets();
+				if (visiblePlanets.length != 0)
+				{
+					planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
+					
+					planetInfoManager.selectedIndex = (planetInfoManager.selectedIndex + 1) % visiblePlanets.length;
+					planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
+					planetInfoManager.selectedPlanet.createGlow(camera, scene);
+					
+					planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
+					planetInfoManager.show();
+				}
+			}
+			
+			if (event.keyCode == SHOW_INFO_BACKWARD)
+			{
+				var visiblePlanets = getVisiblePlanets();
+				if (visiblePlanets.length != 0)
+				{
+					planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
+					
+					planetInfoManager.selectedIndex--;
+					if (planetInfoManager.selectedIndex == -1)
+						planetInfoManager.selectedIndex = visiblePlanets.length - 1;
+					planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
+					planetInfoManager.selectedPlanet.createGlow(camera, scene);
+					
+					planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
+					planetInfoManager.show();
+				}
 			}
 		}
 	};
