@@ -12,6 +12,7 @@ $(function()
   var skybox; // Skybox, viene spostato con la navicella
   var lensflares; // Array con i riferimenti alle lensflares
   var textureFlare1, textureFlare2, textureFlare3; // Texture dei lansflares
+  var lensflaresOriginalPositions;
   
   // Parametri
   var LENS_FLARES_NUMBER = 8;
@@ -219,6 +220,7 @@ $(function()
   function generateLensFlares()
   {
 	lensFlares = [];
+	lensflaresOriginalPositions = [];
 	var textureLoader = new THREE.TextureLoader();
 
 	textureFlare1 = textureLoader.load( "textures/lensflare/lensflare0.png" );
@@ -228,9 +230,16 @@ $(function()
 	textureFlare1.minFilter = THREE.LinearFilter;
 	textureFlare2.minFilter = THREE.LinearFilter;
 	textureFlare3.minFilter = THREE.LinearFilter;
-
+	
+	
 	for (var i = 0; i < LENS_FLARES_NUMBER; i++)
-		addLight(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), random(-RANGE, RANGE), random(-RANGE, RANGE), random(-RANGE, RANGE));
+	{
+		var x = random(-RANGE, RANGE);
+		var y = random(-RANGE, RANGE);
+		var z = random(-RANGE, RANGE);
+		lensflaresOriginalPositions.push(new THREE.Vector3(x,y,z));
+		addLight(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), x, y, z);
+	}
   }
   
   function random(min, max)
@@ -421,6 +430,11 @@ function addLight( h, s, l, x, y, z ) {
 			e.animate();
 		
 		showPlanets(navicella.position);
+		
+		for (var i = 0; i < lensFlares.length; i++)
+			lensFlares[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
+										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
+										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
 		
 		checkCollisions();
 		
