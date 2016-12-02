@@ -22,18 +22,15 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 	if ( domElement ) this.domElement.setAttribute( 'tabindex', - 1 );
 
-	// API
-
 	this.movementSpeed = 1.0;
 	this.rollSpeed = 0.005;
 
 	this.dragToLook = false;
 	this.autoForward = false;
 	this.play=false;
-
-	// disable default target object behavior
-
-	// internals
+	
+	this.checkXBoxController = checkXBoxController;
+	this.doTurbo = doTurbo;
 
 	this.tmpQuaternion = new THREE.Quaternion();
 
@@ -77,7 +74,6 @@ THREE.FlyControls = function ( object, domElement ) {
 			
 			case 65: /*A*/ this.moveState.yawLeft = 1; break;
 			case 68: /*D*/ this.moveState.yawRight = 1; break;
-			
 
 			//case 83: /*S*/ this.moveState.back = 1; break;
 			case 87: /*W*/ this.moveState.forward = 1; break;
@@ -88,41 +84,47 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 37: /*left*/ this.moveState.yawLeft = 0; this.moveState.rollLeft = 15; this.pressed = true; break;
 			case 39: /*right*/ this.moveState.yawRight = 0; this.moveState.rollRight = 15; this.pressed = true; break;
 			
-			case 81: /*Q*/  if (this.usable)
-							{
-								this.moveState.turbo = 1; 
-								this.moveState.forward = 1;
-								if (this.turboDuration == -1)
-								{
-									this.turboDuration = 0;
-									var audioLoader = new THREE.AudioLoader();
-
-									if (this.listener == null)
-									{
-										this.listener = new THREE.AudioListener();
-										this.object.add( this.listener );
-									}
-									
-									var sound1 = new THREE.PositionalAudio( this.listener );
-									audioLoader.load( 'sounds/propulsion.wav', function( buffer ) {
-										sound1.setBuffer( buffer );
-										sound1.setRefDistance( 20 );
-										sound1.play();
-									});
-									
-									this.object.add(sound1);
-								}
-							}
+			case 81: /*Q*/  this.doTurbo();
 						    break; 
 			//case 81: /*Q*/ this.moveState.rollLeft = 1; break;
 			//case 69: /*E*/ this.moveState.rollRight = 1; break;
 
 		}
 
+
 		this.updateMovementVector();
 		this.updateRotationVector();
 
 	};
+	
+	function doTurbo()
+	{
+		if (this.usable)
+		{
+			this.moveState.turbo = 1; 
+			this.moveState.forward = 1;
+			if (this.turboDuration == -1)
+			{
+				this.turboDuration = 0;
+				var audioLoader = new THREE.AudioLoader();
+
+				if (this.listener == null)
+				{
+					this.listener = new THREE.AudioListener();
+					this.object.add( this.listener );
+				}
+				
+				var sound1 = new THREE.PositionalAudio( this.listener );
+				audioLoader.load( 'sounds/propulsion.wav', function( buffer ) {
+					sound1.setBuffer( buffer );
+					sound1.setRefDistance( 20 );
+					sound1.play();
+				});
+				
+				this.object.add(sound1);
+			}
+		}
+	}
 
 	this.keyup = function( event ) {
 
@@ -238,9 +240,91 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 	*/
+	
+	function checkXBoxController()
+	{	
+		if (Gamepad.supported) 
+		{
+			var pads = Gamepad.getStates();
+			var pad = pads[0];
+			
+			if (pad)
+			{
+				if (pad.leftStickY < -0.4)
+					this.moveState.forward = 1;
+				else
+					this.moveState.forward = 0;
+				
+				if (pad.leftStickX < -0.4)
+					this.moveState.yawLeft = 1;
+					
+				if (pad.leftStickX > 0.4)
+					this.moveState.yawRight = 1;
+					
+				if (pad.leftStickX >= -0.4 && pad.leftStickX <= 0.4)
+				{
+					this.moveState.yawLeft = 0;
+					this.moveState.yawRight = 0;
+				}
+				
+				if (pad.rightStickY < -0.4)
+					this.moveState.pitchUp = 2;
+				
+				if (pad.rightStickY > 0.4)
+					this.moveState.pitchDown = 2;
+				
+				if (pad.rightStickY >= -0.4 && pad.rightStickY <= 0.4)
+				{
+					this.moveState.pitchUp = 0;
+					this.moveState.pitchDown = 0;
+				}
+								
+				if (pad.rightStickX < -0.4)
+				{
+					this.moveState.rollLeft = 15; 
+					this.pressed = false; 
+				}
+				
+				if (pad.rightStickX > 0.4)
+				{
+					this.moveState.rollRight = 15; 
+					this.pressed = false;
+				}
+				
+				if (pad.rightStickX >= -0.4 && pad.rightStickX <= 0.4)
+				{
+					this.moveState.rollLeft = 0; 
+					this.moveState.rollRight = 0; 
+					this.pressed = false;
+				}
+				
+				if (pad.faceButton0.pressed) // A on Xbox
+				{
+					this.doTurbo();
+				}
+				else
+					this.moveState.turbo = 0;
+				
+				/*
+				Other potential events to handle:
+				if ( pad.faceButton0 ) // A on Xbox
+				if ( pad.faceButton1 ) // B on Xbox
+				if ( pad.faceButton2 ) // X on Xbox
+				if ( pad.faceButton3 ) // Y	on Xbox
+				if ( pad.start )
+				if ( pad.select )
+			*/
+			}
+		
+			this.updateMovementVector();
+			this.updateRotationVector();		
+		}
+	}
 
-	this.update = function( delta ) {
-
+	this.update = function( delta ) 
+	{
+		this.checkXBoxController();
+	
 		var moveMult = delta * this.movementSpeed;
 		var rotMult = delta * this.rollSpeed;
 		
