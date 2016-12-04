@@ -175,7 +175,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	
 	function inCollision(navPosition)
 	{
-		if (distance(navPosition, new THREE.Vector3(this.x, this.y, this.z)) < this.scala * this.scala)
+		if (distance(navPosition, new THREE.Vector3(this.x, this.y, this.z)) < this.scala * this.scala+5)
 			return true;
 		else
 			return false;

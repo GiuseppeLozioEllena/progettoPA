@@ -49,6 +49,8 @@ $(function()
   var PlayText;
   
   var e; // Esplosione
+
+  var isExplode=false;
   
   /*
     var text2 = document.createElement('div');
@@ -62,18 +64,23 @@ $(function()
 	document.body.appendChild(text2);
 	*/
 	
+
+	
 	window.addEventListener( 'mousedown', onclick, false );
 	
 	function onclick()
 	{
-		/*
+		
 		e = new Explosion();
 		e.esplodi(navicella.position.x, navicella.position.y, navicella.position.z, scene);
-		*/
+		
 		//e = new ParticlesExplosion(navicella.position.x, navicella.position.y, navicella.position.z);
+	
 		e = new ParticlesExplosion();
 		e.init(scene, navicella.position.x, navicella.position.y, navicella.position.z);
 	}
+	
+
 	
 
   function init()
@@ -483,6 +490,8 @@ function addLight( h, s, l, x, y, z ) {
 			*/
 		}
 
+		if(controls.play)
+		{
 		for (var i = 0; i < asteroids_reference.length; i++)
 		{
 			asteroids_reference[i].update(calcolateWorldTotalForceOnPosition(asteroids_reference[i].getPosition()));
@@ -499,6 +508,7 @@ function addLight( h, s, l, x, y, z ) {
 	
 		for (var i = 0; i < planets_reference.length; i++)		
 			planets_reference[i].update(camera);
+	  }
 		
 		skybox.position.x = navicella.position.x;
 		skybox.position.y = navicella.position.y;
@@ -571,8 +581,30 @@ function addLight( h, s, l, x, y, z ) {
    function explode()
    {
 	   // Da implementare
-	   console.log("BOOOOOOOOOOM");
+	   if(!isExplode)
+	   {
+	   	scene.remove(navicella);
+	    isExplode=true;
+	    console.log("BOOOOOOOOOOM");
+	   	e = new ParticlesExplosion();
+		e.init(scene, navicella.position.x, navicella.position.y, navicella.position.z);
+		
+		clearScene();
+	 }
    }
+
+
+
+function clearScene()
+{
+    setTimeout(function(){
+    
+     location.reload();
+    
+    }, 3000);
+	
+}
+
    
    /*
     * calcolateWorldTotalForceOnPosition
@@ -635,7 +667,7 @@ function addLight( h, s, l, x, y, z ) {
 	* Applicata solo sulla navicella (si presume che lo spostamento che la gravità della navicella influisce sui pianeti sia trascurabile)
 	* Calcola le singole forze di attrazione dei pianeti e applica la forza totale risultante
     */
-   function applyForces()
+   function  applyForces()
    {
 		var finalForce = new THREE.Vector3();
 		for (var i = 0; i < planets_reference.length; i++)
