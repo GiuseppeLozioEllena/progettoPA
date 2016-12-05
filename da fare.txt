@@ -1,17 +1,11 @@
-informazioni sul pianeta
 
 tuning esplosione
 tuning fisica
 aggiunta suoni (esplosione)
 modifica atmosfera pianeti
-
-no rightstick
-A avanti
-Y turbo
-LT E LB destra e sinistra
+allunga fiamma nel turbo
 RB E RT naviga tra i pianeti
 B attiva navigazione
-
 start per iniziare
-
 turbo no tenere premuto
+collisione con le lune
