@@ -16,7 +16,6 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.object = object;
 	
-	this.pressed = false;
 	this.lastAngle = 0;
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -30,6 +29,8 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.play=false;
 	this.pause=false;
 	
+	this.isPressed = isPressed;
+	
 	this.checkXBoxController = checkXBoxController;
 	this.doTurbo = doTurbo;
 
@@ -40,6 +41,11 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.moveState = { up: 0, down: 0, left: 0, right: 0, forward: 0, back: 0, pitchUp: 0, pitchDown: 0, yawLeft: 0, yawRight: 0, rollLeft: 0, rollRight: 0, turbo: 0 };
 	this.moveVector = new THREE.Vector3( 0, 0, 0 );
 	this.rotationVector = new THREE.Vector3( 0, 0, 0 );
+	
+	function isPressed()
+	{
+		return false;
+	}
 
 	this.handleEvent = function ( event ) {
 
@@ -159,8 +165,8 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 38: /*up*/ this.moveState.pitchUp = 0; break;
 			case 40: /*down*/ this.moveState.pitchDown = 0; break;
 
-			case 65: /*A*/ this.moveState.yawLeft = 0; this.pressed = false; this.moveState.rollLeft = 0; this.lastAngle = this.object.rotation.y; break;
-			case 68: /*D*/ this.moveState.yawRight = 0; this.moveState.rollRight = 0; this.pressed = false; break;
+			case 65: /*A*/ this.moveState.yawLeft = 0; this.moveState.rollLeft = 0; this.lastAngle = this.object.rotation.y; break;
+			case 68: /*D*/ this.moveState.yawRight = 0; this.moveState.rollRight = 0; break;
 			
 			case 32: /*Space*/ this.moveState.turbo = 0; this.moveState.forward = 0; break;
 
@@ -260,10 +266,12 @@ THREE.FlyControls = function ( object, domElement ) {
 			
 			if (pad)
 			{
+				/*
 				if (pad.leftStickY < -0.4)
 					this.moveState.forward = 1;
 				else
 					this.moveState.forward = 0;
+				*/
 				
 				if (pad.leftStickX < -0.4)
 					this.moveState.yawLeft = 1;
@@ -277,53 +285,44 @@ THREE.FlyControls = function ( object, domElement ) {
 					this.moveState.yawRight = 0;
 				}
 				
-				if (pad.rightStickY < -0.4)
+				if (pad.leftStickY < -0.4)
 					this.moveState.pitchUp = 2;
 				
-				if (pad.rightStickY > 0.4)
+				if (pad.leftStickY > 0.4)
 					this.moveState.pitchDown = 2;
 				
-				if (pad.rightStickY >= -0.4 && pad.rightStickY <= 0.4)
+				if (pad.leftStickY >= -0.4 && pad.leftStickY <= 0.4)
 				{
 					this.moveState.pitchUp = 0;
 					this.moveState.pitchDown = 0;
 				}
 								
-				if (pad.rightStickX < -0.4)
-				{
+				if (pad.leftShoulder1.pressed)
 					this.moveState.rollLeft = 15; 
-					this.pressed = false; 
-				}
-				
-				if (pad.rightStickX > 0.4)
-				{
-					this.moveState.rollRight = 15; 
-					this.pressed = false;
-				}
-				
-				if (pad.rightStickX >= -0.4 && pad.rightStickX <= 0.4)
-				{
+				else
 					this.moveState.rollLeft = 0; 
+				
+				if (pad.rightShoulder1.pressed)
+					this.moveState.rollRight = 15; 
+				else
 					this.moveState.rollRight = 0; 
-					this.pressed = false;
-				}
 				
 				if (pad.faceButton0.pressed) // A on Xbox
-				{
-					this.doTurbo();
-				}
+					this.moveState.forward = 1;
 				else
-					this.moveState.turbo = 0;
+					this.moveState.forward = 0;
 				
+				if (pad.faceButton3.pressed) // Y on Xbox
+					this.doTurbo();
 				/*
-				Other potential events to handle:
-				if ( pad.faceButton0 ) // A on Xbox
-				if ( pad.faceButton1 ) // B on Xbox
-				if ( pad.faceButton2 ) // X on Xbox
-				if ( pad.faceButton3 ) // Y	on Xbox
-				if ( pad.start )
-				if ( pad.select )
-			*/
+					Other potential events to handle:
+					if ( pad.faceButton0 ) // A on Xbox
+					if ( pad.faceButton1 ) // B on Xbox
+					if ( pad.faceButton2 ) // X on Xbox
+					if ( pad.faceButton3 ) // Y	on Xbox
+					if ( pad.start )
+					if ( pad.select )
+				*/
 			}
 		
 			this.updateMovementVector();
@@ -410,11 +409,6 @@ THREE.FlyControls = function ( object, domElement ) {
 			this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
 		}
 	};
-	
-	this.isPressed = function()
-	{
-		return this.pressed;
-	}
 	
 	this.getRotation = function()
 	{
