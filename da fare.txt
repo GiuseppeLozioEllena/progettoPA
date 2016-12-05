@@ -12,3 +12,15 @@ tuning fisica
 aggiunta accelerazione navicella
 aggiunta suoni
 modifica atmosfera pianeti
+
+
+no rightstick
+A avanti
+Y turbo
+LT E LB destra e sinistra
+RB E RT naviga tra i pianeti
+B attiva navigazione
+
+start per iniziare
+
+turbo no tenere premuto

@@ -22,12 +22,13 @@ $(function()
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
   var SOGLIA_VISUALE_NAVICELLA = 1000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
-  var ASTEROIDS_NUMBER = 5; // Numero di asteroidi contemporaneamente presenti in scena
+  var ASTEROIDS_NUMBER = 0; // Numero di asteroidi contemporaneamente presenti in scena
   
   // Tasti per visualizzare info pianeti
-  var SHOW_INFO_BUTTON = 13; // Invio
-  var SHOW_INFO_FORWARD = 88; // X
-  var SHOW_INFO_BACKWARD = 90; // Z
+  var SHOW_INFO_BUTTON = 81; // Q
+  var SHOW_INFO_FORWARD = 69; // E
+  //var SHOW_INFO_BACKWARD = 90; // Z
+
 
   var clock;
   var fire;
@@ -445,7 +446,7 @@ function addLight( h, s, l, x, y, z ) {
 		
 		checkCollisions();
 		
-		if (controls != null && controls.play)
+		if (controls != null && controls.play && !isExplode)
 		{
 
 			scene.remove(PlayText);
@@ -587,8 +588,7 @@ function addLight( h, s, l, x, y, z ) {
 	    isExplode=true;
 	    console.log("BOOOOOOOOOOM");
 	   	e = new ParticlesExplosion();
-		e.init(scene, navicella.position.x, navicella.position.y, navicella.position.z);
-		
+		e.init(scene, navicella.position.x, navicella.position.y, navicella.position.z); // come fa a funzionare?? se la navicella viene eliminata dalla scena?
 		clearScene();
 	 }
    }
@@ -782,7 +782,7 @@ function clearScene()
 
         function createText() 
         {
-				textGeo = new THREE.TextGeometry("Press space  to start", {
+				textGeo = new THREE.TextGeometry("Press ENTER  to start", {
 					font: font,
 					size: size,
 					height: height,
@@ -852,6 +852,7 @@ function clearScene()
 				}
 			}
 			
+			/*
 			if (event.keyCode == SHOW_INFO_BACKWARD)
 			{
 				var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
@@ -869,6 +870,7 @@ function clearScene()
 					planetInfoManager.show();
 				}
 			}
+			*/
 		}
 	};
 	
