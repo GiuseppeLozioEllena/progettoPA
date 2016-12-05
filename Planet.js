@@ -101,7 +101,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 			{ 
 				"c":   { type: "f", value: 1.0 },
 				"p":   { type: "f", value: 1.4 },
-				glowColor: { type: "c", value: new THREE.Color(0xffffff) },
+				glowColor: { type: "c", value: new THREE.Color(0x2FFF00) },
 				viewVector: { type: "v3", value: camera.position }
 			},
 			vertexShader:   document.getElementById( 'vertexShader'   ).textContent,

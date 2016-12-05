@@ -130,7 +130,7 @@ PlanetInfo = function (position, scale, visibility) {
 	{
 		moonVelocities = [];
 		for (var i = 0; i < this.moonNumber; i++)
-			moonVelocities.push(Math.random() / 100);
+			moonVelocities.push(Math.random() / 400);
 		return moonVelocities;
 	}
 	
