@@ -459,13 +459,20 @@ function addLight( h, s, l, x, y, z ) {
 
 		
 		checkCollisions();
+
+		if(controls.pause)
+				LoadMenu();
+
 		
-		if (controls != null && controls.play && !isExplode)
+		if (controls != null && controls.play && !isExplode && !controls.pause)
 		{
 
 			scene.remove(PlayText);
 			controls.movementSpeed = 0.33 * d;
 			controls.update( delta );
+
+
+
 			//seguiNavicella();
 			//console.log(camera.rotation);
 			
@@ -505,7 +512,7 @@ function addLight( h, s, l, x, y, z ) {
 			*/
 		}
 
-		if(controls.play)
+		if(controls.play && !controls.pause)
 		{
 		for (var i = 0; i < asteroids_reference.length; i++)
 		{
@@ -805,11 +812,16 @@ function clearScene()
 				createText();
 				} );
 
-        }
+        }  
 
         function createText() 
         {
-				textGeo = new THREE.TextGeometry("Press ENTER  to start", {
+        		var text;
+        		if(!controls.play)
+        			text="Press ENTER  to start";
+        		else
+        			text="Press ENTER to resume"
+				textGeo = new THREE.TextGeometry(text, {
 					font: font,
 					size: size,
 					height: height,

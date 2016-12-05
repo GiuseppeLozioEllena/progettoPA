@@ -28,6 +28,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.dragToLook = false;
 	this.autoForward = false;
 	this.play=false;
+	this.pause=false;
 	
 	this.checkXBoxController = checkXBoxController;
 	this.doTurbo = doTurbo;
@@ -61,7 +62,16 @@ THREE.FlyControls = function ( object, domElement ) {
 		switch ( event.keyCode ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
-			case 13: this.play=true ;
+			case 13:
+			 if(!this.play)
+			     this.play=true ;
+             else
+             {
+             	if(!this.pause)
+                  this.pause=true;
+                else
+                   this.pause=false;
+           }
 			console.log("space bar");
 			break;
 

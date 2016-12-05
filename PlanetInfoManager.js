@@ -89,7 +89,7 @@ PlanetInfoManager = function()
 		var html = "";
 		for (var i = 0; i < sezioni.length; i++)
 		{
-			if (fields.indexOf(sezioni[i].sectionName) != -1)
+			if (fields.indexOf(sezioni[i].sectionName.trim()) != -1)
 			{
 				html += "<div id=\"header\">" + sezioni[i].sectionName + "</div>";
 				html += "<div id=\"content\">";
