@@ -460,14 +460,17 @@ function addLight( h, s, l, x, y, z ) {
 		
 		checkCollisions();
 
-		if(controls.pause)
+		if(controls.pause && !controls.play)
+		{
 				LoadMenu();
+				controls.pause=false;
+		}
 
 		
 		if (controls != null && controls.play && !isExplode && !controls.pause)
 		{
 
-			scene.remove(PlayText);
+			camera.remove(PlayText);
 			controls.movementSpeed = 0.33 * d;
 			controls.update( delta );
 
@@ -817,10 +820,8 @@ function clearScene()
         function createText() 
         {
         		var text;
-        		if(!controls.play)
+        		if(!controls.pause)
         			text="Press ENTER  to start";
-        		else
-        			text="Press ENTER to resume"
 				textGeo = new THREE.TextGeometry(text, {
 					font: font,
 					size: size,
@@ -835,13 +836,34 @@ function clearScene()
 
 				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 				PlayText = new THREE.Mesh( textGeo, material );
+
+
+				/*
+				var matrix = new THREE.Matrix4();
+				matrix.extractRotation( navicella.matrix );		
+		
+		//console.log(navicella.children[1].matrix);
+	
+				var directionZ = new THREE.Vector3(0, 0, 1);
+				directionZ.applyMatrix4(matrix);	
+				
+				var directionX = new THREE.Vector3(1, 0, 0);
+				directionX.applyMatrix4(matrix);	
                 
-				PlayText.position.x=navicella.position.x-50;
-				PlayText.position.y=navicella.position.y+20;
-				PlayText.position.z=navicella.position.z-80;
+				var directionY = new THREE.Vector3(0, 1, 0);
+				directionY.applyMatrix4(matrix);	
 
+				PlayText.position.x= navicella.position.x - directionZ.x * 0 - directionX.x * 60;
+				PlayText.position.y=navicella.position.y - directionZ.y * 0 + directionY.y * 5;
+				PlayText.position.z=navicella.position.z - directionZ.z * 50;
+				*/
+				camera.add(PlayText);
+				PlayText.position.x=-50;
+				PlayText.position.y=10;
+				PlayText.position.z=-80;
+				
 
-				scene.add(PlayText);
+				//scene.add(PlayText);
 
 		
 		}

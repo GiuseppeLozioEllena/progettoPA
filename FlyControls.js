@@ -69,14 +69,16 @@ THREE.FlyControls = function ( object, domElement ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
 			case 13:
-			 if(!this.play)
+			 if(!this.play && !this.pause)
 			     this.play=true ;
              else
              {
-             	if(!this.pause)
-                  this.pause=true;
-                else
-                   this.pause=false;
+             	if(!this.pause && this.play)
+             	{
+                   this.pause=true;
+             	   this.play=false;
+             	}
+
            }
 			console.log("space bar");
 			break;
