@@ -11,6 +11,7 @@ $(function()
   var planets_reference; // Array con i riferimenti ai pianeti
   var skybox; // Skybox, viene spostato con la navicella
   var lensflares; // Array con i riferimenti alle lensflares
+  var lights;
   var textureFlare1, textureFlare2, textureFlare3; // Texture dei lansflares
   var lensflaresOriginalPositions;
   
@@ -183,6 +184,7 @@ $(function()
 	function populate_universe(n)
 	{
 		planets_reference = [];
+
 		planetsInfo = [];
 		for (var i = 0; i < n; i++)
 		{
@@ -228,6 +230,7 @@ $(function()
   function generateLensFlares()
   {
 	lensFlares = [];
+	lights=[];
 	lensflaresOriginalPositions = [];
 	var textureLoader = new THREE.TextureLoader();
 
@@ -303,6 +306,7 @@ function addLight( h, s, l, x, y, z ) {
 	lensFlare.position.copy( light.position );
 
 	lensFlares.push(lensFlare);
+	lights.push(light);
 	
 	scene.add( lensFlare );
 }
@@ -440,9 +444,19 @@ function addLight( h, s, l, x, y, z ) {
 		showPlanets(navicella.position);
 		
 		for (var i = 0; i < lensFlares.length; i++)
+		{
 			lensFlares[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
 										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
 										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
+			lights[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
+										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
+										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
+						
+
+
+		}
+
+
 		
 		checkCollisions();
 		
@@ -584,11 +598,24 @@ function addLight( h, s, l, x, y, z ) {
 	   // Da implementare
 	   if(!isExplode)
 	   {
+
+
+	   	var matrix = new THREE.Matrix4();
+		matrix.extractRotation( navicella.matrix );		
+	
+		//console.log(navicella.children[1].matrix);
+	
+		var directionZ = new THREE.Vector3(0, 0, 1);
+		directionZ.applyMatrix4(matrix);	
+		
+
 	   	scene.remove(navicella);
 	    isExplode=true;
 	    console.log("BOOOOOOOOOOM");
 	   	e = new ParticlesExplosion();
-		e.init(scene, navicella.position.x, navicella.position.y, navicella.position.z); // come fa a funzionare?? se la navicella viene eliminata dalla scena?
+		e.init(scene, navicella.position.x + directionZ.x * 5,
+							navicella.position.y + directionZ.y * 5 ,
+							navicella.position.z + directionZ.z * 5); // come fa a funzionare?? se la navicella viene eliminata dalla scena?
 		clearScene();
 	 }
    }
