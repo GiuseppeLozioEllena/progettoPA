@@ -318,7 +318,6 @@ THREE.FlyControls = function ( object, domElement ) {
 				if (pad.start.pressed && !this.start_is_pressing)
 				{
 					this.startPressed();
-					console.log("dentro");
 					this.start_is_pressing = true;
 				}
 				else

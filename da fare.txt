@@ -1,10 +1,7 @@
-
 tuning esplosione
 tuning fisica
 aggiunta suoni (esplosione)
 modifica atmosfera pianeti
 allunga fiamma nel turbo
-RB E RT naviga tra i pianeti
-B attiva navigazione
 turbo no tenere premuto
 collisione con le lune

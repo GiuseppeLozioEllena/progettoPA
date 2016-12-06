@@ -34,9 +34,6 @@ $(function()
   var clock;
   var fire;
   
-  var lastRotationY = 0;
-  var lastSettedY = 0;
-  
   var G = 6.67408 * 0.01; // Costante di gravitazione universale (cambiata la scala rispetto all'origianale, sorry Newton)
   var MASSA_NAVICELLA = 1;
   
@@ -53,6 +50,10 @@ $(function()
   var e; // Esplosione
 
   var isExplode=false;
+  
+  var button1Pressed = false;
+  var leftShoulderPressed = false;
+  var rightShoulderPressed = false;
  
   function init()
   {
@@ -114,7 +115,6 @@ $(function()
 	//scene.add(spotLight);
 	var s = new THREE.SpotLightHelper(spotLight);
 	scene.add(s);
-
 
   	var fireWidth  = 1.25;
 	var fireHeight = 1;
@@ -398,6 +398,49 @@ function addLight( h, s, l, x, y, z ) {
 		else
 			return null;
 	}
+	
+	/*
+	 * checkXBoxController
+	 * Controlla se vengono premuti i tasti del controller
+	 */
+	function checkXBoxController()
+	{	
+		if (Gamepad.supported) 
+		{
+			var pads = Gamepad.getStates();
+			var pad = pads[0];
+			
+			if (pad)
+			{
+				if (pad.faceButton1.pressed && !button1Pressed)
+				{
+					startShowInfoPlanet();
+					button1Pressed = true;
+				}
+				else
+					if (!pad.faceButton1.pressed)
+						button1Pressed = false;
+					
+				if (pad.rightShoulder0.pressed && !rightShoulderPressed)
+				{
+					infoForward();
+					rightShoulderPressed = true;
+				}
+				else
+					if (!pad.rightShoulder0.pressed)
+						rightShoulderPressed = false;
+				
+				if (pad.leftShoulder0.pressed && !leftShoulderPressed)
+				{
+					infoBackward();
+					leftShoulderPressed = true;
+				}
+				else
+					if (!pad.leftShoulder0.pressed)
+						leftShoulderPressed = false;
+			}
+		}
+	}
 
    function animate()
    {
@@ -435,6 +478,7 @@ function addLight( h, s, l, x, y, z ) {
 			camera.remove(PlayText);
 			controls.movementSpeed = 0.33 * d;
 			controls.update( delta );
+			checkXBoxController();
 		}
 		else
 			controls.checkXBoxController();
@@ -760,6 +804,74 @@ function addLight( h, s, l, x, y, z ) {
 
 		
 		}
+		
+	/*
+	 * startShowInfoPlanet
+	 * Funziona chiamata quando si apre/chiude la modalità informazioni pianeta
+	 */
+	function startShowInfoPlanet()
+	{
+		if (!planetInfoManager.active)
+		{
+			var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
+			if (visiblePlanets.length != 0)
+			{
+				planetInfoManager.selectedIndex = 0;
+				planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
+				planetInfoManager.selectedPlanet.createGlow(camera, scene);
+				planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
+				planetInfoManager.show();
+			}
+		}
+		else
+		{
+			planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
+			planetInfoManager.selectedPlanet = null;
+			planetInfoManager.hideAll();
+		}
+	}
+	
+	/*
+	 * infoForward
+	 * Mostra le informazioni del pianeta successivo
+	 */
+	function infoForward()
+	{
+		var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
+		if (visiblePlanets.length != 0)
+		{
+			planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
+			
+			planetInfoManager.selectedIndex = (planetInfoManager.selectedIndex + 1) % visiblePlanets.length;
+			planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
+			planetInfoManager.selectedPlanet.createGlow(camera, scene);
+			
+			planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
+			planetInfoManager.show();
+		}		
+	}
+	
+	/*
+	 * infoBackward
+	 * Mostra le informazioni del pianeta precedente
+	 */
+	function infoBackward()
+	{
+		var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
+		if (visiblePlanets.length != 0)
+		{
+			planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
+			
+			planetInfoManager.selectedIndex--;
+			if (planetInfoManager.selectedIndex == -1)
+				planetInfoManager.selectedIndex = visiblePlanets.length - 1;
+			planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
+			planetInfoManager.selectedPlanet.createGlow(camera, scene);
+			
+			planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
+			planetInfoManager.show();
+		}
+	}
 
 	this.keydown = function( event ) {
 		if ( event.altKey ) {
@@ -767,64 +879,15 @@ function addLight( h, s, l, x, y, z ) {
 		}
 		
 		if (event.keyCode == SHOW_INFO_BUTTON)
-		{
-			if (!planetInfoManager.active)
-			{
-				var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
-				if (visiblePlanets.length != 0)
-				{
-					planetInfoManager.selectedIndex = 0;
-					planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
-					planetInfoManager.selectedPlanet.createGlow(camera, scene);
-					planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
-					planetInfoManager.show();
-				}
-			}
-			else
-			{
-				planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
-				planetInfoManager.selectedPlanet = null;
-				planetInfoManager.hideAll();
-			}
-		}
+			startShowInfoPlanet();
 		
 		if (planetInfoManager.active)
 		{
 			if (event.keyCode == SHOW_INFO_FORWARD)
-			{
-				var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
-				if (visiblePlanets.length != 0)
-				{
-					planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
-					
-					planetInfoManager.selectedIndex = (planetInfoManager.selectedIndex + 1) % visiblePlanets.length;
-					planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
-					planetInfoManager.selectedPlanet.createGlow(camera, scene);
-					
-					planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
-					planetInfoManager.show();
-				}
-			}
+				infoForward();
 			
-			/*
-			if (event.keyCode == SHOW_INFO_BACKWARD)
-			{
-				var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
-				if (visiblePlanets.length != 0)
-				{
-					planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
-					
-					planetInfoManager.selectedIndex--;
-					if (planetInfoManager.selectedIndex == -1)
-						planetInfoManager.selectedIndex = visiblePlanets.length - 1;
-					planetInfoManager.selectedPlanet = visiblePlanets[planetInfoManager.selectedIndex];
-					planetInfoManager.selectedPlanet.createGlow(camera, scene);
-					
-					planetInfoManager.loadInfoFromFile("./planets_info/info" + planetInfoManager.selectedPlanet.textureNumber + ".txt");
-					planetInfoManager.show();
-				}
-			}
-			*/
+			//if (event.keyCode == SHOW_INFO_BACKWARD)
+				//infoBackward();
 		}
 	};
 	
