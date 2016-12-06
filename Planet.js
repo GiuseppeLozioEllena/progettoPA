@@ -24,6 +24,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	this.removeFromScene = removeFromScene;	
 	this.removeGlowFromScene = removeGlowFromScene;
 	this.getPlanetReference = getPlanetReference;
+	this.moon_scales = [];
 
 	function update(camera)
 	{
@@ -131,6 +132,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		this.master_reference = new THREE.Object3D();
 		this.master_reference.position.set(this.x,this.y,this.z);
 		this.moons_velocity = [];
+		this.moon_scales = scales;
 		for (i = 0; i < this.numero_lune; i++)
 		{
 			this.createMoon(positions[i], scales[i]);
@@ -175,10 +177,19 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	
 	function inCollision(navPosition)
 	{
-		if (distance(navPosition, new THREE.Vector3(this.x, this.y, this.z)) < this.scala * this.scala+5)
+		if (distance(navPosition, new THREE.Vector3(this.x, this.y, this.z)) < this.scala * this.scala + 5)
 			return true;
-		else
-			return false;
+		
+		for (i = 0; i < this.numero_lune; i++)
+		{
+			var v = new THREE.Vector3();
+			v.setFromMatrixPosition( this.master_reference.children[i].children[0].matrixWorld );
+		
+			if (distance(navPosition, v) < this.moon_scales[i] * this.moon_scales[i] + 1)
+				return true;	
+		}
+
+		return false;
 	}
 	
 	function getMass()

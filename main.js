@@ -547,6 +547,7 @@ function addLight( h, s, l, x, y, z ) {
 	function checkCollisions()
 	{
 		var inCollision = false;
+		scene.updateMatrixWorld();
 		for (var i = 0; i < planets_reference.length && !inCollision; i++)
 		{
 			if (planets_reference[i].inCollision(navicella.position))
