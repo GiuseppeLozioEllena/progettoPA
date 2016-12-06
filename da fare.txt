@@ -6,6 +6,5 @@ modifica atmosfera pianeti
 allunga fiamma nel turbo
 RB E RT naviga tra i pianeti
 B attiva navigazione
-start per iniziare
 turbo no tenere premuto
 collisione con le lune

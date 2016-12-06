@@ -29,7 +29,9 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.play=false;
 	this.pause=false;
 	
-	this.isPressed = isPressed;
+	this.start_is_pressing = false;
+	
+	this.startPressed = startPressed;
 	
 	this.checkXBoxController = checkXBoxController;
 	this.doTurbo = doTurbo;
@@ -41,11 +43,6 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.moveState = { up: 0, down: 0, left: 0, right: 0, forward: 0, back: 0, pitchUp: 0, pitchDown: 0, yawLeft: 0, yawRight: 0, rollLeft: 0, rollRight: 0, turbo: 0 };
 	this.moveVector = new THREE.Vector3( 0, 0, 0 );
 	this.rotationVector = new THREE.Vector3( 0, 0, 0 );
-	
-	function isPressed()
-	{
-		return false;
-	}
 
 	this.handleEvent = function ( event ) {
 
@@ -68,25 +65,11 @@ THREE.FlyControls = function ( object, domElement ) {
 		switch ( event.keyCode ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
-			case 13:
-			 if(!this.play && !this.pause)
-			     this.play=true ;
-             else
-             {
-             	if(!this.pause && this.play)
-             	{
-                   this.pause=true;
-             	   this.play=false;
-             	}
-
-           }
-			console.log("space bar");
-			break;
+			case 13: /* enter */ this.startPressed(); break;
 
 			//case 87: /*W*/ this.moveState.forward = 1; break;
 			//case 83: /*S*/ this.moveState.back = 1; break;
 
-			
 			//case 65: /*A*/ this.moveState.left = 1; break;
 			//case 68: /*D*/ this.moveState.right = 1; break;
 			
@@ -102,11 +85,9 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 65: /*A*/ this.moveState.yawLeft = 0; this.moveState.rollLeft = 15; this.pressed = true; break;
 			case 68: /*D*/ this.moveState.yawRight = 0; this.moveState.rollRight = 15; this.pressed = true; break;
 			
-			case 32: /*Space*/  this.doTurbo();
-						    break; 
+			case 32: /*Space*/  this.doTurbo(); break; 
 			//case 81: /*Q*/ this.moveState.rollLeft = 1; break;
-			//case 69: /*E*/ this.moveState.rollRight = 1; break;
-
+			//case 69: /*E*/ this.moveState.rollRight = 1; break
 		}
 
 
@@ -115,6 +96,30 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 	
+	/*
+	 * startPressed
+	 * Chiamato quando il giocatore preme start (su controller) o invio sulla tastiera	 
+	 */
+	function startPressed()
+	{
+		if(!this.play && !this.pause)
+		{
+			this.play=true;
+		}
+        else
+        {
+			if(!this.pause && this.play)
+            {
+				this.pause=true;
+             	this.play=false;
+            }
+	    }
+	}
+	
+	/*
+	 * doTurbo
+	 * Esegue il turbo della navicella
+	 */
 	function doTurbo()
 	{
 		if (this.usable)
@@ -268,13 +273,6 @@ THREE.FlyControls = function ( object, domElement ) {
 			
 			if (pad)
 			{
-				/*
-				if (pad.leftStickY < -0.4)
-					this.moveState.forward = 1;
-				else
-					this.moveState.forward = 0;
-				*/
-				
 				if (pad.leftStickX < -0.4)
 					this.moveState.yawLeft = 1;
 					
@@ -316,6 +314,19 @@ THREE.FlyControls = function ( object, domElement ) {
 				
 				if (pad.faceButton3.pressed) // Y on Xbox
 					this.doTurbo();
+					
+				if (pad.start.pressed && !this.start_is_pressing)
+				{
+					this.startPressed();
+					console.log("dentro");
+					this.start_is_pressing = true;
+				}
+				else
+				{
+					if (!pad.start.pressed)
+						this.start_is_pressing = false;
+				}
+				
 				/*
 					Other potential events to handle:
 					if ( pad.faceButton0 ) // A on Xbox

@@ -53,38 +53,7 @@ $(function()
   var e; // Esplosione
 
   var isExplode=false;
-  
-  /*
-    var text2 = document.createElement('div');
-	text2.style.position = 'absolute';
-	//text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
-	text2.style.width = 300;
-	text2.style.height = 300;
-	text2.innerHTML = "<font color='white'>4708 Mrigashirsha VI<br/>Type=Small iron/silicate<br/>Radius=2457.46 km &nbsp; (0.39 x earth)<br/>Surface Area=7.59 x 10<sup>7</sup> km<sup>2</sup><br/>Land Area=3.11 x 10<sup>7</sup> km<sup>2</sup> &nbsp; (0.21 x earth)<br/>Mass=3.19 x 10<sup>23</sup> kg &nbsp; (0.05 x earth)<br/>Density=5.14 g/cm<sup>3</sup> &nbsp; (0.93 x earth)<br/>Composition=39.8% oxygen, 34.4% iron, 15.7% silicon, 5.0% aluminum, 5.0% other metals, trace other elements<br/>Gravity=3.51 m/s<sup>2</sup> &nbsp; (0.36 x earth)<br/>Escape Velocity=4.15 km/s<br/>Period=36.09 hours<br/>Axis Tilt=24.51 &deg;<br/>Water=60 %<br/>Ice=9 %<br/>Type=Thin toxic<br/>Pressure=11.67 kPa &nbsp; (0.12 x earth)<br/>Composition=44.8% carbon dioxide, 32.7% nitrogen, 17.5% sulfur dioxide, 3.2% methane, 1.7% argon, trace other gases<br/>Type=Standard<br/>Min Temp=126 K &nbsp; (-146 &deg;C)<br/>Avg Temp=292 K &nbsp; (19 &deg;C)<br/>Max Temp=371 K &nbsp; (97 &deg;C)<br/>Chemistry=Nitrogen-phosphorous<br/>Lifeforms=Microbes, algae, sentient animals<br/>Type=Alien Homeworld<br/>Population=16.24 million<br/>Society=Military Dictatorship<br/>Tech Level=Iron Age (water power, iron tools and weapons)<br/>Features=Ruins of an ancient civilization</font>";
-	text2.style.bottom = 0 + 'px';
-	text2.style.left = 0 + 'px';
-	document.body.appendChild(text2);
-	*/
-	
-
-	
-	window.addEventListener( 'mousedown', onclick, false );
-	
-	function onclick()
-	{
-		
-		e = new Explosion();
-		e.esplodi(navicella.position.x, navicella.position.y, navicella.position.z, scene);
-		
-		//e = new ParticlesExplosion(navicella.position.x, navicella.position.y, navicella.position.z);
-	
-		e = new ParticlesExplosion();
-		e.init(scene, navicella.position.x, navicella.position.y, navicella.position.z);
-	}
-	
-
-	
-
+ 
   function init()
   {
   	clock = new THREE.Clock();
@@ -451,89 +420,44 @@ function addLight( h, s, l, x, y, z ) {
 			lights[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
 										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
 										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
-						
-
-
 		}
-
-
 		
 		checkCollisions();
 
 		if(controls.pause && !controls.play)
 		{
-				LoadMenu();
-				controls.pause=false;
+			LoadMenu();
+			controls.pause=false;
 		}
 
-		
 		if (controls != null && controls.play && !isExplode && !controls.pause)
 		{
-
 			camera.remove(PlayText);
 			controls.movementSpeed = 0.33 * d;
 			controls.update( delta );
-
-
-
-			//seguiNavicella();
-			//console.log(camera.rotation);
-			
-			//if (controls.isPressed())
-				//camera.rotation.z = -(controls.getRotation().y - lastRotationY);
-
-			if (controls.isPressed())
-			{
-				camera.rotation.z = -(controls.getRotation().y + lastRotationY);
-				lastSettedY = controls.getRotation().y + lastRotationY;
-				//console.log("1Camera rotation z: " + camera.rotation.z + ", lastSetted: " + lastSettedY);
-			}
-			else	
-			{
-				lastRotationY = lastSettedY - controls.getRotation().y;
-				//console.log("1lastRotationY: " + lastRotationY);
-			}
-			//console.log("z: " + controls.getRotation().x + ", " + controls.getRotation().y + ", " + controls.getRotation().z);
-			//else
-			//{				
-				//camera.rotation.z = -controls.getRotation().y;
-				/*
-				if (camera.rotation.z >= 0.1)
-					camera.rotation.z -= 0.1;
-				if (camera.rotation.z <= -0.1)
-					camera.rotation.z += 0.1;
-				
-				lastRotationY = controls.getRotation().y;
-				*/
-			//}
-			
-			/*
-			if (camera.rotation.z < -90)
-				camera.rotation.z = 90;
-			if (camera.rotation.z > 90)
-				camera.rotation.z = 90;
-			*/
 		}
+		else
+			controls.checkXBoxController();
 
 		if(controls.play && !controls.pause)
 		{
-		for (var i = 0; i < asteroids_reference.length; i++)
-		{
-			asteroids_reference[i].update(calcolateWorldTotalForceOnPosition(asteroids_reference[i].getPosition()));
-			if (distance(navicella.position, asteroids_reference[i].getPosition()) > SOGLIA_VISUALE_NAVICELLA)
+			for (var i = 0; i < asteroids_reference.length; i++)
 			{
-				// Asteroide troppo lontano, va eliminato e creato uno nuovo
-				asteroids_reference[i].removeFromScene(scene);
-				var asteroid = new Asteroid();
-				asteroid.create(navicella.position, SOGLIA_VISUALE_NAVICELLA);
-				asteroid.addToScene(scene);
-				asteroids_reference[i] = asteroid;
+				asteroids_reference[i].update(calcolateWorldTotalForceOnPosition(asteroids_reference[i].getPosition()));
+				if (distance(navicella.position, asteroids_reference[i].getPosition()) > SOGLIA_VISUALE_NAVICELLA)
+				{
+					// Asteroide troppo lontano, va eliminato e creato uno nuovo
+					asteroids_reference[i].removeFromScene(scene);
+					var asteroid = new Asteroid();
+					asteroid.create(navicella.position, SOGLIA_VISUALE_NAVICELLA);
+					asteroid.addToScene(scene);
+					asteroids_reference[i] = asteroid;
+				}
 			}
-		}
 	
-		for (var i = 0; i < planets_reference.length; i++)		
-			planets_reference[i].update(camera);
-	  }
+			for (var i = 0; i < planets_reference.length; i++)		
+				planets_reference[i].update(camera);
+		}
 		
 		skybox.position.x = navicella.position.x;
 		skybox.position.y = navicella.position.y;
@@ -605,43 +529,32 @@ function addLight( h, s, l, x, y, z ) {
 	*/
    function explode()
    {
-	   // Da implementare
 	   if(!isExplode)
 	   {
-
-
-	   	var matrix = new THREE.Matrix4();
-		matrix.extractRotation( navicella.matrix );		
-	
-		//console.log(navicella.children[1].matrix);
-	
-		var directionZ = new THREE.Vector3(0, 0, 1);
-		directionZ.applyMatrix4(matrix);	
+			var matrix = new THREE.Matrix4();
+			matrix.extractRotation( navicella.matrix );		
 		
-
-	   	scene.remove(navicella);
-	    isExplode=true;
-	    console.log("BOOOOOOOOOOM");
-	   	e = new ParticlesExplosion();
-		e.init(scene, navicella.position.x + directionZ.x * 5,
+			var directionZ = new THREE.Vector3(0, 0, 1);
+			directionZ.applyMatrix4(matrix);	
+		
+			scene.remove(navicella);
+			isExplode=true;
+			console.log("BOOOOOOOOOOM");
+			e = new ParticlesExplosion();
+			e.init(scene, navicella.position.x + directionZ.x * 5,
 							navicella.position.y + directionZ.y * 5 ,
-							navicella.position.z + directionZ.z * 5); // come fa a funzionare?? se la navicella viene eliminata dalla scena?
-		clearScene();
-	 }
-   }
+							navicella.position.z + directionZ.z * 5);
+			clearScene();
+		}
+	}
 
-
-
-function clearScene()
-{
-    setTimeout(function(){
-    
-     location.reload();
-    
-    }, 3000);
-	
-}
-
+	function clearScene()
+	{
+		setTimeout(function()
+		{
+			location.reload();		
+		}, 3000);
+	}
    
    /*
     * calcolateWorldTotalForceOnPosition
