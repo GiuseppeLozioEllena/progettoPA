@@ -3,4 +3,3 @@ tuning fisica
 aggiunta suoni (esplosione)
 modifica atmosfera pianeti
 allunga fiamma nel turbo
-turbo no tenere premuto

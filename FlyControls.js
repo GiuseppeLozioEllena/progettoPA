@@ -175,7 +175,7 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 65: /*A*/ this.moveState.yawLeft = 0; this.moveState.rollLeft = 0; this.lastAngle = this.object.rotation.y; break;
 			case 68: /*D*/ this.moveState.yawRight = 0; this.moveState.rollRight = 0; break;
 			
-			case 32: /*Space*/ this.moveState.turbo = 0; this.moveState.forward = 0; break;
+			//case 32: /*Space*/ this.moveState.turbo = 0; this.moveState.forward = 0; break;
 
 			//case 81: /*Q*/ this.moveState.rollLeft = 0; break;
 			//case 69: /*E*/ this.moveState.rollRight = 0; break;
@@ -310,7 +310,8 @@ THREE.FlyControls = function ( object, domElement ) {
 				if (pad.faceButton0.pressed) // A on Xbox
 					this.moveState.forward = 1;
 				else
-					this.moveState.forward = 0;
+					if (this.moveState.turbo == 0)
+						this.moveState.forward = 0;
 				
 				if (pad.faceButton3.pressed) // Y on Xbox
 					this.doTurbo();
@@ -364,6 +365,8 @@ THREE.FlyControls = function ( object, domElement ) {
 			{
 				this.usable = false;
 				turboZ = 1;
+				this.moveState.turbo = 0;
+				this.moveState.forward = 0;
 				this.lastTurboUsedTime = 0;
 			}
 			else
