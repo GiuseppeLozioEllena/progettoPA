@@ -24,6 +24,7 @@ $(function()
   var SOGLIA_VISUALE_NAVICELLA = 1000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
   var ASTEROIDS_NUMBER = 0; // Numero di asteroidi contemporaneamente presenti in scena
+  var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
   
   // Tasti per visualizzare info pianeti
   var SHOW_INFO_BUTTON = 81; // Q
@@ -34,7 +35,7 @@ $(function()
   var clock;
   var fire;
   
-  var G = 6.67408 * 0.01; // Costante di gravitazione universale (cambiata la scala rispetto all'origianale, sorry Newton)
+  var G = 6.67408 * 0.1; // Costante di gravitazione universale (cambiata la scala rispetto all'origianale, sorry Newton)
   var MASSA_NAVICELLA = 1;
   
   var listener;
@@ -501,13 +502,13 @@ function addLight( h, s, l, x, y, z ) {
 	
 			for (var i = 0; i < planets_reference.length; i++)		
 				planets_reference[i].update(camera);
+			
+			applyForces();
 		}
 		
 		skybox.position.x = navicella.position.x;
 		skybox.position.y = navicella.position.y;
 		skybox.position.z = navicella.position.z;
-		
-		//applyForces();
 
 		var elapsed = clock.getElapsedTime();
 		fire.update(elapsed);
@@ -670,24 +671,26 @@ function addLight( h, s, l, x, y, z ) {
 			var distanza = (planets_reference[i].position().x - navicella.position.x) * (planets_reference[i].position().x - navicella.position.x) +
 						(planets_reference[i].position().y - navicella.position.y) * (planets_reference[i].position().y - navicella.position.y) +
 						(planets_reference[i].position().z - navicella.position.z) * (planets_reference[i].position().z - navicella.position.z);
-			
-			var direzione = new THREE.Vector3(planets_reference[i].position().x - navicella.position.x,
+				
+			if (distanza < SOGLIA_DISTANZA_EFFETTO_GRAVITA)
+			{
+				var direzione = new THREE.Vector3(planets_reference[i].position().x - navicella.position.x,
 											planets_reference[i].position().y - navicella.position.y,
 											planets_reference[i].position().z - navicella.position.z);
 			
-			var m1 = planets_reference[i].getMass();
-			var m2 = MASSA_NAVICELLA;
-			var forza = G * (m1 * m2) / distanza;
+				var m1 = planets_reference[i].getMass();
+				var m2 = MASSA_NAVICELLA;
+				var forza = G * (m1 * m2) / distanza;
 			
-			finalForce.x += forza * direzione.x;
-			finalForce.y += forza * direzione.y;
-			finalForce.z += forza * direzione.z;
+				finalForce.x += forza * direzione.x;
+				finalForce.y += forza * direzione.y;
+				finalForce.z += forza * direzione.z;
 		   
-		   var np = new THREE.Vector3(navicella.position.x + finalForce.x,
+				var np = new THREE.Vector3(navicella.position.x + finalForce.x,
 											navicella.position.y + finalForce.y,
 											navicella.position.z + finalForce.z);
-			navicella.position.set(np.x, np.y, np.z);
-			
+				navicella.position.set(np.x, np.y, np.z);	
+			}
 	    }	
    }
    
