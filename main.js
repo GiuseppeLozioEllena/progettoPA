@@ -503,7 +503,8 @@ function addLight( h, s, l, x, y, z ) {
 			for (var i = 0; i < planets_reference.length; i++)		
 				planets_reference[i].update(camera);
 			
-			applyForces();
+			if (!isExplode)
+				applyForces();
 		}
 		
 		skybox.position.x = navicella.position.x;
@@ -590,6 +591,18 @@ function addLight( h, s, l, x, y, z ) {
 			e.init(scene, navicella.position.x + directionZ.x * 5,
 							navicella.position.y + directionZ.y * 5 ,
 							navicella.position.z + directionZ.z * 5);
+							
+			var audioLoader = new THREE.AudioLoader();
+			
+			var sound1 = new THREE.PositionalAudio( listener );
+			audioLoader.load( 'sounds/explosion.mp3', function( buffer ) {
+				sound1.setBuffer( buffer );
+				sound1.setRefDistance( 20 );
+				sound1.play();
+			});
+			
+			navicella.add(sound1);
+							
 			clearScene();
 		}
 	}
