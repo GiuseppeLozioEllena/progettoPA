@@ -1,4 +1,3 @@
 tuning esplosione
 modifica atmosfera pianeti
 allunga fiamma nel turbo
-sistemare asteroidi (altrimenti la partita dura 10 secondi)

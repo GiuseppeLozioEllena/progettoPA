@@ -6,6 +6,7 @@ Asteroid = function ()
 {	
 	var MIN_FORCE = 0.0005;
 	var MAX_FORCE = 0.005;
+	var DISTANCE_MAX_FROM_SPACESHIP = 150;
 	
 	var ASTEROID_SIZE = 3000; // Forse da abbassare un po'
 	
@@ -26,6 +27,9 @@ Asteroid = function ()
 	
 	this.distance = distance;
 	
+	this.explosion = null;
+	this.explode = explode;
+	
 	/*
 	 * update
 	 * Modifica la posizione del mondo
@@ -35,9 +39,14 @@ Asteroid = function ()
 	 */
 	function update(worldTotalForce)
 	{
-		this.asteroid.position.set(this.asteroid.position.x + worldTotalForce.x + this.direction.x * this.force,
+		if (this.explosion != null)
+			this.explosion.animate();
+		else
+		{
+			this.asteroid.position.set(this.asteroid.position.x + worldTotalForce.x + this.direction.x * this.force,
 									this.asteroid.position.y + worldTotalForce.y + this.direction.y * this.force,
 									this.asteroid.position.z + worldTotalForce.z + this.direction.z * this.force);
+		}
 	}
 	
 	function create(navPosition, minimumDistance)
@@ -94,7 +103,9 @@ Asteroid = function ()
 	
 	function generateDirection(navPosition)
 	{
-		var randomDirection = new THREE.Vector3(Math.random() * 50 - 25, Math.random() * 50 - 25, Math.random() * 50 - 25);
+		var randomDirection = new THREE.Vector3(Math.random() * DISTANCE_MAX_FROM_SPACESHIP - DISTANCE_MAX_FROM_SPACESHIP / 2, 
+												Math.random() * DISTANCE_MAX_FROM_SPACESHIP - DISTANCE_MAX_FROM_SPACESHIP / 2, 
+												Math.random() * DISTANCE_MAX_FROM_SPACESHIP - DISTANCE_MAX_FROM_SPACESHIP / 2);
 		var internalPoint = new THREE.Vector3(navPosition.x + randomDirection.x,
 									navPosition.y + randomDirection.y,
 									navPosition.z + randomDirection.z);
@@ -110,10 +121,26 @@ Asteroid = function ()
 	
 	function inCollision(navPosition)
 	{
-		if (distance(navPosition, this.asteroid.position) < ASTEROID_SIZE * this.scala)
-			return true;
+		if (this.explosion == null)
+		{
+			if (distance(navPosition, this.asteroid.position) < ASTEROID_SIZE * this.scala)
+				return true;
+			else
+				return false;
+		}
 		else
 			return false;
+	}
+	
+	function explode(scene)
+	{
+		console.log("esplodo");
+		var e = new ParticlesExplosion();
+		e.init(scene, this.getPosition().x,
+					this.getPosition().y,
+					this.getPosition().z);
+		this.explosion = e;
+		this.removeFromScene(scene);
 	}
 	
 	/*

@@ -23,7 +23,7 @@ $(function()
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
   var SOGLIA_VISUALE_NAVICELLA = 1000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
-  var ASTEROIDS_NUMBER = 0; // Numero di asteroidi contemporaneamente presenti in scena
+  var ASTEROIDS_NUMBER = 3; // Numero di asteroidi contemporaneamente presenti in scena
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
   
   // Tasti per visualizzare info pianeti
@@ -489,7 +489,7 @@ function addLight( h, s, l, x, y, z ) {
 			for (var i = 0; i < asteroids_reference.length; i++)
 			{
 				asteroids_reference[i].update(calcolateWorldTotalForceOnPosition(asteroids_reference[i].getPosition()));
-				if (distance(navicella.position, asteroids_reference[i].getPosition()) > SOGLIA_VISUALE_NAVICELLA)
+				if (distance(navicella.position, asteroids_reference[i].getPosition()) > SOGLIA_VISUALE_NAVICELLA * 2)
 				{
 					// Asteroide troppo lontano, va eliminato e creato uno nuovo
 					asteroids_reference[i].removeFromScene(scene);
@@ -567,6 +567,21 @@ function addLight( h, s, l, x, y, z ) {
 				inCollision = true;
 			}
 		}
+		
+		/*
+		for (var i = 0; i < asteroids_reference.length; i++)
+		{
+			inCollision = false;
+			for (var j = 0; j < planets_reference.length && !inCollision; j++)
+			{
+				if (planets_reference[j].inCollision(asteroids_reference[i].getPosition()))
+				{
+					inCollision = true;
+					asteroids_reference[i].explode(scene);
+				}	
+			}
+		}
+		*/
 	}
    
    /*
@@ -586,7 +601,7 @@ function addLight( h, s, l, x, y, z ) {
 		
 			scene.remove(navicella);
 			isExplode=true;
-			console.log("BOOOOOOOOOOM");
+
 			e = new ParticlesExplosion();
 			e.init(scene, navicella.position.x + directionZ.x * 5,
 							navicella.position.y + directionZ.y * 5 ,
