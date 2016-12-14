@@ -371,14 +371,20 @@ function addLight( h, s, l, x, y, z ) {
 	datGUI.close();
 
 
+
  $("#webGL-container").append(renderer.domElement);
-        /*stats*/
+       
+       /*
         stats = new Stats();        
         stats.domElement.style.position = 'absolute';
-        stats.domElement.style.left = '0px';
+        stats.domElement.style.left = '800px';
         stats.domElement.style.top = '0px';     
-        $("#webGL-container").append( stats.domElement );    
+        $("#webGL-container").append( stats.domElement );  
+        */
+         
  }
+
+ 
  
  	/*
 	 * isVisibleFromCamera
@@ -447,7 +453,7 @@ function addLight( h, s, l, x, y, z ) {
    {
 		var delta = clock.getDelta();
 		requestAnimationFrame(animate);
-		stats.update();
+		//stats.update();
    		renderer.render(scene,camera);
 		d = 100;
 		
