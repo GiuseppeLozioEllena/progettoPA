@@ -19,6 +19,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	this.getMoons = getMoons;
 	this.getClouds = getClouds;	
 	this.getMass = getMass;
+	this.isNear = isNear;
 	this.inCollision = inCollision;
 	this.addToScene = addToScene;
 	this.removeFromScene = removeFromScene;	
@@ -188,6 +189,25 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 			if (distance(navPosition, v) < this.moon_scales[i] * this.moon_scales[i] + 1)
 				return true;	
 		}
+
+		return false;
+	}
+	
+	function isNear(navPosition)
+	{
+		if (distance(navPosition, new THREE.Vector3(this.x, this.y, this.z)) < (this.scala * this.scala + 5) * 20)
+			return true;
+		
+		/*
+		for (i = 0; i < this.numero_lune; i++)
+		{
+			var v = new THREE.Vector3();
+			v.setFromMatrixPosition( this.master_reference.children[i].children[0].matrixWorld );
+		
+			if (distance(navPosition, v) < (this.moon_scales[i] * this.moon_scales[i] + 1 * 3))
+				return true;	
+		}
+		*/
 
 		return false;
 	}

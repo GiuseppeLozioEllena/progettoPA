@@ -55,10 +55,36 @@ $(function()
   var button1Pressed = false;
   var leftShoulderPressed = false;
   var rightShoulderPressed = false;
+  
+  /* Variabili per la gestione del cambio della texture della navicella */
+  var manager;
+  var blue_texture, red_texture;
+  var is_red;
  
   function init()
   {
-  	clock = new THREE.Clock();
+  	manager = new THREE.LoadingManager();
+	is_red = false;
+	
+	blue_texture = new THREE.Texture();
+	//console.log(texture_path);
+	var loader = new THREE.ImageLoader(manager);
+	loader.load( 'textures/spaceship/diffuse.bmp', function ( image ) 
+	{
+		blue_texture.image = image;
+		blue_texture.needsUpdate = true;
+	} );
+				
+	red_texture = new THREE.Texture();
+	//console.log(texture_path);
+	var loader = new THREE.ImageLoader(manager);
+	loader.load( 'textures/spaceship/diffuse red.bmp', function ( image ) 
+	{
+		red_texture.image = image;
+		red_texture.needsUpdate = true;
+	} );				
+
+	clock = new THREE.Clock();
 	
 	planetInfoManager = new PlanetInfoManager();
 	planetInfoManager.hideAll();
@@ -315,31 +341,33 @@ function addLight( h, s, l, x, y, z ) {
 	return starField;
 	*/
   }
-  
-  function caricaNavicella(x,y,z)
-  {
-  
-    var model = new Model(x,y,z);
-    navicella = model.LoadmodelScale('textures/spaceship/diffuse.bmp','model/spaceship.obj',0.025);
-	navicella.rotation.set(0,0,0);
-	
-	//navicella.add(camera);
-    		
-	camera.position.set(0, 3, 20);
-	controls = new THREE.FlyControls(navicella);
-	controls.movementSpeed = 1000;
-	controls.domElement = container;
-	controls.rollSpeed = Math.PI / 24;
-	controls.autoForward = false;
-	controls.dragToLook = false;
+
+	/*
+	 * caricaNavicella
+	 * Carica modello 3D di navicella, inizializza controlli e ecamera
+	 */ 
+	function caricaNavicella(x,y,z)
+	{
+		var model = new Model(x,y,z);
+		navicella = model.LoadmodelScale('textures/spaceship/diffuse.bmp','model/spaceship.obj',0.025);
+		navicella.rotation.set(0,0,0);
 		
-	//var axis = new THREE.AxisHelper(5);
-	//navicella.add(axis);
-    scene.add(navicella);
+		//navicella.add(camera);
+				
+		camera.position.set(0, 3, 20);
+		controls = new THREE.FlyControls(navicella);
+		controls.movementSpeed = 1000;
+		controls.domElement = container;
+		controls.rollSpeed = Math.PI / 24;
+		controls.autoForward = false;
+		controls.dragToLook = false;
+		
+		//var axis = new THREE.AxisHelper(5);
+		//navicella.add(axis);
+		scene.add(navicella);
 	
-	scene.add(camera);
-  }
-  
+		scene.add(camera);
+	}  
 
 	function generateSprite() {
 
@@ -448,7 +476,7 @@ function addLight( h, s, l, x, y, z ) {
 			}
 		}
 	}
-
+	
    function animate()
    {
 		var delta = clock.getDelta();
@@ -551,11 +579,13 @@ function addLight( h, s, l, x, y, z ) {
    /*
     * checkCollisions
 	* Controlla se vi sono collisioni tra la navicella e pianeti o asteroidi
+	* Modifica anche la texture della navicella se necessario
 	*/
 	function checkCollisions()
 	{
 		var inCollision = false;
 		scene.updateMatrixWorld();
+		var isNear = false;
 		for (var i = 0; i < planets_reference.length && !inCollision; i++)
 		{
 			if (planets_reference[i].inCollision(navicella.position))
@@ -563,6 +593,37 @@ function addLight( h, s, l, x, y, z ) {
 				explode();
 				inCollision = true;
 			}
+			
+			if (planets_reference[i].isNear(navicella.position))
+			{
+				isNear = true;
+				console.log("sono vicino! -> " + navicella.children.length);
+				if (!is_red)
+				{
+					is_red = true;
+					if (navicella.children[2].children[0] instanceof THREE.Mesh) // sempre vero in teoria
+					{
+						var f = navicella.children[2].children[0];
+						f.material.map = red_texture;
+						console.log("Vicino");
+					}
+					else
+						console.log("Errore, non ho trovato la mesh in navicella");
+				}
+			}
+		}
+		
+		if (!isNear && is_red)
+		{
+			is_red = false;
+			if (navicella.children[2].children[0] instanceof THREE.Mesh) // sempre vero in teoria
+			{
+				var f = navicella.children[2].children[0];
+				f.material.map = blue_texture;
+				console.log("Lontano");
+			}
+			else
+				console.log("Errore, non ho trovato la mesh in navicella");
 		}
 	  
 		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
