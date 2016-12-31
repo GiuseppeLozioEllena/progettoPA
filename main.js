@@ -268,9 +268,9 @@ $(function()
 	
 	for (var i = 0; i < LENS_FLARES_NUMBER; i++)
 	{
-		var x = random(-RANGE, RANGE);
-		var y = random(-RANGE, RANGE);
-		var z = random(-RANGE, RANGE);
+		var x = random(-RANGE * 2, RANGE * 2);
+		var y = random(-RANGE * 2, RANGE * 2);
+		var z = random(-RANGE * 2, RANGE * 2);
 		lensflaresOriginalPositions.push(new THREE.Vector3(x,y,z));
 		addLight(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), x, y, z);
 	}
