@@ -21,10 +21,12 @@ $(function()
   var RANGE = 1000;
   var PLANETS_TOTAL_NUMBER = 1000;
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
-  var SOGLIA_VISUALE_NAVICELLA = 3000000;
-  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
+  var SOGLIA_VISUALE_NAVICELLA = 6000000;
+  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 13;
   var ASTEROIDS_NUMBER = 0; //3; // Numero di asteroidi contemporaneamente presenti in scena
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
+  var MAX_DISTANCE_CAMERA = 4000;
+  var DIM_SKYBOX = 4000;
   
   // Tasti per visualizzare info pianeti
   var SHOW_INFO_BUTTON = 81; // Q
@@ -115,7 +117,7 @@ $(function()
 	planetInfoManager.hideAll();
 
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,10000);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
 	skybox = setSkybox();
@@ -348,7 +350,7 @@ function addLight( h, s, l, x, y, z ) {
 		materialArray.push( new THREE.MeshBasicMaterial({
 	map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
 	side: THREE.BackSide}));
-	var skyGeometry = new THREE.CubeGeometry(10000,10000, 10000 );
+	var skyGeometry = new THREE.CubeGeometry(DIM_SKYBOX, DIM_SKYBOX, DIM_SKYBOX);
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	skyBox.renderDepth = 5000.0;  
