@@ -120,6 +120,12 @@ $(function()
     camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
+	scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
+	scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
+	renderer.setClearColor( scene.fog.color );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	
 	skybox = setSkybox();
 	scene.add(skybox);
    
@@ -306,7 +312,7 @@ $(function()
 }
   
 function addLight( h, s, l, x, y, z ) {
-
+	
 	var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
 	light.color.setHSL( h, s, l );
 	light.position.set( x, y, z );
@@ -315,8 +321,8 @@ function addLight( h, s, l, x, y, z ) {
 	var flareColor = new THREE.Color( 0xffffff );
 	flareColor.setHSL( h, s, l + 0.5 );
 
-	var lensFlare = new THREE.LensFlare( textureFlare1, 500, 0.0, THREE.AdditiveBlending, flareColor );
-
+	var lensFlare = new THREE.LensFlare( textureFlare1, 700, 0.0, THREE.AdditiveBlending, flareColor );
+	
 	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
@@ -325,6 +331,7 @@ function addLight( h, s, l, x, y, z ) {
 	lensFlare.add( textureFlare3, 70, 0.7, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
 	lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
+	
 	lensFlare.customUpdateCallback = lensFlareUpdateCallback;
 	lensFlare.position.copy( light.position );
 
