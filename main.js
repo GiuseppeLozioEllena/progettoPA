@@ -21,9 +21,9 @@ $(function()
   var RANGE = 1000;
   var PLANETS_TOTAL_NUMBER = 1000;
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
-  var SOGLIA_VISUALE_NAVICELLA = 1000000;
+  var SOGLIA_VISUALE_NAVICELLA = 3000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 20;
-  var ASTEROIDS_NUMBER = 3; // Numero di asteroidi contemporaneamente presenti in scena
+  var ASTEROIDS_NUMBER = 0; //3; // Numero di asteroidi contemporaneamente presenti in scena
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
   
   // Tasti per visualizzare info pianeti
@@ -56,10 +56,12 @@ $(function()
   var leftShoulderPressed = false;
   var rightShoulderPressed = false;
   
-  /* Variabili per la gestione del cambio della texture della navicella */
+  /* Variabili per la gestione del cambio delle texture */
   var manager;
   var blue_texture, red_texture;
   var is_red;
+  var clouds_texture;
+  var moon_texture;
  
   function init()
   {
@@ -67,7 +69,6 @@ $(function()
 	is_red = false;
 	
 	blue_texture = new THREE.Texture();
-	//console.log(texture_path);
 	var loader = new THREE.ImageLoader(manager);
 	loader.load( 'textures/spaceship/diffuse.bmp', function ( image ) 
 	{
@@ -76,13 +77,28 @@ $(function()
 	} );
 				
 	red_texture = new THREE.Texture();
-	//console.log(texture_path);
 	var loader = new THREE.ImageLoader(manager);
 	loader.load( 'textures/spaceship/diffuse red.bmp', function ( image ) 
 	{
 		red_texture.image = image;
 		red_texture.needsUpdate = true;
 	} );				
+	
+	clouds_texture = new THREE.Texture();
+	var loader = new THREE.ImageLoader(manager);
+	loader.load( "textures/clouds/clouds_2.jpg", function ( image ) 
+	{
+		clouds_texture.image = image;
+		clouds_texture.needsUpdate = true;
+	} );
+	
+	moon_texture = new THREE.Texture();
+	var loader = new THREE.ImageLoader(manager);
+	loader.load( "textures/planet/moon.jpg", function ( image ) 
+	{
+		moon_texture.image = image;
+		moon_texture.needsUpdate = true;
+	} );					
 
 	clock = new THREE.Clock();
 	
@@ -537,8 +553,8 @@ function addLight( h, s, l, x, y, z ) {
 			for (var i = 0; i < planets_reference.length; i++)		
 				planets_reference[i].update(camera);
 			
-			if (!isExplode)
-				applyForces();
+			//if (!isExplode)
+				//applyForces();
 		}
 		
 		skybox.position.x = navicella.position.x;
@@ -597,7 +613,6 @@ function addLight( h, s, l, x, y, z ) {
 			if (planets_reference[i].isNear(navicella.position))
 			{
 				isNear = true;
-				console.log("sono vicino! -> " + navicella.children.length);
 				if (!is_red)
 				{
 					is_red = true;
@@ -605,7 +620,6 @@ function addLight( h, s, l, x, y, z ) {
 					{
 						var f = navicella.children[2].children[0];
 						f.material.map = red_texture;
-						console.log("Vicino");
 					}
 					else
 						console.log("Errore, non ho trovato la mesh in navicella");
@@ -620,7 +634,6 @@ function addLight( h, s, l, x, y, z ) {
 			{
 				var f = navicella.children[2].children[0];
 				f.material.map = blue_texture;
-				console.log("Lontano");
 			}
 			else
 				console.log("Errore, non ho trovato la mesh in navicella");
@@ -725,8 +738,13 @@ function addLight( h, s, l, x, y, z ) {
 			   {
 				 var p = new Planet(planetsInfo[i].getPosition().x, planetsInfo[i].getPosition().y, planetsInfo[i].getPosition().z);
 				 p.create(planetsInfo[i].getScale(), planetsInfo[i].getTextureNumber());
-				 p.createClouds();
-				 p.generateMoon(planetsInfo[i].getMoonNumber(), planetsInfo[i].getMoonVelocities(), planetsInfo[i].getMoonPositions(), planetsInfo[i].getMoonScales());
+				 p.createClouds(clouds_texture);
+				 p.generateMoon(planetsInfo[i].getMoonNumber(), 
+									planetsInfo[i].getMoonVelocities(), 
+									planetsInfo[i].getMoonPositions(), 
+									planetsInfo[i].getMoonScales(),
+									moon_texture);
+				 
 				 p.addToScene(scene);
 				 planets_reference.push(p);
 				 

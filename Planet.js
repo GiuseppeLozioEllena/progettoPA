@@ -70,6 +70,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	{
 		this.scala = scalaPianeta;
 		this.texture = "textures/planets_downloaded/texture" + numeroTexture + ".jpg";
+		//this.texture = "textures/planet/earth.jpg";
 		this.textureNumber = numeroTexture;
 		//this.texture = "textures/planet/earth_texture_2.jpg";		
 		this.mass = this.scala;
@@ -83,14 +84,15 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		return this.planet_reference;
 	}
 	
-	function createClouds()
+	function createClouds(texture)
 	{
 		var model = new Model(this.x,this.y,this.z);
 		var modelM = new THREE.MeshPhongMaterial({
           transparent: true,
           opacity: 0.3});
 		 		  
-		this.clouds =  model.loadModelTexture("textures/clouds/clouds_2.jpg",this.scala + 2.5,modelM);
+		//this.clouds =  model.loadModelTexture("textures/clouds/clouds_2.jpg",this.scala + 2.5,modelM);
+		this.clouds =  model.loadModelWithTexture(texture,this.scala + 2.5,modelM);
 		
 		return this.clouds;
 	}
@@ -127,7 +129,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		this.planetGlow = null;
 	}
 
-	function generateMoon(numero_lune_pianeta, velocity, positions, scales)
+	function generateMoon(numero_lune_pianeta, velocity, positions, scales, texture)
 	{
 		this.numero_lune = numero_lune_pianeta;
 		this.master_reference = new THREE.Object3D();
@@ -136,20 +138,20 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		this.moon_scales = scales;
 		for (i = 0; i < this.numero_lune; i++)
 		{
-			this.createMoon(positions[i], scales[i]);
+			this.createMoon(positions[i], scales[i], texture);
 			this.moons_velocity[i] = velocity[i];
 		}
 		return this.master_reference;
 	}
 
-	function createMoon(position, scale)
+	function createMoon(position, scale, texture)
 	{	
 		parent = new THREE.Object3D();
 		parent.position.set(0,0,0);
 		
 		var model = new Model(0, position, 0);
 	    var modelM = new THREE.MeshPhongMaterial({ });
-		this.moon =  model.loadModelTexture("textures/planet/moon.jpg", scale, modelM);
+		this.moon =  model.loadModelWithTexture(texture, scale, modelM);
 		
 		parent.add(this.moon);
 		this.master_reference.add(parent);

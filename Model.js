@@ -4,8 +4,9 @@ function Model(x_pianeta,y_pianeta,z_pianeta)
        this.x = x_pianeta;
        this.y = y_pianeta;
        this.z = z_pianeta;
-       this.LoadmodelScale=LoadmodelScale;
-       this.loadModelTexture=loadModelTexture;
+       this.LoadmodelScale = LoadmodelScale;
+       this.loadModelTexture = loadModelTexture;
+	   this.loadModelWithTexture = loadModelWithTexture;
 }
  var onError = function ( xhr ) 
       {
@@ -60,6 +61,25 @@ function loadModelTexture(texture_path,scale,material)
 	  var mesh=new THREE.Mesh(modelG,modelM);
 	  container.add(mesh);
 	} );
+
+	return container;
+}
+
+/*
+ * loadModelWithTexture
+ * A differenza di loadModelTexture qui viene passata direttamente la texture
+ * in modo che non debba venir caricata ogni volta dal file
+ */
+function loadModelWithTexture(texture,scale,material)
+{
+	var container = new THREE.Object3D();
+	container.position.set(this.x,this.y,this.z);
+	
+	var modelG = new THREE.SphereGeometry(scale,50,50);
+	var modelM = material;
+	modelM.map=texture;
+	var mesh=new THREE.Mesh(modelG,modelM);
+	container.add(mesh);
 
 	return container;
 }
