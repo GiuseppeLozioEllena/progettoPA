@@ -66,7 +66,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		scene.remove(this.master_reference);
 	}
 
-	function create(scalaPianeta, numeroTexture)
+	function create(scalaPianeta, numeroTexture, texture2)
 	{
 		this.scala = scalaPianeta;
 		this.texture = "textures/planets_downloaded/texture" + numeroTexture + ".jpg";
@@ -79,7 +79,8 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
           color: 0xaaaaaa,
           specular: 0x333333,
           shininess: 25});
-		this.planet_reference = model.loadModelTexture(this.texture, this.scala, modelM);
+	    this.planet_reference = model.loadModelTexture(this.texture, this.scala, modelM);
+		//this.planet_reference = model.loadModelWithTexture(texture2, this.scala, modelM);
 		
 		return this.planet_reference;
 	}

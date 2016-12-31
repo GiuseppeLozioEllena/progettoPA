@@ -62,6 +62,7 @@ $(function()
   var is_red;
   var clouds_texture;
   var moon_texture;
+  var earth_texture;
  
   function init()
   {
@@ -98,7 +99,15 @@ $(function()
 	{
 		moon_texture.image = image;
 		moon_texture.needsUpdate = true;
-	} );					
+	} );
+	
+	earth_texture = new THREE.Texture();
+	var loader = new THREE.ImageLoader(manager);
+	loader.load( "textures/planet/earth.jpg", function ( image ) 
+	{
+		earth_texture.image = image;
+		earth_texture.needsUpdate = true;
+	} );	
 
 	clock = new THREE.Clock();
 	
@@ -737,14 +746,15 @@ function addLight( h, s, l, x, y, z ) {
 			   if (!planetsInfo[i].isVisible())
 			   {
 				 var p = new Planet(planetsInfo[i].getPosition().x, planetsInfo[i].getPosition().y, planetsInfo[i].getPosition().z);
-				 p.create(planetsInfo[i].getScale(), planetsInfo[i].getTextureNumber());
+				 p.create(planetsInfo[i].getScale(), planetsInfo[i].getTextureNumber(), earth_texture);
 				 p.createClouds(clouds_texture);
+				 
 				 p.generateMoon(planetsInfo[i].getMoonNumber(), 
 									planetsInfo[i].getMoonVelocities(), 
 									planetsInfo[i].getMoonPositions(), 
 									planetsInfo[i].getMoonScales(),
 									moon_texture);
-				 
+				
 				 p.addToScene(scene);
 				 planets_reference.push(p);
 				 
