@@ -983,7 +983,7 @@ function addLight( h, s, l, x, y, z ) {
 	function infoForward()
 	{
 		var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
-		if (visiblePlanets.length != 0)
+		if (visiblePlanets.length != 0  && planetInfoManager.selectedPlanet != null)
 		{
 			planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
 			
@@ -1003,7 +1003,7 @@ function addLight( h, s, l, x, y, z ) {
 	function infoBackward()
 	{
 		var visiblePlanets = ordinaPerDistanza(getVisiblePlanets());
-		if (visiblePlanets.length != 0)
+		if (visiblePlanets.length != 0 && planetInfoManager.selectedPlanet != null)
 		{
 			planetInfoManager.selectedPlanet.removeGlowFromScene(scene);
 			
