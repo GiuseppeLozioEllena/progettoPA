@@ -943,11 +943,8 @@ function addLight( h, s, l, x, y, z ) {
 				PlayText.position.x=-60;
 				PlayText.position.y=10;
 				PlayText.position.z=-80;
-				
 
 				//scene.add(PlayText);
-
-		
 		}
 		
 	/*

@@ -149,6 +149,25 @@ THREE.FlyControls = function ( object, domElement ) {
 			this.fire.mesh.position.z = 6.5;
 			this.navicella.add(this.fire.mesh);
 		}
+		
+		if (s == 2 && (this.fire == null || (this.fire != null && this.fire.mesh.position.z == 6.5 /* Accelerazione normale */)))
+		{
+			this.fire = new VolumetricFire(
+				fireWidth,
+				fireHeight,
+				fireDepth,
+				sliceSpacing,
+				this.camera
+			);
+			
+			// you can set position, rotation and scale
+			// fire.mesh accepts THREE.mesh features
+			
+			this.fire.mesh.rotation.x = 90;
+			//fire.mesh.position.x += 0.73;
+			this.fire.mesh.position.z = 10.5;
+			this.navicella.add(this.fire.mesh);
+		}
 	}
 	
 	/*
@@ -199,6 +218,7 @@ THREE.FlyControls = function ( object, domElement ) {
 					sound1.play();
 				});
 				
+				this.manageFire(2);
 				this.object.add(sound1);
 			}
 		}
@@ -377,7 +397,9 @@ THREE.FlyControls = function ( object, domElement ) {
 					}
 				
 				if (pad.faceButton3.pressed) // Y on Xbox
+				{
 					this.doTurbo();
+				}
 					
 				if (pad.start.pressed && !this.start_is_pressing)
 				{
@@ -431,6 +453,8 @@ THREE.FlyControls = function ( object, domElement ) {
 				this.moveState.turbo = 0;
 				this.moveState.forward = 0;
 				this.lastTurboUsedTime = 0;
+				
+				this.manageFire(0);
 			}
 			else
 				this.usable = true;
