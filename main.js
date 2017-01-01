@@ -65,6 +65,12 @@ $(function()
   var clouds_texture;
   var moon_texture;
   var earth_texture;
+  
+  /* Variabili fuoco */
+  var fireWidth  = 1.25;
+  var fireHeight = 1;
+  var fireDepth  = 1.75;
+  var sliceSpacing = 0.25;
  
   function init()
   {
@@ -176,12 +182,7 @@ $(function()
 	var s = new THREE.SpotLightHelper(spotLight);
 	scene.add(s);
 
-  	var fireWidth  = 1.25;
-	var fireHeight = 1;
-	var fireDepth  = 1.75;
-	var sliceSpacing = 0.25;
-
-
+	/*
 	fire = new VolumetricFire(
 		fireWidth,
 		fireHeight,
@@ -190,7 +191,6 @@ $(function()
 		camera
 	);
 	
-	
 	// you can set position, rotation and scale
 	// fire.mesh accepts THREE.mesh features
 	
@@ -198,6 +198,7 @@ $(function()
 	//fire.mesh.position.x += 0.73;
 	fire.mesh.position.z = navicella.position.z - 10.5;
 	navicella.add(fire.mesh);
+	*/
 	
 	populate_universe(PLANETS_TOTAL_NUMBER);
 	
@@ -390,6 +391,7 @@ function addLight( h, s, l, x, y, z ) {
 				
 		camera.position.set(0, 3, 20);
 		controls = new THREE.FlyControls(navicella);
+		controls.setCamera(camera);
 		controls.movementSpeed = 1000;
 		controls.domElement = container;
 		controls.rollSpeed = Math.PI / 24;
@@ -511,6 +513,7 @@ function addLight( h, s, l, x, y, z ) {
 		}
 	}
 	
+	var t = 0;
    function animate()
    {
 		var delta = clock.getDelta();
@@ -580,7 +583,10 @@ function addLight( h, s, l, x, y, z ) {
 		skybox.position.z = navicella.position.z;
 
 		var elapsed = clock.getElapsedTime();
-		fire.update(elapsed);
+		//fire.update(elapsed);
+		//t += elapsed;
+		if (controls.getFire() != null)
+			controls.getFire().update(elapsed);
 		
 		var matrix = new THREE.Matrix4();
 		matrix.extractRotation( navicella.matrix );		
@@ -634,13 +640,16 @@ function addLight( h, s, l, x, y, z ) {
 				if (!is_red)
 				{
 					is_red = true;
-					if (navicella.children[2].children[0] instanceof THREE.Mesh) // sempre vero in teoria
+					for (var j = 0; j < navicella.children.length; j++)
 					{
-						var f = navicella.children[2].children[0];
-						f.material.map = red_texture;
+						if (navicella.children[j].length > 0 && navicella.children[j].children[0] instanceof THREE.Mesh) // sempre vero in teoria
+						{
+							var f = navicella.children[j].children[0];
+							f.material.map = red_texture;
+						}
+						else
+							console.log("Errore, non ho trovato la mesh in navicella");
 					}
-					else
-						console.log("Errore, non ho trovato la mesh in navicella");
 				}
 			}
 		}

@@ -6,6 +6,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	
 	this.listener = null;
 	this.usable = true;
+	this.fire = null;
 	
 	MAX_Y = 26;
 	MIN_Y = -26;
@@ -15,6 +16,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.lastTurboUsedTime = -1;
 
 	this.object = object;
+	this.navicella = object;
 	
 	this.lastAngle = 0;
 
@@ -33,8 +35,15 @@ THREE.FlyControls = function ( object, domElement ) {
 	
 	this.startPressed = startPressed;
 	
+	this.camera = null;
+	this.setCamera = setCamera;
+	
+	this.getFire = getFire;
+	
 	this.checkXBoxController = checkXBoxController;
 	this.doTurbo = doTurbo;
+	
+	this.manageFire = manageFire;
 
 	this.tmpQuaternion = new THREE.Quaternion();
 
@@ -43,6 +52,12 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.moveState = { up: 0, down: 0, left: 0, right: 0, forward: 0, back: 0, pitchUp: 0, pitchDown: 0, yawLeft: 0, yawRight: 0, rollLeft: 0, rollRight: 0, turbo: 0 };
 	this.moveVector = new THREE.Vector3( 0, 0, 0 );
 	this.rotationVector = new THREE.Vector3( 0, 0, 0 );
+	
+	/* Variabili fuoco */
+	var fireWidth  = 1.25;
+	var fireHeight = 1;
+	var fireDepth  = 1.75;
+	var sliceSpacing = 0.25;
 
 	this.handleEvent = function ( event ) {
 
@@ -77,7 +92,9 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 39: /*right*/ this.moveState.yawRight = 1; break;
 
 			//case 83: /*S*/ this.moveState.back = 1; break;
-			case 87: /*W*/ this.moveState.forward = 1; break;
+			case 87: /*W*/ this.moveState.forward = 1; 
+							this.manageFire(1);	
+							break;
 
 			case 38: /*up*/ this.moveState.pitchUp = 2; break;
 			case 40: /*down*/ this.moveState.pitchDown = 2; break;
@@ -95,6 +112,44 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.updateRotationVector();
 
 	};
+	
+	function setCamera(c)
+	{
+		this.camera = c;
+	}
+	
+	function getFire()
+	{
+		return this.fire;		
+	}
+	
+	function manageFire(s)
+	{
+		if (s == 0 && this.fire != null)
+		{
+			this.navicella.remove(this.fire.mesh);
+			delete this.fire;
+		}
+		
+		if (s == 1 && this.fire == null)
+		{
+			this.fire = new VolumetricFire(
+				fireWidth,
+				fireHeight,
+				fireDepth,
+				sliceSpacing,
+				this.camera
+			);
+			
+			// you can set position, rotation and scale
+			// fire.mesh accepts THREE.mesh features
+			
+			this.fire.mesh.rotation.x = 90;
+			//fire.mesh.position.x += 0.73;
+			this.fire.mesh.position.z = 6.5;
+			this.navicella.add(this.fire.mesh);
+		}
+	}
 	
 	/*
 	 * startPressed
@@ -166,8 +221,10 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 37: /*left*/ this.moveState.yawLeft = 0; break;
 			case 39: /*right*/ this.moveState.yawRight = 0; break;
 
+			case 87: /*W*/ this.moveState.forward = 0;
+							this.manageFire(0);
+							break;
 			case 83: /*S*/ this.moveState.back = 0; break;
-			case 87: /*W*/ this.moveState.forward = 0; break;
 
 			case 38: /*up*/ this.moveState.pitchUp = 0; break;
 			case 40: /*down*/ this.moveState.pitchDown = 0; break;
@@ -308,10 +365,16 @@ THREE.FlyControls = function ( object, domElement ) {
 					this.moveState.rollRight = 0; 
 				
 				if (pad.faceButton0.pressed) // A on Xbox
+				{
 					this.moveState.forward = 1;
+					this.manageFire(1);
+				}
 				else
 					if (this.moveState.turbo == 0)
+					{
 						this.moveState.forward = 0;
+						this.manageFire(0);
+					}
 				
 				if (pad.faceButton3.pressed) // Y on Xbox
 					this.doTurbo();
