@@ -44,6 +44,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.doTurbo = doTurbo;
 	
 	this.manageFire = manageFire;
+	this.setFire = setFire;
 
 	this.tmpQuaternion = new THREE.Quaternion();
 
@@ -123,8 +124,15 @@ THREE.FlyControls = function ( object, domElement ) {
 		return this.fire;		
 	}
 	
+	function setFire(f)
+	{
+		this.fire = f;
+		this.manageFire(0);
+	}
+	
 	function manageFire(s)
 	{
+		/*
 		if (this.fire == null)
 		{
 			this.fire = new VolumetricFire(
@@ -143,6 +151,7 @@ THREE.FlyControls = function ( object, domElement ) {
 			this.fire.mesh.position.z = 6.5;
 			this.navicella.add(this.fire.mesh);
 		}
+		*/
 		
 		if (s == 0)
 		{
@@ -154,7 +163,7 @@ THREE.FlyControls = function ( object, domElement ) {
 			this.fire.mesh.position.z = 6.5;
 		}
 		
-		if (s == 2 && (this.fire == null || (this.fire != null && this.fire.mesh.position.z == 6.5 /* Accelerazione normale */)))
+		if (s == 2)
 		{
 			this.fire.mesh.position.z = 10.5;
 		}
@@ -450,6 +459,7 @@ THREE.FlyControls = function ( object, domElement ) {
 				this.usable = true;
 				this.moveState.forward = 1;
 				this.manageFire(2);
+				console.log("dentro");
 			}
 		}
 		else

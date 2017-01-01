@@ -182,7 +182,6 @@ $(function()
 	var s = new THREE.SpotLightHelper(spotLight);
 	scene.add(s);
 
-	/*
 	fire = new VolumetricFire(
 		fireWidth,
 		fireHeight,
@@ -191,14 +190,14 @@ $(function()
 		camera
 	);
 	
+	controls.setFire(fire);
+	
 	// you can set position, rotation and scale
 	// fire.mesh accepts THREE.mesh features
 	
 	fire.mesh.rotation.x = 90;
-	//fire.mesh.position.x += 0.73;
-	fire.mesh.position.z = navicella.position.z - 10.5;
+	fire.mesh.position.z = 100; // Nascosto
 	navicella.add(fire.mesh);
-	*/
 	
 	populate_universe(PLANETS_TOTAL_NUMBER);
 	
@@ -585,8 +584,8 @@ function addLight( h, s, l, x, y, z ) {
 		var elapsed = clock.getElapsedTime();
 		//fire.update(elapsed);
 		//t += elapsed;
-		if (controls.getFire() != null)
-			controls.getFire().update(elapsed);
+		if (fire != null)
+			fire.update(elapsed);
 		
 		var matrix = new THREE.Matrix4();
 		matrix.extractRotation( navicella.matrix );		
@@ -640,15 +639,16 @@ function addLight( h, s, l, x, y, z ) {
 				if (!is_red)
 				{
 					is_red = true;
-					for (var j = 0; j < navicella.children.length; j++)
+					//for (var j = 0; j < navicella.children.length; j++)
 					{
-						if (navicella.children[j].length > 0 && navicella.children[j].children[0] instanceof THREE.Mesh) // sempre vero in teoria
+						//if (navicella.children[j].length > 0 && navicella.children[j].children[0] instanceof THREE.Mesh) // sempre vero in teoria
+						if (navicella.children[2].children[0] instanceof THREE.Mesh)
 						{
-							var f = navicella.children[j].children[0];
+							var f = navicella.children[2].children[0];
 							f.material.map = red_texture;
 						}
 						else
-							console.log("Errore, non ho trovato la mesh in navicella");
+							console.log("Errore vicinanza, non ho trovato la mesh in navicella");
 					}
 				}
 			}
@@ -663,7 +663,7 @@ function addLight( h, s, l, x, y, z ) {
 				f.material.map = blue_texture;
 			}
 			else
-				console.log("Errore, non ho trovato la mesh in navicella");
+				console.log("Errore lontananza, non ho trovato la mesh in navicella");
 		}
 	  
 		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
