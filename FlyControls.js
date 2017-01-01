@@ -28,8 +28,8 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.dragToLook = false;
 	this.autoForward = false;
-	this.play=false;
-	this.pause=false;
+	this.play = false;
+	this.pause = false;
 	
 	this.start_is_pressing = false;
 	
@@ -125,13 +125,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	
 	function manageFire(s)
 	{
-		if (s == 0 && this.fire != null)
-		{
-			this.navicella.remove(this.fire.mesh);
-			delete this.fire;
-		}
-		
-		if (s == 1 && this.fire == null)
+		if (this.fire == null)
 		{
 			this.fire = new VolumetricFire(
 				fireWidth,
@@ -150,23 +144,19 @@ THREE.FlyControls = function ( object, domElement ) {
 			this.navicella.add(this.fire.mesh);
 		}
 		
+		if (s == 0)
+		{
+			this.fire.mesh.position.z = 20; // Dietro la navicella, così non si vede
+		}
+		
+		if (s == 1)
+		{
+			this.fire.mesh.position.z = 6.5;
+		}
+		
 		if (s == 2 && (this.fire == null || (this.fire != null && this.fire.mesh.position.z == 6.5 /* Accelerazione normale */)))
 		{
-			this.fire = new VolumetricFire(
-				fireWidth,
-				fireHeight,
-				fireDepth,
-				sliceSpacing,
-				this.camera
-			);
-			
-			// you can set position, rotation and scale
-			// fire.mesh accepts THREE.mesh features
-			
-			this.fire.mesh.rotation.x = 90;
-			//fire.mesh.position.x += 0.73;
 			this.fire.mesh.position.z = 10.5;
-			this.navicella.add(this.fire.mesh);
 		}
 	}
 	
@@ -453,11 +443,13 @@ THREE.FlyControls = function ( object, domElement ) {
 				this.moveState.turbo = 0;
 				this.moveState.forward = 0;
 				this.lastTurboUsedTime = 0;
-				
 				this.manageFire(0);
 			}
 			else
+			{
 				this.usable = true;
+				this.moveState.forward = 1;
+			}
 		}
 		else
 		{
