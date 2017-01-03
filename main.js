@@ -1,3 +1,103 @@
+THREE.VolumetericLightShader = {
+  uniforms: {
+    tDiffuse: {value:null},
+    lightPosition: {value: new THREE.Vector2(0.5, 0.5)},
+    exposure: {value: 0.18},
+    decay: {value: 0.95},
+    density: {value: 0.8},
+    weight: {value: 0.4},
+    samples: {value: 50}
+  },
+
+  vertexShader: [
+    "varying vec2 vUv;",
+    "void main() {",
+      "vUv = uv;",
+      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+    "}"
+  ].join("\n"),
+
+  fragmentShader: [
+    "varying vec2 vUv;",
+    "uniform sampler2D tDiffuse;",
+    "uniform vec2 lightPosition;",
+    "uniform float exposure;",
+    "uniform float decay;",
+    "uniform float density;",
+    "uniform float weight;",
+    "uniform int samples;",
+    "const int MAX_SAMPLES = 100;",
+    "void main()",
+    "{",
+      "vec2 texCoord = vUv;",
+      "vec2 deltaTextCoord = texCoord - lightPosition;",
+      "deltaTextCoord *= 1.0 / float(samples) * density;",
+      "vec4 color = texture2D(tDiffuse, texCoord);",
+      "float illuminationDecay = 1.0;",
+      "for(int i=0; i < MAX_SAMPLES; i++)",
+      "{",
+        "if(i == samples){",
+          "break;",
+        "}",
+        "texCoord -= deltaTextCoord;",
+        "vec4 sample = texture2D(tDiffuse, texCoord);",
+        "sample *= illuminationDecay * weight;",
+        "color += sample;",
+        "illuminationDecay *= decay;",
+      "}",
+      "gl_FragColor = color * exposure;",
+    "}"
+  ].join("\n")
+};
+
+THREE.AdditiveBlendingShader = {
+  uniforms: {
+    tDiffuse: { value:null },
+    tAdd: { value:null }
+  },
+
+  vertexShader: [
+    "varying vec2 vUv;",
+    "void main() {",
+      "vUv = uv;",
+      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+    "}"
+  ].join("\n"),
+
+  fragmentShader: [
+    "uniform sampler2D tDiffuse;",
+    "uniform sampler2D tAdd;",
+    "varying vec2 vUv;",
+    "void main() {",
+      "vec4 color = texture2D( tDiffuse, vUv );",
+      "vec4 add = texture2D( tAdd, vUv );",
+      "gl_FragColor = color + add;",
+    "}"
+  ].join("\n")
+};
+
+THREE.PassThroughShader = {
+    uniforms: {
+        tDiffuse: { value: null }
+    },
+
+    vertexShader: [
+        "varying vec2 vUv;",
+    "void main() {",
+          "vUv = uv;",
+            "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+        "}"
+    ].join( "\n" ),
+
+    fragmentShader: [
+    "uniform sampler2D tDiffuse;",
+    "varying vec2 vUv;",
+    "void main() {",
+            "gl_FragColor = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
+        "}"
+    ].join( "\n" )
+};
+
 $(function()
 {
   var scene,camera,renderer;
@@ -71,6 +171,13 @@ $(function()
   var fireHeight = 1;
   var fireDepth  = 1.75;
   var sliceSpacing = 0.25;
+
+
+
+    var DEFAULT_LAYER = 0,
+    OCCLUSION_LAYER = 1,
+    renderScale = 0.5,
+    angle = 0;
  
   function init()
   {
@@ -155,32 +262,11 @@ $(function()
 	});
 	
 	container = document.getElementById("webGL-container");
-
-  	spotLight=new THREE.SpotLight(0xffffff);
-  	spotLight.castShadow=true;
-	spotLight.angle = 1	;
-	spotLight.intensity = 2;	
-	spotLight.distance = 50;
-	spotLight.penumbra = 0;
-	
-	//spotLight.rotation.set(0, 0, 0);
-
-	spotLight.position.set(0, 0, 20);
 	
   	caricaNavicella(40,50,15);
   	LoadMenu();
-	camera.add(spotLight);
 	
 	navicella.add( sound1 );
-	//navicella.add(spotLight);
-	
-	spotLight.target = navicella;
-	
-	//navicella.add(spotLight);
-	
-	//scene.add(spotLight);
-	var s = new THREE.SpotLightHelper(spotLight);
-	scene.add(s);
 
 	fire = new VolumetricFire(
 		fireWidth,
@@ -204,6 +290,8 @@ $(function()
 	generateAsteroids(ASTEROIDS_NUMBER);
   	
   	generateLensFlares();
+  	setupScene();
+  	setupPostprocessing();
 	
 	/*
 	 * populate_universe
@@ -258,6 +346,8 @@ $(function()
   
   function generateLensFlares()
   {
+
+  	/*
 	lensFlares = [];
 	lights=[];
 	lensflaresOriginalPositions = [];
@@ -280,14 +370,13 @@ $(function()
 		lensflaresOriginalPositions.push(new THREE.Vector3(x,y,z));
 		addLight(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), x, y, z);
 	}
+	*/
   }
   
-  function random(min, max)
-  {
-	  return Math.random() * (max - min) + min;
-  }
-    
+  
  function lensFlareUpdateCallback( object ) {
+
+ 	/*
 
 	var f, fl = object.lensFlares.length;
 	var flare;
@@ -309,37 +398,11 @@ $(function()
 	object.lensFlares[ 2 ].y += 0.025;
 	object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
 
+	*/
+
 }
   
-function addLight( h, s, l, x, y, z ) {
-	
-	var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
-	light.color.setHSL( h, s, l );
-	light.position.set( x, y, z );
-	scene.add( light );
 
-	var flareColor = new THREE.Color( 0xffffff );
-	flareColor.setHSL( h, s, l + 0.5 );
-
-	var lensFlare = new THREE.LensFlare( textureFlare1, 700, 0.0, THREE.AdditiveBlending, flareColor );
-	
-	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-	lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-
-	lensFlare.add( textureFlare3, 50, 0.6, THREE.AdditiveBlending );
-	lensFlare.add( textureFlare3, 70, 0.7, THREE.AdditiveBlending );
-	lensFlare.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
-	lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
-	
-	lensFlare.customUpdateCallback = lensFlareUpdateCallback;
-	lensFlare.position.copy( light.position );
-
-	lensFlares.push(lensFlare);
-	lights.push(light);
-	
-	scene.add( lensFlare );
-}
   
   function getRandomInt(min, max) 
   {
@@ -519,6 +582,7 @@ function addLight( h, s, l, x, y, z ) {
 		requestAnimationFrame(animate);
 		//stats.update();
    		renderer.render(scene,camera);
+   		render_();
 		d = 100;
 		
 		if (e != null)
@@ -526,6 +590,7 @@ function addLight( h, s, l, x, y, z ) {
 		
 		showPlanets(navicella.position);
 		
+		/*
 		for (var i = 0; i < lensFlares.length; i++)
 		{
 			lensFlares[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
@@ -535,6 +600,7 @@ function addLight( h, s, l, x, y, z ) {
 										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
 										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
 		}
+		*/
 		
 		checkCollisions();
 
@@ -1085,6 +1151,88 @@ function addLight( h, s, l, x, y, z ) {
 	
 		return pianetiOrdinati;
 	}
+
+	function random(min, max)
+  {
+	  return Math.random() * (max - min) + min;
+  }
+    
+
+
+	function setupScene()
+	{
+    var ambientLight,
+        geometry,
+        material;
+
+    ambientLight = new THREE.AmbientLight(0x2c3e50);
+    scene.add(ambientLight);
+    
+    pointLight = new THREE.PointLight(0xffffff);
+    scene.add(pointLight);
+    
+  
+    for (var i = 0; i < 50; i++)
+	{
+		var x = random(-RANGE / 2, RANGE / 2);
+		var y = random(-RANGE / 2, RANGE / 2);
+		var z = random(-RANGE / 2, RANGE / 2);
+		addLight(x, y, z);
+	}
+
+  }
+
+  function addLight(x, y, z ) 
+{
+
+    geometry = new THREE.SphereBufferGeometry(random(1, 5),16,16);
+    material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+    lightSphere = new THREE.Mesh( geometry, material );
+    lightSphere.layers.set( OCCLUSION_LAYER );
+    lightSphere.position.x=x;
+    lightSphere.position.y=y;
+    lightSphere.position.z=z;
+    
+    scene.add( lightSphere );
+
+}
+
+
+  function setupPostprocessing()
+  {
+    var pass;
+    
+    occlusionRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth * renderScale, window.innerHeight * renderScale );
+    occlusionComposer = new THREE.EffectComposer( renderer, occlusionRenderTarget);
+    occlusionComposer.addPass( new THREE.RenderPass( scene, camera ) );
+    pass = new THREE.ShaderPass( THREE.VolumetericLightShader );
+    pass.needsSwap = false;
+    occlusionComposer.addPass( pass );
+    
+    volumetericLightShaderUniforms = pass.uniforms;
+    
+    composer = new THREE.EffectComposer( renderer );
+    composer.addPass( new THREE.RenderPass( scene, camera ) );
+    pass = new THREE.ShaderPass( THREE.AdditiveBlendingShader );
+    pass.uniforms.tAdd.value = occlusionRenderTarget.texture;
+    composer.addPass( pass );
+    pass.renderToScreen = true;
+  }
+
+  function render_()
+  {
+    camera.layers.set(OCCLUSION_LAYER);
+    renderer.setClearColor(0x000000);
+    occlusionComposer.render();
+    
+    camera.layers.set(DEFAULT_LAYER);
+    renderer.setClearColor(0x090611);
+    composer.render();
+  }
+
+
+
+
 	
 
    init();
