@@ -123,10 +123,11 @@ $(function()
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
   var SOGLIA_VISUALE_NAVICELLA = 6000000;
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 13;
-  var ASTEROIDS_NUMBER = 0; //3; // Numero di asteroidi contemporaneamente presenti in scena
+  var ASTEROIDS_NUMBER = 1; //3; // Numero di asteroidi contemporaneamente presenti in scena
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
   var MAX_DISTANCE_CAMERA = 4000;
   var DIM_SKYBOX = 4000;
+  var SOGLIA_AVVISO_ASTEROIDE = 500000;
   
   // Tasti per visualizzare info pianeti
   var SHOW_INFO_BUTTON = 81; // Q
@@ -172,7 +173,9 @@ $(function()
   var fireDepth  = 1.75;
   var sliceSpacing = 0.25;
 
-
+	var arrow;
+	var fake_arrow;
+	var arrow_presente;
 
     var DEFAULT_LAYER = 0,
     OCCLUSION_LAYER = 1,
@@ -183,6 +186,8 @@ $(function()
   {
   	manager = new THREE.LoadingManager();
 	is_red = false;
+	
+	arrow_presente = false;
 	
 	blue_texture = new THREE.Texture();
 	var loader = new THREE.ImageLoader(manager);
@@ -449,6 +454,13 @@ $(function()
 		navicella = model.LoadmodelScale('textures/spaceship/diffuse.bmp','model/spaceship.obj',0.025);
 		navicella.rotation.set(0,0,0);
 		
+		var geometry = new THREE.CylinderGeometry( 0, 1, 3, 12 );
+		geometry.rotateX( Math.PI / 2 );
+		var material = new THREE.MeshNormalMaterial();
+		
+		arrow = new THREE.Mesh( geometry, material );
+		fake_arrow = new THREE.Object3D();
+		
 		//navicella.add(camera);
 				
 		camera.position.set(0, 3, 20);
@@ -463,6 +475,13 @@ $(function()
 		//var axis = new THREE.AxisHelper(5);
 		//navicella.add(axis);
 		scene.add(navicella);
+		
+		fake_arrow.position.set(0, 0, -20);
+	
+		arrow.position.set(40, 50, 15);
+		//scene.add(arrow);
+		
+		camera.add(fake_arrow);
 	
 		scene.add(camera);
 	}  
@@ -661,25 +680,77 @@ $(function()
 		var directionZ = new THREE.Vector3(0, 0, 1);
 		directionZ.applyMatrix4(matrix);	
 		
-		var directionY = new THREE.Vector3(0, 0.5, 0);
-		directionY.applyMatrix4(matrix);	
-		
-		//console.log("Navicella: " + printVector3(navicella.position));
-		//console.log("Direzione: " + printVector3(direction));
+		var matrix2 = new THREE.Matrix4();
+		matrix2.extractRotation( camera.matrix );		
+		var directionY = new THREE.Vector3(0, 0, 1);
+		directionY.applyMatrix4(matrix);
 		
 		camera.position.set(navicella.position.x + directionZ.x * 15 + directionY.x * 0,
 							navicella.position.y + directionZ.y * 15 + directionY.y * 0,
 							navicella.position.z + directionZ.z * 15 + directionY.z * 0);
-							
-		//console.log("Camera: " + printVector3(camera.position));
+
+		
+		manageArrow();
 		
 		var lookAtPosition = new THREE.Vector3(navicella.position.x + + 0, /*directionY.x * 5, */
 												navicella.position.y + 5, /* directionY.y * 5, */
 												navicella.position.z + 0 /* directionY.z * 5 */);
 		camera.lookAt(lookAtPosition);
-			
-		//console.log(navicella.rotation);
    }
+   
+   /*
+    * manageArrow
+	* Gestisce l'apparizione e la scomparsa dell'indicatore dell'asteroide
+    */
+	function manageArrow()
+	{
+		var nearestAsteroidPosition = getNearestAsteroidPosition();
+		if (distance(navicella.position, nearestAsteroidPosition) < SOGLIA_AVVISO_ASTEROIDE)
+			p = true;
+		else
+			p = false;
+		
+		if (p && !arrow_presente)
+			scene.add(arrow);
+		else
+		{
+			if (!p && arrow_presente)
+				scene.remove(arrow);
+		}
+		
+		arrow_presente = p;
+		
+		if (arrow_presente)
+		{
+			arrow.lookAt( nearestAsteroidPosition );
+		
+			var v = new THREE.Vector3();
+			v.setFromMatrixPosition( fake_arrow.matrixWorld );
+		
+			arrow.position.set(v.x, v.y, v.z);
+		}
+	}
+	
+	/*
+	 * getNearestAsteroidPosition
+	 * Ritorna la posizione dell'asteroide più vicino
+	 */
+	function getNearestAsteroidPosition()
+	{
+		var d = 999999999;
+		var index = -1;
+		for (var i = 0; i < asteroids_reference.length; i++)
+		{
+			var dist = distance(navicella.position, asteroids_reference[i].getPosition());
+			console.log("distanza: " + dist);
+			if (dist < d)
+			{
+				d = dist;
+				index = i;
+			}
+		}
+		return asteroids_reference[index].getPosition();
+	}
    
    /*
     * checkCollisions

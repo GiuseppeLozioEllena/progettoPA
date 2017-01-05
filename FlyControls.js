@@ -459,7 +459,6 @@ THREE.FlyControls = function ( object, domElement ) {
 				this.usable = true;
 				this.moveState.forward = 1;
 				this.manageFire(2);
-				console.log("dentro");
 			}
 		}
 		else
