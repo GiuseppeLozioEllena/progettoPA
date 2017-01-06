@@ -1,3 +1,4 @@
+
 THREE.VolumetericLightShader = {
   uniforms: {
     tDiffuse: {value:null},
@@ -77,25 +78,25 @@ THREE.AdditiveBlendingShader = {
 };
 
 THREE.PassThroughShader = {
-    uniforms: {
-        tDiffuse: { value: null }
-    },
+	uniforms: {
+		tDiffuse: { value: null }
+	},
 
-    vertexShader: [
-        "varying vec2 vUv;",
+	vertexShader: [
+		"varying vec2 vUv;",
     "void main() {",
-          "vUv = uv;",
-            "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-        "}"
-    ].join( "\n" ),
+		  "vUv = uv;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"}"
+	].join( "\n" ),
 
-    fragmentShader: [
+	fragmentShader: [
     "uniform sampler2D tDiffuse;",
     "varying vec2 vUv;",
     "void main() {",
-            "gl_FragColor = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
-        "}"
-    ].join( "\n" )
+			"gl_FragColor = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
+		"}"
+	].join( "\n" )
 };
 
 $(function()
@@ -236,11 +237,18 @@ $(function()
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
+	/*
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
 	scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
 	scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
 	renderer.setClearColor( scene.fog.color );
+	
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	*/
+	
+	renderer = new THREE.WebGLRenderer();
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	
@@ -601,7 +609,7 @@ $(function()
 		requestAnimationFrame(animate);
 		//stats.update();
    		renderer.render(scene,camera);
-   		render_();
+   		
 		d = 100;
 		
 		if (e != null)
@@ -742,7 +750,6 @@ $(function()
 		for (var i = 0; i < asteroids_reference.length; i++)
 		{
 			var dist = distance(navicella.position, asteroids_reference[i].getPosition());
-			console.log("distanza: " + dist);
 			if (dist < d)
 			{
 				d = dist;
@@ -776,16 +783,13 @@ $(function()
 				if (!is_red)
 				{
 					is_red = true;
-					//for (var j = 0; j < navicella.children.length; j++)
+					for (var j = 0; j < navicella.children.length; j++)
 					{
-						//if (navicella.children[j].length > 0 && navicella.children[j].children[0] instanceof THREE.Mesh) // sempre vero in teoria
-						if (navicella.children[2].children[0] instanceof THREE.Mesh)
+						if (navicella.children[j].children != null && navicella.children[j].children.length > 0 && navicella.children[j].children[0] instanceof THREE.Mesh)
 						{
 							var f = navicella.children[2].children[0];
 							f.material.map = red_texture;
 						}
-						else
-							console.log("Errore vicinanza, non ho trovato la mesh in navicella");
 					}
 				}
 			}
@@ -794,13 +798,14 @@ $(function()
 		if (!isNear && is_red)
 		{
 			is_red = false;
-			if (navicella.children[2].children[0] instanceof THREE.Mesh) // sempre vero in teoria
+			for (var j = 0; j < navicella.children.length; j++)
 			{
-				var f = navicella.children[2].children[0];
-				f.material.map = blue_texture;
+				if (navicella.children[j].children != null && navicella.children[j].children.length > 0 && navicella.children[j].children[0] instanceof THREE.Mesh)
+				{
+					var f = navicella.children[2].children[0];
+					f.material.map = blue_texture;
+				}
 			}
-			else
-				console.log("Errore lontananza, non ho trovato la mesh in navicella");
 		}
 	  
 		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
@@ -811,6 +816,23 @@ $(function()
 				inCollision = true;
 			}
 		}
+		
+		/*
+		if (navicella.children.length >= 3 && navicella.children[2].children[0] instanceof THREE.Mesh)
+		{
+			for (var vertexIndex = 0; vertexIndex < navicella.children[2].children[0].bufferGeometry.vertices.length; vertexIndex++)
+			{		
+				var localVertex = navicella.children[2].children[0].geometry.vertices[vertexIndex].clone();
+				var globalVertex = localVertex.applyMatrix4( navicella.children[2].children[0].matrix );
+				var directionVector = globalVertex.sub( navicella.position );
+			
+				var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+				var collisionResults = ray.intersectObjects( collidableMeshList );
+				if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
+					console.log("hit");
+			}	
+		}
+		*/
 		
 		/*
 		for (var i = 0; i < asteroids_reference.length; i++)
@@ -1250,12 +1272,10 @@ $(function()
 		var z = random(-RANGE / 2, RANGE / 2);
 		addLight(x, y, z);
 	}
-
   }
 
   function addLight(x, y, z ) 
 {
-
     geometry = new THREE.SphereBufferGeometry(random(1, 5),16,16);
     material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     lightSphere = new THREE.Mesh( geometry, material );
@@ -1266,11 +1286,11 @@ $(function()
     
     scene.add( lightSphere );
 
+		
+	lightSphere.lookAt(camera.position);
 }
 
-
-  function setupPostprocessing()
-  {
+  function setupPostprocessing(){
     var pass;
     
     occlusionRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth * renderScale, window.innerHeight * renderScale );
@@ -1289,9 +1309,8 @@ $(function()
     composer.addPass( pass );
     pass.renderToScreen = true;
   }
-
-  function render_()
-  {
+  
+  function render_(){
     camera.layers.set(OCCLUSION_LAYER);
     renderer.setClearColor(0x000000);
     occlusionComposer.render();
@@ -1302,12 +1321,17 @@ $(function()
   }
 
 
-
+	function onFrame()
+	{
+		requestAnimationFrame( onFrame );
+		render_();
+	}
 
 	
 
    init();
    animate(); 
+   onFrame();
 
    $(window).resize(function(){
    		SCREEN_WIDTH=window.innerWidth;

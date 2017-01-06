@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+	<body>
+
+<script src="./jquery.min.js"></script>
+<script src="../three.js-master/build/three.min.js"></script>
+<script src="../dat.gui-master/build/dat.gui.min.js"></script>
+<script src="../three.js-master/examples/js/controls/OrbitControls.js"></script>
+<script src="../three.js-master/examples/js/libs/stats.min.js"></script>
+<script src="../three.js-master/examples/js/Detector.js"></script>
+<script src="../three.js-master/examples/js/loaders/ObjLoader.js"></script>
+<script src="../three.js-master/examples/js/postprocessing/EffectComposer.js"></script> 
+<script src="../three.js-master/examples/js/postprocessing/ShaderPass.js"></script> 
+<script src="../three.js-master/examples/js/postprocessing/RenderPass.js"></script> 
+<script src="../three.js-master/examples/js/shaders/CopyShader.js"></script> 
+<script src="../three.js-master/examples/js/postprocessing/BloomPass.js"></script>
+<script src="../three.js-master/examples/js/shaders/ConvolutionShader.js"></script>
+<script src="../three.js-master/examples/js/postprocessing/FilmPass.js"></script>
+<script src="../three.js-master/examples/js/shaders/FilmShader.js"></script>
+
+<script src="../three.js-master/examples/js/postprocessing/MaskPass.js"></script>
+		
+		
+		
+
+<!--
+<script src="../Physijs-master/physi.js"></script> 
+-->
+<script src="./Model.js"></script> 
+<script src="./Planet.js"></script>
+<script src="./PlanetInfo.js"></script>
+<script src="./UniverseInfo.js"></script>
+<script src="./FlyControls.js"></script> 
+<script src="./VolumetricFire.js"></script> 
+<script src="./Asteroid.js"></script>
+<script src="./ParticlesExplosion.js"></script>
+<script src="./tween.min.js"></script>
+<script src="./PlanetInfoManager.js"></script>
+<script src="./PlanetInfoSection.js"></script>
+<script src="./Gamepad.js"></script>
+<script src="./Sun.js"></script>
+
+<script src="./Projector.js"></script>
+<script src="./GeometryUtils.js"></script>
+<script src="./Detector.js"></script>
+		
+		<script id="vertexShader" type="x-shader/x-vertex">
+		uniform vec3 viewVector;
+		uniform float c;
+		uniform float p;
+		varying float intensity;
+		void main() 
+		{
+			vec3 vNormal = normalize( normalMatrix * normal );
+			vec3 vNormel = normalize( normalMatrix * viewVector );
+			intensity = pow( c - dot(vNormal, vNormel), p );
+			
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		}
+		</script>
+
+		<!-- fragment shader a.k.a. pixel shader -->
+		<script id="fragmentShader" type="x-shader/x-vertex"> 
+		uniform vec3 glowColor;
+		varying float intensity;
+		void main() 
+		{
+			vec3 glow = glowColor * intensity;
+			gl_FragColor = vec4( glow, 1.0 );
+		}
+		</script>
+
+		<script id="fragmentShaderSun" type="x-shader/x-fragment">
+
+			uniform float time;
+			uniform vec2 resolution;
+
+			uniform float fogDensity;
+			uniform vec3 fogColor;
+
+			uniform sampler2D texture1;
+			uniform sampler2D texture2;
+
+			varying vec2 vUv;
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+
+				vec4 noise = texture2D( texture1, vUv );
+				vec2 T1 = vUv + vec2( 1.5, -1.5 ) * time  *0.02;
+				vec2 T2 = vUv + vec2( -0.5, 2.0 ) * time * 0.01;
+
+				T1.x += noise.x * 2.0;
+				T1.y += noise.y * 2.0;
+				T2.x -= noise.y * 0.2;
+				T2.y += noise.z * 0.2;
+
+				float p = texture2D( texture1, T1 * 2.0 ).a;
+
+				vec4 color = texture2D( texture2, T2 * 2.0 );
+				vec4 temp = color * ( vec4( p, p, p, p ) * 2.0 ) + ( color * color - 0.1 );
+
+				if( temp.r > 1.0 ){ temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
+				if( temp.g > 1.0 ){ temp.rb += temp.g - 1.0; }
+				if( temp.b > 1.0 ){ temp.rg += temp.b - 1.0; }
+
+				gl_FragColor = temp;
+
+				float depth = gl_FragCoord.z / gl_FragCoord.w;
+				const float LOG2 = 1.442695;
+				float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );
+				fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );
+
+				gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
+
+			}
+
+		</script>
+
+		<script id="vertexShaderSun" type="x-shader/x-vertex">
+
+			uniform vec2 uvScale;
+			varying vec2 vUv;
+
+			void main()
+			{
+
+				vUv = uvScale * uv;
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		
+		<div id="container"></div>
+		
+				<script>
+
+			var container;
+
+			var clock = new THREE.Clock();
+
+			var camera, renderer, composer;
+
+			var uniforms, material, mesh;
+
+			var mouseX = 0, mouseY = 0,
+			lat = 0, lon = 0, phy = 0, theta = 0;
+
+			var width = window.innerWidth || 2;
+			var height = window.innerHeight || 2;
+
+			var windowHalfX = width / 2;
+			var windowHalfY = height / 2;
+
+			init();
+			animate();
+
+			function init() {
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 45, windowHalfX / windowHalfY, 1, 3000 );
+				camera.position.z = 4;
+
+				scene = new THREE.Scene();
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+	
+				scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
+				scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+	
+				container.appendChild( renderer.domElement );
+				renderer.autoClear = false;
+				
+				var textureLoader = new THREE.TextureLoader();
+
+				uniforms = {
+
+					fogDensity: { value: 0.45 },
+					fogColor:   { value: new THREE.Vector3( 0, 0, 0 ) },
+					time:       { value: 1.0 },
+					resolution: { value: new THREE.Vector2() },
+					uvScale:    { value: new THREE.Vector2( 3.0, 1.0 ) },
+					texture1:   { value: textureLoader.load( "textures/lava/cloud.png" ) },
+					texture2:   { value: textureLoader.load( "textures/lava/lavatile.jpg" ) }
+
+				};
+
+				uniforms.texture1.value.wrapS = uniforms.texture1.value.wrapT = THREE.RepeatWrapping;
+				uniforms.texture2.value.wrapS = uniforms.texture2.value.wrapT = THREE.RepeatWrapping;
+
+				var size = 0.65;
+
+				material = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: document.getElementById( 'vertexShaderSun' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShaderSun' ).textContent
+
+				} );
+
+				mesh = new THREE.Mesh( new THREE.SphereGeometry( size, 32, 32 ), material );
+				mesh.rotation.x = 0.3;
+				scene.add( mesh );
+				
+				var model = new Model(0,0,0);
+				navicella = model.LoadmodelScale('textures/spaceship/diffuse.bmp','model/spaceship.obj',15);
+				navicella.position.set(0,0,0);
+				
+				scene.add(navicella);
+				
+				
+			
+				pointLight = new THREE.PointLight(0xffffff);
+				scene.add(pointLight);
+				
+				pointLight.position.set(0,0,0)
+				
+
+				//
+
+				//stats = new Stats();
+				//container.appendChild( stats.dom );
+
+				//
+
+				
+				var renderModel = new THREE.RenderPass( scene, camera );
+				//var effectBloom = new THREE.BloomPass( 0 );
+				var effectFilm = new THREE.FilmPass( 0, 0, 0, false );
+
+				effectFilm.renderToScreen = true;
+
+				
+				composer = new THREE.EffectComposer( renderer );
+
+				composer.addPass( renderModel );
+				composer.addPass( effectBloom );
+				composer.addPass( effectFilm );
+
+				//
+/*
+				onWindowResize();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+*/
+			}
+/*
+			function onWindowResize( event ) {
+
+				uniforms.resolution.value.x = window.innerWidth;
+				uniforms.resolution.value.y = window.innerHeight;
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				composer.reset();
+
+			}
+
+			*/
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				//stats.update();
+			}
+
+			function render() {
+
+				var delta = 5 * clock.getDelta();
+
+				uniforms.time.value += 0.2 * delta;
+
+				mesh.rotation.y += 0.0125 * delta;
+				mesh.rotation.x += 0.05 * delta;
+
+				renderer.clear();
+				composer.render( 0.01 );
+
+			}
+
+		</script>
+	</body>
+</html>
