@@ -207,7 +207,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		return false;
 	}
 	
-	function createRings(radius, segments) 
+	function createRings(radius, rotation, segments) 
 	{ 
 		this.rings = new THREE.Mesh(new THREE.XRingGeometry(1.2 * radius, 2 * radius, 2 * segments, 5, 0, Math.PI * 2), 
 				new THREE.MeshBasicMaterial(
@@ -218,6 +218,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 					opacity: 0.6 
 				})); 
 		this.rings.position.set(this.x,this.y,this.z);
+		this.rings.rotation.set(rotation.x, rotation.y, rotation.z);
 		return this.rings;
 	} 
 	

@@ -53,6 +53,9 @@ PlanetInfo = function (position, scale, visibility) {
 	this.setRingSize = setRingSize;
 	this.getRingSize = getRingSize;
 	
+	this.setRingRotation = setRingRotation;
+	this.getRingRotation = getRingRotation;
+	
 	function getPosition()
 	{
 		return this.position;
@@ -195,5 +198,15 @@ PlanetInfo = function (position, scale, visibility) {
 	function getRingSize()
 	{
 		return this.ringSize;
+	}
+	
+	function setRingRotation()
+	{
+		this.ringRotation = new THREE.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+	}
+	
+	function getRingRotation()
+	{
+		return this.ringRotation;
 	}
 }
