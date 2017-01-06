@@ -10,6 +10,10 @@ PlanetInfo = function (position, scale, visibility) {
 	var TEXTURES_NUMBER = 100;
 	var DISTANZA_MINIMA_LUNE = 25;
 	
+	var SCALA_MINIMA_ANELLI = 55;
+	var SCALA_MASSIMA_ANELLI = 70;
+	var PROBABILITA_ANELLI = 10;
+	
 	this.position = position;
 	this.scale = scale;
 	this.visibility = visibility;
@@ -45,6 +49,9 @@ PlanetInfo = function (position, scale, visibility) {
 	this.setVisibility = setVisibility;
 	
 	this.moonDistantFromOtherMoons = moonDistantFromOtherMoons;
+	
+	this.setRingSize = setRingSize;
+	this.getRingSize = getRingSize;
 	
 	function getPosition()
 	{
@@ -172,5 +179,21 @@ PlanetInfo = function (position, scale, visibility) {
 	function setVisibility(vis)
 	{
 		this.visibility = vis;
+	}
+	
+	function setRingSize()
+	{
+		if (Math.random() * 100 < PROBABILITA_ANELLI)
+		{
+			this.ringSize = Math.random() * SCALA_MINIMA_ANELLI + SCALA_MASSIMA_ANELLI;
+			this.moonNumber = 0; // Se ci sono gli anelli non ci sono lune (per evitare a priori collisioni)
+		}
+		else
+			this.ringSize = -1;
+	}
+	
+	function getRingSize()
+	{
+		return this.ringSize;
 	}
 }

@@ -30,6 +30,8 @@ Asteroid = function ()
 	this.explosion = null;
 	this.explode = explode;
 	
+	this.getMesh = getMesh;
+	
 	/*
 	 * update
 	 * Modifica la posizione del mondo
@@ -71,6 +73,15 @@ Asteroid = function ()
 		var model = new Model(this.origin.x, this.origin.y, this.origin.z);
 		this.asteroid = model.LoadmodelScale('textures/planet/asteroid.png','model/Asteroid.obj', this.scala);
 		return this.asteroid;
+	}
+	
+	function getMesh()
+	{
+		if (this.asteroid.children.length == 1)
+			if (this.asteroid.children[0].children.length == 1)
+				if (this.asteroid.children[0].children[0]  instanceof THREE.Mesh)
+					return this.asteroid.children[0].children[0];
+		return null;
 	}
 	
 	function addToScene(scene)

@@ -177,6 +177,7 @@ $(function()
 	var arrow;
 	var fake_arrow;
 	var arrow_presente;
+	var wireframeCube;
 
     var DEFAULT_LAYER = 0,
     OCCLUSION_LAYER = 1,
@@ -336,6 +337,8 @@ $(function()
 			p_info.setMoonVelocities(p_info.generateMoonVelocities());
 			p_info.setMoonPositions(p_info.generateMoonPositions());
 			p_info.setMoonScales(p_info.generateMoonScales());
+			p_info.setRingSize();
+			//p_info.setRingRotation();
 			planetsInfo.push(p_info);
 		}
 	}
@@ -479,6 +482,15 @@ $(function()
 		controls.rollSpeed = Math.PI / 24;
 		controls.autoForward = false;
 		controls.dragToLook = false;
+		
+		//var cubeGeometry = new THREE.CubeGeometry(5,2, 5,1,1,1);
+		var cubeGeometry = new THREE.CubeGeometry(10,4, 10,1,1,1);
+		var wireMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe:true } );
+		wireframe = new THREE.Mesh( cubeGeometry, wireMaterial );
+		wireframe.position.set(0, 1, 0);	
+		wireframeCube = wireframe;
+		
+		navicella.add(wireframe);
 		
 		//var axis = new THREE.AxisHelper(5);
 		//navicella.add(axis);
@@ -787,8 +799,8 @@ $(function()
 					{
 						if (navicella.children[j].children != null && navicella.children[j].children.length > 0 && navicella.children[j].children[0] instanceof THREE.Mesh)
 						{
-							var f = navicella.children[2].children[0];
-							f.material.map = red_texture;
+							var f = navicella.children[j].children[0];
+								f.material.map = red_texture;
 						}
 					}
 				}
@@ -802,12 +814,13 @@ $(function()
 			{
 				if (navicella.children[j].children != null && navicella.children[j].children.length > 0 && navicella.children[j].children[0] instanceof THREE.Mesh)
 				{
-					var f = navicella.children[2].children[0];
+					var f = navicella.children[j].children[0];
 					f.material.map = blue_texture;
 				}
 			}
 		}
-	  
+		
+		/*
 		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
 		{
 			if (asteroids_reference[i].inCollision(navicella.position))
@@ -816,23 +829,33 @@ $(function()
 				inCollision = true;
 			}
 		}
+		*/
+		
 		
 		/*
-		if (navicella.children.length >= 3 && navicella.children[2].children[0] instanceof THREE.Mesh)
+		 * Collisioni con asteroidi
+		 */
+		var collidableMeshList = [];
+		for (var i = 0; i < asteroids_reference.length; i++)
 		{
-			for (var vertexIndex = 0; vertexIndex < navicella.children[2].children[0].bufferGeometry.vertices.length; vertexIndex++)
-			{		
-				var localVertex = navicella.children[2].children[0].geometry.vertices[vertexIndex].clone();
-				var globalVertex = localVertex.applyMatrix4( navicella.children[2].children[0].matrix );
-				var directionVector = globalVertex.sub( navicella.position );
-			
-				var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-				var collisionResults = ray.intersectObjects( collidableMeshList );
-				if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
-					console.log("hit");
-			}	
+			var mesh = asteroids_reference[i].getMesh();
+			if (mesh != null)
+				collidableMeshList.push(mesh);
 		}
-		*/
+		
+		var originPoint = wireframe.position.clone();		
+		for (var vertexIndex = 0; vertexIndex < wireframeCube.geometry.vertices.length; vertexIndex++)
+		{		
+			var localVertex = wireframeCube.geometry.vertices[vertexIndex].clone();
+			var globalVertex = localVertex.applyMatrix4( wireframeCube.matrix );
+			var directionVector = globalVertex.sub( wireframeCube.position );
+		
+			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+			var collisionResults = ray.intersectObjects( collidableMeshList );
+			if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
+				console.log("hit");
+		}	
+		
 		
 		/*
 		for (var i = 0; i < asteroids_reference.length; i++)
@@ -931,6 +954,9 @@ $(function()
 									planetsInfo[i].getMoonPositions(), 
 									planetsInfo[i].getMoonScales(),
 									moon_texture);
+									
+				if (planetsInfo[i].getRingSize() > 0)
+					p.createRings(planetsInfo[i].getRingSize(), /*planetsInfo[i].getRingRotation(),*/ 32);
 				
 				 p.addToScene(scene);
 				 planets_reference.push(p);
