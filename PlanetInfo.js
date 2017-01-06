@@ -10,8 +10,8 @@ PlanetInfo = function (position, scale, visibility) {
 	var TEXTURES_NUMBER = 100;
 	var DISTANZA_MINIMA_LUNE = 25;
 	
-	var SCALA_MINIMA_ANELLI = 55;
-	var SCALA_MASSIMA_ANELLI = 70;
+	var SCALA_MINIMA_ANELLI = 45;
+	var SCALA_MASSIMA_ANELLI = 60;
 	var PROBABILITA_ANELLI = 10;
 	
 	this.position = position;

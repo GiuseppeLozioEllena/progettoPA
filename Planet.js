@@ -26,6 +26,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	this.removeGlowFromScene = removeGlowFromScene;
 	this.getPlanetReference = getPlanetReference;
 	this.moon_scales = [];
+	this.getRings = getRings;
 	this.createRings = createRings;
 
 	function update(camera)
@@ -250,4 +251,9 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 				(p1.y - p2.y) * (p1.y - p2.y) +
 				(p1.z - p2.z) * (p1.z - p2.z);
     }
+	
+	function getRings()
+	{
+		return this.rings;
+	}
 }

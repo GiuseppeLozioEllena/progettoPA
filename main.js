@@ -174,10 +174,8 @@ $(function()
   var fireDepth  = 1.75;
   var sliceSpacing = 0.25;
 
-	var arrow;
-	var fake_arrow;
-	var arrow_presente;
-	var wireframeCube;
+	var arrow, fake_arrow, arrow_presente;
+	var wireframeCube, fake_wireframe;
 
     var DEFAULT_LAYER = 0,
     OCCLUSION_LAYER = 1,
@@ -483,14 +481,19 @@ $(function()
 		controls.autoForward = false;
 		controls.dragToLook = false;
 		
-		//var cubeGeometry = new THREE.CubeGeometry(5,2, 5,1,1,1);
-		var cubeGeometry = new THREE.CubeGeometry(10,4, 10,1,1,1);
+		var cubeGeometry = new THREE.CubeGeometry(5,2,3,4,4,4);
 		var wireMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe:true } );
 		wireframe = new THREE.Mesh( cubeGeometry, wireMaterial );
-		wireframe.position.set(0, 1, 0);	
+		wireframe.position.set(navicella.position.x, navicella.position.y, navicella.position.z);	
+		
 		wireframeCube = wireframe;
 		
-		navicella.add(wireframe);
+		fake_wireframe = new THREE.Object3D();
+		fake_wireframe.position.set(0, 1, 0);
+		
+		navicella.add(fake_wireframe);
+		
+		//scene.add(wireframe);
 		
 		//var axis = new THREE.AxisHelper(5);
 		//navicella.add(axis);
@@ -702,13 +705,18 @@ $(function()
 		
 		var matrix2 = new THREE.Matrix4();
 		matrix2.extractRotation( camera.matrix );		
-		var directionY = new THREE.Vector3(0, 0, 1);
+		var directionY = new THREE.Vector3(0, 1, 0);
 		directionY.applyMatrix4(matrix);
 		
-		camera.position.set(navicella.position.x + directionZ.x * 15 + directionY.x * 0,
-							navicella.position.y + directionZ.y * 15 + directionY.y * 0,
-							navicella.position.z + directionZ.z * 15 + directionY.z * 0);
+		camera.position.set(navicella.position.x + directionZ.x * 15,
+							navicella.position.y + directionZ.y * 15,
+							navicella.position.z + directionZ.z * 15);
+							
+		var v = new THREE.Vector3();
+		v.setFromMatrixPosition( fake_wireframe.matrixWorld );
 
+		wireframe.position.set(v.x, v.y, v.z)
+		wireframe.rotation.set(navicella.rotation.x, navicella.rotation.y, navicella.rotation.z);
 		
 		manageArrow();
 		
@@ -833,9 +841,16 @@ $(function()
 		
 		
 		/*
-		 * Collisioni con asteroidi
+		 * Collisioni con anelli
 		 */
 		var collidableMeshList = [];
+		for (var i = 0; i < planets_reference.length; i++)
+		{
+			var mesh = planets_reference[i].getRings();
+			if (mesh != null)
+				collidableMeshList.push(mesh);
+		}
+		
 		for (var i = 0; i < asteroids_reference.length; i++)
 		{
 			var mesh = asteroids_reference[i].getMesh();
@@ -843,8 +858,8 @@ $(function()
 				collidableMeshList.push(mesh);
 		}
 		
-		var originPoint = wireframe.position.clone();		
-		for (var vertexIndex = 0; vertexIndex < wireframeCube.geometry.vertices.length; vertexIndex++)
+		var originPoint = wireframe.position.clone();
+		for (var vertexIndex = 0; vertexIndex < wireframeCube.geometry.vertices.length && !inCollision; vertexIndex++)
 		{		
 			var localVertex = wireframeCube.geometry.vertices[vertexIndex].clone();
 			var globalVertex = localVertex.applyMatrix4( wireframeCube.matrix );
@@ -853,24 +868,11 @@ $(function()
 			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 			var collisionResults = ray.intersectObjects( collidableMeshList );
 			if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
-				console.log("hit");
-		}	
-		
-		
-		/*
-		for (var i = 0; i < asteroids_reference.length; i++)
-		{
-			inCollision = false;
-			for (var j = 0; j < planets_reference.length && !inCollision; j++)
 			{
-				if (planets_reference[j].inCollision(asteroids_reference[i].getPosition()))
-				{
-					inCollision = true;
-					asteroids_reference[i].explode(scene);
-				}	
+				explode();
+				inCollision = true;
 			}
 		}
-		*/
 	}
    
    /*
