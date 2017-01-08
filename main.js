@@ -388,7 +388,15 @@ $(function()
   
 	function addLensFlares( h, s, l, x, y, z ) 
 	{
-		var textureFlare0 = THREE.ImageUtils.loadTexture("textures/lensflare/lensflare0.png");
+		var textureFlare0 = new THREE.Texture();
+		var loader = new THREE.ImageLoader(manager);
+		loader.load( "textures/lensflare/lensflare0.png", function ( image ) 
+		{
+			textureFlare0.image = image;
+			textureFlare0.needsUpdate = true;
+		} );
+		//var textureFlare0 = THREE.ImageUtils.loadTexture("textures/lensflare/lensflare0.png");
+		
 		/*
 		var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
 		light.color.setHSL( h, s, l );
@@ -458,9 +466,11 @@ $(function()
 
 	var materialArray = [];
 	for (var i = 0; i < 6; i++)
+	{
 		materialArray.push( new THREE.MeshBasicMaterial({
-	map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
-	side: THREE.BackSide}));
+			map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+			side: THREE.BackSide}));
+	}
 	var skyGeometry = new THREE.CubeGeometry(DIM_SKYBOX, DIM_SKYBOX, DIM_SKYBOX);
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );

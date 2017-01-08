@@ -63,10 +63,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 			scene.add(this.glow);
 		
 		if (this.rings != null)
-		{
 			scene.add(this.rings);
-			console.log("aggiungo anelli");
-		}
 	}
 	
 	function removeFromScene(scene)
@@ -209,14 +206,24 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	
 	function createRings(radius, rotation, segments) 
 	{ 
+		var manager = new THREE.LoadingManager();
+		var texture = new THREE.Texture();
+		var loader = new THREE.ImageLoader(manager);
+		loader.load( 'textures/rings/rings1.png', function ( image ) 
+		{
+			texture.image = image;
+			texture.needsUpdate = true;
+		} );
+		
 		this.rings = new THREE.Mesh(new THREE.XRingGeometry(1.2 * radius, 2 * radius, 2 * segments, 5, 0, Math.PI * 2), 
 				new THREE.MeshBasicMaterial(
 				{ 
-					map: THREE.ImageUtils.loadTexture('https://cdn.rawgit.com/bubblin/The-Solar-System/master/images/page-60/saturn-rings.png'), 
+					map: texture,
 					side: THREE.DoubleSide, 
 					transparent: true, 
 					opacity: 0.6 
 				})); 
+					
 		this.rings.position.set(this.x,this.y,this.z);
 		this.rings.rotation.set(rotation.x, rotation.y, rotation.z);
 		return this.rings;
