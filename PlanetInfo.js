@@ -7,7 +7,7 @@ PlanetInfo = function (position, scale, visibility) {
 	var SCALA_MINIMA = 40;
 	var SCALA_VARIAZIONE_MASSIMA = 15;
 	var MAX_MOONS_NUMBER = 1;
-	var TEXTURES_NUMBER = 100;
+	var TEXTURES_NUMBER = 130;
 	var DISTANZA_MINIMA_LUNE = 25;
 	
 	var SCALA_MINIMA_ANELLI = 45;
