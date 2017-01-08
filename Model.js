@@ -36,6 +36,7 @@ function LoadmodelScale(texture_path,model_path,scale)
             if ( child instanceof THREE.Mesh ) 
             {
 			  child.material.map = texture;
+			  //child.material.depthWrite = false; // Se attivato le lensflare sono sempre davanti all'oggetto
               child.scale.set(scale,scale,scale);
             }
           });

@@ -3,10 +3,10 @@ THREE.VolumetericLightShader = {
   uniforms: {
     tDiffuse: {value:null},
     lightPosition: {value: new THREE.Vector2(0.5, 0.5)},
-    exposure: {value: 0.18},
+    exposure: {value: 0.0}, /* era 0.18 */
     decay: {value: 0.95},
     density: {value: 0.8},
-    weight: {value: 0.4},
+    weight: {value: 0}, /* era 0.4 */
     samples: {value: 50}
   },
 
@@ -236,7 +236,7 @@ $(function()
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
-	/*
+	
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	
 	scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
@@ -245,11 +245,13 @@ $(function()
 	
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	*/
 	
+	/*
 	renderer = new THREE.WebGLRenderer();
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	*/
+	renderer.shadowMapEnabled = true;
 	
 	skybox = setSkybox();
 	scene.add(skybox);
@@ -279,7 +281,7 @@ $(function()
   	LoadMenu();
 	
 	navicella.add( sound1 );
-
+	
 	fire = new VolumetricFire(
 		fireWidth,
 		fireHeight,
@@ -360,10 +362,8 @@ $(function()
   
   function generateLensFlares()
   {
-
-  	/*
 	lensFlares = [];
-	lights=[];
+	lights = [];
 	lensflaresOriginalPositions = [];
 	var textureLoader = new THREE.TextureLoader();
 
@@ -382,16 +382,46 @@ $(function()
 		var y = random(-RANGE / 2, RANGE / 2);
 		var z = random(-RANGE / 2, RANGE / 2);
 		lensflaresOriginalPositions.push(new THREE.Vector3(x,y,z));
-		addLight(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), x, y, z);
+		addLensFlares(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), x, y, z);
 	}
-	*/
   }
   
+	function addLensFlares( h, s, l, x, y, z ) 
+	{
+		var textureFlare0 = THREE.ImageUtils.loadTexture("textures/lensflare/lensflare0.png");
+		/*
+		var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+		light.color.setHSL( h, s, l );
+		light.position.set( x, y, z );
+		scene.add( light );
+		*/
+
+		var flareColor = new THREE.Color( 0xffffff );
+		flareColor.setHSL( h, s, l + 0.5 );
+
+		var lensFlare = new THREE.LensFlare( textureFlare0, 600, 0.0, THREE.AdditiveBlending, flareColor );
+		
+		lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
+		lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
+		lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
+
+		lensFlare.add( textureFlare3, 60, 0.6, THREE.AdditiveBlending );
+		lensFlare.add( textureFlare3, 70, 0.7, THREE.AdditiveBlending );
+		lensFlare.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
+		lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
+
+		lensFlare.customUpdateCallback = lensFlareUpdateCallback;
+		
+		lensFlare.position.set(x,y,z);
+		
+		lensFlares.push(lensFlare);
+
+		scene.add( lensFlare );
+	}  
   
- function lensFlareUpdateCallback( object ) {
-
- 	/*
-
+  
+ function lensFlareUpdateCallback( object ) 
+ {
 	var f, fl = object.lensFlares.length;
 	var flare;
 	var vecX = -object.positionScreen.x * 2;
@@ -411,9 +441,6 @@ $(function()
 
 	object.lensFlares[ 2 ].y += 0.025;
 	object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
-
-	*/
-
 }
   
 
@@ -632,17 +659,17 @@ $(function()
 		
 		showPlanets(navicella.position);
 		
-		/*
 		for (var i = 0; i < lensFlares.length; i++)
 		{
 			lensFlares[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
 										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
 										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
+										/*
 			lights[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
 										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
 										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
+										*/
 		}
-		*/
 		
 		checkCollisions();
 
@@ -1313,8 +1340,7 @@ $(function()
     lightSphere.position.z=z;
     
     scene.add( lightSphere );
-
-		
+	
 	lightSphere.lookAt(camera.position);
 }
 
@@ -1347,7 +1373,6 @@ $(function()
     renderer.setClearColor(0x090611);
     composer.render();
   }
-
 
 	function onFrame()
 	{
