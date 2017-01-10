@@ -135,7 +135,7 @@ PlanetInfo = function (position, scale, visibility) {
 	
 	function generateTextureNumber()
 	{
-		return Math.round(Math.random() * TEXTURES_NUMBER);
+		return Math.round(Math.random() * (TEXTURES_NUMBER - 1) + 1);
 	}
 	
 	function generateMoonVelocities()
@@ -214,7 +214,7 @@ PlanetInfo = function (position, scale, visibility) {
 	
 	function setRingTexture()
 	{
-		this.ringTexture = Math.round(Math.random() * RING_TEXTURES_NUMBER);
+		this.ringTexture = Math.round(Math.random() * (RING_TEXTURES_NUMBER - 1) + 1);
 	}
 	
 	function getRingTexture()

@@ -126,7 +126,7 @@ $(function()
   var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 13;
   var ASTEROIDS_NUMBER = 1; //3; // Numero di asteroidi contemporaneamente presenti in scena
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
-  var MAX_DISTANCE_CAMERA = 4000;
+  var MAX_DISTANCE_CAMERA = 6000;
   var DIM_SKYBOX = 4000;
   var SOGLIA_AVVISO_ASTEROIDE = 500000;
   
