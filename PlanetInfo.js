@@ -8,6 +8,7 @@ PlanetInfo = function (position, scale, visibility) {
 	var SCALA_VARIAZIONE_MASSIMA = 15;
 	var MAX_MOONS_NUMBER = 1;
 	var TEXTURES_NUMBER = 130;
+	var RING_TEXTURES_NUMBER = 5;
 	var DISTANZA_MINIMA_LUNE = 25;
 	
 	var SCALA_MINIMA_ANELLI = 45;
@@ -52,9 +53,10 @@ PlanetInfo = function (position, scale, visibility) {
 	
 	this.setRingSize = setRingSize;
 	this.getRingSize = getRingSize;
-	
 	this.setRingRotation = setRingRotation;
 	this.getRingRotation = getRingRotation;
+	this.setRingTexture = setRingTexture;
+	this.getRingTexture = getRingTexture;
 	
 	function getPosition()
 	{
@@ -133,7 +135,7 @@ PlanetInfo = function (position, scale, visibility) {
 	
 	function generateTextureNumber()
 	{
-		return Math.round(Math.random() * TEXTURES_NUMBER +1);
+		return Math.round(Math.random() * TEXTURES_NUMBER);
 	}
 	
 	function generateMoonVelocities()
@@ -208,5 +210,15 @@ PlanetInfo = function (position, scale, visibility) {
 	function getRingRotation()
 	{
 		return this.ringRotation;
+	}
+	
+	function setRingTexture()
+	{
+		this.ringTexture = Math.round(Math.random() * RING_TEXTURES_NUMBER);
+	}
+	
+	function getRingTexture()
+	{
+		return this.ringTexture;
 	}
 }

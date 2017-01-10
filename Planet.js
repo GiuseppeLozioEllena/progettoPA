@@ -204,12 +204,12 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		return false;
 	}
 	
-	function createRings(radius, rotation, segments) 
+	function createRings(radius, rotation, textureNumber, segments) 
 	{ 
 		var manager = new THREE.LoadingManager();
 		var texture = new THREE.Texture();
 		var loader = new THREE.ImageLoader(manager);
-		loader.load( 'textures/rings/rings1.png', function ( image ) 
+		loader.load( 'textures/rings/rings' + textureNumber + '.png', function ( image ) 
 		{
 			texture.image = image;
 			texture.needsUpdate = true;

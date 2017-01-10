@@ -339,6 +339,7 @@ $(function()
 			p_info.setMoonScales(p_info.generateMoonScales());
 			p_info.setRingSize();
 			p_info.setRingRotation();
+			p_info.setRingTexture();
 			planetsInfo.push(p_info);
 		}
 	}
@@ -995,7 +996,7 @@ $(function()
 									moon_texture);
 									
 				if (planetsInfo[i].getRingSize() > 0)
-					p.createRings(planetsInfo[i].getRingSize(), planetsInfo[i].getRingRotation(), 32);
+					p.createRings(planetsInfo[i].getRingSize(), planetsInfo[i].getRingRotation(), planetsInfo[i].getRingTexture(), 32);
 				
 				 p.addToScene(scene);
 				 planets_reference.push(p);
