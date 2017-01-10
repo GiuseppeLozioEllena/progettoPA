@@ -181,6 +181,8 @@ $(function()
     OCCLUSION_LAYER = 1,
     renderScale = 0.5,
     angle = 0;
+	
+	var engine;
  
   function init()
   {
@@ -267,12 +269,19 @@ $(function()
 	
 	var audioLoader = new THREE.AudioLoader();
 
-	var sound1 = new THREE.PositionalAudio( listener );
+	var backgroundMusic = new THREE.PositionalAudio( listener );
 	audioLoader.load( 'sounds/358232_j_s_song.ogg', function( buffer ) {
-		sound1.setLoop(true);
-		sound1.setBuffer( buffer );
-		sound1.setRefDistance( 20 );
-		sound1.play();
+		backgroundMusic.setLoop(true);
+		backgroundMusic.setBuffer( buffer );
+		backgroundMusic.setRefDistance( 20 );
+		backgroundMusic.play();
+	});
+	
+	engine = new THREE.PositionalAudio( listener );
+	audioLoader.load( 'sounds/engine.wav', function( buffer ) {
+		engine.setLoop(true);
+		engine.setBuffer( buffer );
+		engine.setRefDistance( 20 );
 	});
 	
 	container = document.getElementById("webGL-container");
@@ -280,7 +289,8 @@ $(function()
   	caricaNavicella(40,50,15);
   	LoadMenu();
 	
-	navicella.add( sound1 );
+	navicella.add(backgroundMusic);
+	navicella.add(engine);
 	
 	fire = new VolumetricFire(
 		fireWidth,
@@ -656,6 +666,7 @@ $(function()
 	}
 	
 	var t = 0;
+	var oldCameraPosition;
    function animate()
    {
 		var delta = clock.getDelta();
@@ -744,9 +755,28 @@ $(function()
 		var directionY = new THREE.Vector3(0, 1, 0);
 		directionY.applyMatrix4(matrix);
 		
+		oldCameraPosition = camera.position.clone();
 		camera.position.set(navicella.position.x + directionZ.x * 15,
 							navicella.position.y + directionZ.y * 15,
 							navicella.position.z + directionZ.z * 15);
+		if (camera.position.x == oldCameraPosition.x && camera.position.y == oldCameraPosition.y && camera.position.z == oldCameraPosition.z)
+		{			
+			try {
+				engine.stop();
+			}
+			catch(err) {
+				// Significa che non ha ancora finito la chiamata asincrona per il caricamento, bisogna solo attendere
+			} 
+		}
+		else
+		{
+			try {
+				engine.play();
+			}
+			catch(err) {
+				// Significa che non ha ancora finito la chiamata asincrona per il caricamento, bisogna solo attendere
+			} 
+		}
 							
 		var v = new THREE.Vector3();
 		v.setFromMatrixPosition( fake_wireframe.matrixWorld );
@@ -760,10 +790,10 @@ $(function()
 												navicella.position.y + 5, /* directionY.y * 5, */
 												navicella.position.z + 0 /* directionY.z * 5 */);
 			
-		var oldRotation = camera.rotation.clone();
 		camera.lookAt(lookAtPosition);	
 		
 		var SOGLIA = 0.1;
+		var oldRotation = camera.rotation.clone();
 		while (oldRotation.z > Math.PI)
 			oldRotation -= Math.PI;
 		while (oldRotation.z < -Math.PI)
