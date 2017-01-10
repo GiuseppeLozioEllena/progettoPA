@@ -1,0 +1,46 @@
+.intro-content h1 {
+	color: #FFFFFF;
+	font-family: "merriweather-bold", serif;
+	font-size: 5.4rem;
+	max-width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.intro-content h5 {
+	color: rgba(255, 255, 255, 0.6);
+	font-family: "raleway-heavy", sans-serif;
+	font-size: 1.8rem;
+	line-height: 1.667;
+	margin-bottom: 0.6rem;
+	text-transform: uppercase;
+	letter-spacing: .25rem;
+}
+.intro-content .play-mode a {
+	  text-align: center;
+}
+.intro-content .button {
+	border-color: #FFFFFF;
+	color: #FFFFFF;
+	font-family: "raleway-heavy", sans-serif;
+	font-size: 1.4rem;
+	text-transform: uppercase;
+	letter-spacing: .4rem;
+	position: absolute;
+    top: 50%;
+    left: 50%;
+}
+.intro-content .button:hover, .intro-content .button:focus {
+	color: #05bca9;
+	border-color: #05bca9;
+}
+
+.wrapper {
+	font-family: "raleway-heavy", sans-serif;
+	font-size: 1.4rem;
+    text-align: center;
+}
+
+.button {
+	  position: absolute;
+      top: 50%;
+}

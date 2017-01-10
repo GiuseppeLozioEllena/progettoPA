@@ -15,7 +15,7 @@
 <script src='https://abberg.github.io/lib/postprocessing/EffectComposer.js'></script>
 <script src='https://abberg.github.io/lib/postprocessing/RenderPass.js'></script>
 <script src='https://abberg.github.io/lib/postprocessing/ShaderPass.js'></script>
-
+<link rel="stylesheet" href="css/my.css">  
 
 <!--
 <script src="../Physijs-master/physi.js"></script> 
@@ -118,8 +118,8 @@ void main()
 	}
 </style>
 
-<body>
-	
+<body
+ background="images/planets.jpg">
 <div
 	id="webGL-container">
 </div>
@@ -159,10 +159,19 @@ document.body.appendChild(text2);
 	</div>
 </div>
 
--- <script type="text/javascript" src="main.js"> 
+<!-- -- <script type="text/javascript" src="main.js"> -->
 
 	
 </script>
+
+    
+   	<div class="intro-content">
+	   			<div class="wrapper">
+                  <button class="button" onclick="javascript: $.getScript('main.js');" >Play</button>
+                     </div>
+	   			<h5 align="center">Explore the space with your little spaceship</h5>
+	   			<h1 align="center">Discover new planets and avoid the asteroids</h1>
+	   </div>   		 	
 
 </body>
 </HTML>
