@@ -736,8 +736,6 @@ $(function()
 		var matrix = new THREE.Matrix4();
 		matrix.extractRotation( navicella.matrix );		
 	
-		//console.log(navicella.children[1].matrix);
-	
 		var directionZ = new THREE.Vector3(0, 0, 1);
 		directionZ.applyMatrix4(matrix);	
 		
@@ -761,7 +759,62 @@ $(function()
 		var lookAtPosition = new THREE.Vector3(navicella.position.x + + 0, /*directionY.x * 5, */
 												navicella.position.y + 5, /* directionY.y * 5, */
 												navicella.position.z + 0 /* directionY.z * 5 */);
-		camera.lookAt(lookAtPosition);
+			
+		var oldRotation = camera.rotation.clone();
+		camera.lookAt(lookAtPosition);	
+		
+		var SOGLIA = 0.1;
+		while (oldRotation.z > Math.PI)
+			oldRotation -= Math.PI;
+		while (oldRotation.z < -Math.PI)
+			oldRotation += Math.PI;
+		if (Math.abs(oldRotation.z - camera.rotation.z) >= SOGLIA)
+		{
+			var mol = calcolateDirection(oldRotation.z, camera.rotation.z);
+			if (mol != 0)
+				camera.rotation.z = oldRotation.z + SOGLIA * mol;
+		}
+   }
+   
+   function calcolateDirection(r1, r2)
+   {
+	   var d1 = r1 * 180 / Math.PI;
+	   var d2 = r2 * 180 / Math.PI;
+	    if (d1 < d2)
+		{
+			var diff = d2 - d1;
+			if (diff <= 6 || diff >= 354)
+				return 0;
+			if (diff <= 180)
+				mol = 1;
+			else
+				mol = -1;
+		}
+		else
+		{
+			var diff = d1 - d2;
+			if (diff <= 6 || diff >= 354)
+				return 0;
+			if (diff <= 180)
+				mol = -1;
+			else
+				mol = 1;
+		}	
+		return mol;
+   }
+   
+   function correctRotation(o, n)
+   {
+	   var SOGLIA = 0.1;
+	   if (Math.abs(o.z - n.z) > SOGLIA)
+	   {
+		   if (o.z < n.z)
+			   n.z = o.z + SOGLIA;
+		   else
+			   n.z = o.z - SOGLIA;
+		   console.log("cambio: " + printVector3(n));
+	   }
+	   return n.clone();
    }
    
    /*

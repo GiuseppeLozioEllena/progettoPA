@@ -481,37 +481,19 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.object.translateX( this.moveVector.x * moveMult );
 		this.object.translateY( this.moveVector.y * moveMult );
 		this.object.translateZ( this.moveVector.z * moveMult * turboZ);	
-			
-		var angoloInGradi = this.object.rotation.y * 180 / Math.PI;
-		
-		var canModifyY = 0;
-		if (angoloInGradi >= MIN_Y && angoloInGradi <= MAX_Y || 
-			(angoloInGradi >= MAX_Y && this.moveState.yawRight != 0) ||
-			(angoloInGradi <= MIN_Y && this.moveState.yawLeft != 0))
-			canModifyY = 1;
-			
-		canModifyY = 1; // DA ELIMINARE
-			
-		if (canModifyY == 1)
-		{
-			//console.log("ruoto di: " + this.rotationVector.x * rotMult + ", " + this.rotationVector.y * rotMult + ", " + this.rotationVector.z * rotMult);
-			this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
-			//console.log("ruoto di1: " + this.tmpQuaternion.x + ", " + this.tmpQuaternion.y + ", " + this.tmpQuaternion.z);
-			this.object.quaternion.multiply( this.tmpQuaternion );
-			/*
-			this.object.quaternion.set( this.object.rotation.x + this.rotationVector.x * rotMult, 
-											 this.object.rotation.y + this.rotationVector.y * rotMult, 
-											 this.object.rotation.z + this.rotationVector.z * rotMult, 1 );
-			*/
-			//console.log("ruoto di2: " + this.object.quaternion.x + ", " + this.object.quaternion.y + ", " + this.object.quaternion.z);
-			this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
-		}
-		else
-		{
-			this.tmpQuaternion.set( this.rotationVector.x * rotMult, 0, 0, 1 ).normalize();
-			this.object.quaternion.multiply( this.tmpQuaternion );
-			this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
-		}
+	
+		//console.log("ruoto di: " + this.rotationVector.x * rotMult + ", " + this.rotationVector.y * rotMult + ", " + this.rotationVector.z * rotMult);
+		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
+		//console.log("ruoto di1: " + this.tmpQuaternion.x + ", " + this.tmpQuaternion.y + ", " + this.tmpQuaternion.z);
+		this.object.quaternion.multiply( this.tmpQuaternion );
+		/*
+		this.object.quaternion.set( this.object.rotation.x + this.rotationVector.x * rotMult, 
+										 this.object.rotation.y + this.rotationVector.y * rotMult, 
+										 this.object.rotation.z + this.rotationVector.z * rotMult, 1 );
+		*/
+		//console.log("ruoto di2: " + this.object.quaternion.x + ", " + this.object.quaternion.y + ", " + this.object.quaternion.z);
+		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+		//console.log("Rotazione: " + this.object.rotation.x + ", " + this.object.rotation.y + ", " + this.object.rotation.z);
 	};
 	
 	this.getRotation = function()
@@ -541,9 +523,6 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.rotationVector.x = ( - this.moveState.pitchDown + this.moveState.pitchUp );
 		this.rotationVector.y = ( - this.moveState.yawRight  + this.moveState.yawLeft );
 		this.rotationVector.z = ( - this.moveState.rollRight + this.moveState.rollLeft );
-
-		//console.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
-
 	};
 
 	this.getContainerDimensions = function() {
