@@ -777,7 +777,8 @@ $(function()
 		if (camera.position.x == oldCameraPosition.x && camera.position.y == oldCameraPosition.y && camera.position.z == oldCameraPosition.z)
 		{			
 			try {
-				engine.stop();
+				if (engine.isPlaying)
+					engine.stop();
 			}
 			catch(err) {
 				// Significa che non ha ancora finito la chiamata asincrona per il caricamento, bisogna solo attendere
@@ -786,7 +787,8 @@ $(function()
 		else
 		{
 			try {
-				engine.play();
+				if (!engine.isPlaying)
+					engine.play();
 			}
 			catch(err) {
 				// Significa che non ha ancora finito la chiamata asincrona per il caricamento, bisogna solo attendere
