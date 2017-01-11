@@ -186,7 +186,8 @@ $(function()
  
   function init()
   {
-  	manager = new THREE.LoadingManager();
+  	document.getElementById("intro").style.display = 'none'; 
+	manager = new THREE.LoadingManager();
 	is_red = false;
 	
 	arrow_presente = false;

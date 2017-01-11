@@ -137,11 +137,11 @@ text2.style.left = 200 + 'px';
 document.body.appendChild(text2);
 -->
 
-<div id="planetName">
+<div id="planetName" style="display: none;">
 	
 </div>
 
-<div id="bottomLeft">
+<div id="bottomLeft" style="display: none;">
 	<div id="header"> 
 		
 	</div>
@@ -150,7 +150,7 @@ document.body.appendChild(text2);
 	</div>
 </div>
 
-<div id="bottomRight">
+<div id="bottomRight" style="display: none;">
 	<div id="header"> 
 		
 	</div>
@@ -165,13 +165,13 @@ document.body.appendChild(text2);
 </script>
 
     
-   	<div class="intro-content">
-	   			<div class="wrapper">
-                  <button class="button" onclick="javascript: $.getScript('main.js');" >Play</button>
-                     </div>
-	   			<h5 align="center">Explore the space with your little spaceship</h5>
-	   			<h1 align="center">Discover new planets and avoid the asteroids</h1>
-	   </div>   		 	
+   	<div class="intro-content" id="intro">
+		<div class="wrapper">
+		  <button class="button" onclick="javascript: $.getScript('main.js');" >Play</button>
+		 </div>
+		<h5 align="center">Explore the space with your little spaceship</h5>
+		<h1 align="center">Discover new planets and avoid the asteroids</h1>
+   </div>   		 	
 
 </body>
 </HTML>
