@@ -3,10 +3,10 @@ THREE.VolumetericLightShader = {
   uniforms: {
     tDiffuse: {value:null},
     lightPosition: {value: new THREE.Vector2(0.5, 0.5)},
-    exposure: {value: 0.0}, /* era 0.18 */
+    exposure: {value: 0.18}, /* era 0.18 */
     decay: {value: 0.95},
     density: {value: 0.8},
-    weight: {value: 0}, /* era 0.4 */
+    weight: {value: 0.4}, /* era 0.4 */
     samples: {value: 50}
   },
 
@@ -135,6 +135,7 @@ $(function()
   var SHOW_INFO_FORWARD = 69; // E
   //var SHOW_INFO_BACKWARD = 90; // Z
 
+  var NUMERO_LUCI = 1;
 
   var clock;
   var fire;
@@ -181,6 +182,12 @@ $(function()
     OCCLUSION_LAYER = 1,
     renderScale = 0.5,
     angle = 0;
+	
+	var sfere = [];
+	var luci = [];
+	var luci_original_positions = [];
+	var uniforms = [];
+	var occlusionsComposer = [];
 	
 	var engine;
  
@@ -254,7 +261,7 @@ $(function()
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	*/
-	renderer.shadowMapEnabled = true;
+	//renderer.shadowMapEnabled = true;
 	
 	skybox = setSkybox();
 	scene.add(skybox);
@@ -694,6 +701,13 @@ $(function()
 										*/
 		}
 		
+		for (var i = 0; i < luci.length; i++)
+		{
+			sfere[i].position.set(luci_original_positions[i].x + navicella.position.x - 40,
+									luci_original_positions[i].y + navicella.position.y - 40,
+									luci_original_positions[i].z + navicella.position.z - 40);
+		}
+		
 		checkCollisions();
 
 		if(controls.pause && !controls.play)
@@ -805,6 +819,18 @@ $(function()
 			if (mol != 0)
 				camera.rotation.z = oldRotation.z + SOGLIA * mol;
 		}
+		
+		
+		for (var i = 0; i < luci.length; i++)
+		{
+			var p = sfere[i].position.clone(),
+              vector = p.project(camera),
+              x = ( vector.x + 1 ) / 2,
+              y = ( vector.y + 1 ) / 2;
+          uniforms[i].lightPosition.value.set(x, y);
+          luci[i].position.copy(sfere[i].position);
+		}
+		
    }
    
    function calcolateDirection(r1, r2)
@@ -1396,32 +1422,26 @@ $(function()
 	}
 
 	function random(min, max)
-  {
+	{
 	  return Math.random() * (max - min) + min;
-  }
+	}
     
-
-
 	function setupScene()
 	{
-    var ambientLight,
-        geometry,
-        material;
+		var ambientLight,
+			geometry,
+			material;
 
-    ambientLight = new THREE.AmbientLight(0x2c3e50);
-    scene.add(ambientLight);
-    
-    pointLight = new THREE.PointLight(0xffffff);
-    scene.add(pointLight);
-    
-  
-    for (var i = 0; i < 50; i++)
-	{
-		var x = random(-RANGE / 2, RANGE / 2);
-		var y = random(-RANGE / 2, RANGE / 2);
-		var z = random(-RANGE / 2, RANGE / 2);
-		addLight(x, y, z);
-	}
+		ambientLight = new THREE.AmbientLight(0x2c3e50);
+		scene.add(ambientLight);    
+	
+		for (var i = 0; i < NUMERO_LUCI; i++)
+		{
+			var x = random(-RANGE / 2, RANGE / 2);
+			var y = random(-RANGE / 2, RANGE / 2);
+			var z = random(-RANGE / 2, RANGE / 2);
+			addLight(x, y, z);
+		}
   }
 
   function addLight(x, y, z ) 
@@ -1430,26 +1450,36 @@ $(function()
     material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     lightSphere = new THREE.Mesh( geometry, material );
     lightSphere.layers.set( OCCLUSION_LAYER );
-    lightSphere.position.x=x;
-    lightSphere.position.y=y;
-    lightSphere.position.z=z;
-    
-    scene.add( lightSphere );
+    lightSphere.position.set(x,y,z);
 	
-	lightSphere.lookAt(camera.position);
+	pointLight = new THREE.PointLight(0xffffff);
+	pointLight.position.set(x,y,z);
+    scene.add(pointLight);
+	
+	sfere.push(lightSphere);
+	luci.push(pointLight);
+	
+	luci_original_positions.push(new THREE.Vector3(x,y,z));
+    
+	scene.add(pointLight);
+    scene.add( lightSphere );
 }
 
   function setupPostprocessing(){
     var pass;
-    
     occlusionRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth * renderScale, window.innerHeight * renderScale );
-    occlusionComposer = new THREE.EffectComposer( renderer, occlusionRenderTarget);
-    occlusionComposer.addPass( new THREE.RenderPass( scene, camera ) );
-    pass = new THREE.ShaderPass( THREE.VolumetericLightShader );
-    pass.needsSwap = false;
-    occlusionComposer.addPass( pass );
-    
-    volumetericLightShaderUniforms = pass.uniforms;
+	for (var i = 0; i < NUMERO_LUCI; i++)
+	{
+		occlusionComposer = new THREE.EffectComposer( renderer, occlusionRenderTarget);
+		occlusionComposer.addPass( new THREE.RenderPass( scene, camera ) );
+		pass = new THREE.ShaderPass( THREE.VolumetericLightShader );
+		pass.needsSwap = false;
+		occlusionComposer.addPass( pass );
+		
+		//volumetericLightShaderUniforms = pass.uniforms;
+		occlusionsComposer.push(occlusionComposer);
+		uniforms.push(pass.uniforms);
+	}
     
     composer = new THREE.EffectComposer( renderer );
     composer.addPass( new THREE.RenderPass( scene, camera ) );
@@ -1462,7 +1492,9 @@ $(function()
   function render_(){
     camera.layers.set(OCCLUSION_LAYER);
     renderer.setClearColor(0x000000);
-    occlusionComposer.render();
+	
+	for (var i = 0; i < occlusionsComposer.length; i++)
+		occlusionsComposer[i].render();
     
     camera.layers.set(DEFAULT_LAYER);
     renderer.setClearColor(0x090611);
