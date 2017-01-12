@@ -248,13 +248,14 @@ $(function()
     camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
 	
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-	
+	/*
 	scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
 	scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
 	renderer.setClearColor( scene.fog.color );
+	*/
 	
 	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setSize( window.innerWidth / 2, window.innerHeight / 2);
 	
 	/*
 	renderer = new THREE.WebGLRenderer();
