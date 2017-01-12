@@ -13,7 +13,7 @@ PlanetInfo = function (position, scale, visibility) {
 	
 	var SCALA_MINIMA_ANELLI = 45;
 	var SCALA_MASSIMA_ANELLI = 60;
-	var PROBABILITA_ANELLI = 10;
+	var PROBABILITA_ANELLI = 5;
 	
 	this.position = position;
 	this.scale = scale;
