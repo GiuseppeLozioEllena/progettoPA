@@ -117,13 +117,13 @@ $(function()
   var lensflaresOriginalPositions;
   
   // Parametri
-  var LENS_FLARES_NUMBER = 8;
+  var LENS_FLARES_NUMBER = 0;
   var PLANETS_NUMBER = 15;
   var RANGE = 1000;
   var PLANETS_TOTAL_NUMBER = 1000;
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
   var SOGLIA_VISUALE_NAVICELLA = 6000000;
-  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 10; // Era diviso 13
+  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 1; // Era diviso 13
   var ASTEROIDS_NUMBER = 1; //3; // Numero di asteroidi contemporaneamente presenti in scena
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
   var MAX_DISTANCE_CAMERA = 5000;
@@ -255,7 +255,7 @@ $(function()
 	*/
 	
 	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth / 2, window.innerHeight / 2);
+	renderer.setSize( window.innerWidth, window.innerHeight);
 	
 	/*
 	renderer = new THREE.WebGLRenderer();
@@ -599,13 +599,12 @@ $(function()
 
  $("#webGL-container").append(renderer.domElement);
        
-       /*
         stats = new Stats();        
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.left = '800px';
         stats.domElement.style.top = '0px';     
         $("#webGL-container").append( stats.domElement );  
-        */
+
          
  }
 
@@ -680,7 +679,7 @@ $(function()
    {
 		var delta = clock.getDelta();
 		requestAnimationFrame(animate);
-		//stats.update();
+		stats.update();
    		renderer.render(scene,camera);
    		
 		d = 100;

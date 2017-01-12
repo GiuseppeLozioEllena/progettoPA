@@ -78,7 +78,7 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	{
 		this.scala = scalaPianeta;
 		this.texture = "textures/planets_downloaded/texture" + numeroTexture + ".jpg";
-		//this.texture = "textures/planet/earth.jpg";
+
 		this.textureNumber = numeroTexture;
 		//this.texture = "textures/planet/earth_texture_2.jpg";		
 		this.mass = this.scala;
