@@ -123,10 +123,10 @@ $(function()
   var PLANETS_TOTAL_NUMBER = 1000;
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
   var SOGLIA_VISUALE_NAVICELLA = 6000000;
-  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 13;
+  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 10; // Era diviso 13
   var ASTEROIDS_NUMBER = 1; //3; // Numero di asteroidi contemporaneamente presenti in scena
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
-  var MAX_DISTANCE_CAMERA = 6000;
+  var MAX_DISTANCE_CAMERA = 5000;
   var DIM_SKYBOX = 4000;
   var SOGLIA_AVVISO_ASTEROIDE = 500000;
   
@@ -745,8 +745,8 @@ $(function()
 			for (var i = 0; i < planets_reference.length; i++)		
 				planets_reference[i].update(camera);
 			
-			//if (!isExplode)
-				//applyForces();
+			if (!isExplode)
+				applyForces();
 		}
 		
 		skybox.position.x = navicella.position.x;
@@ -774,6 +774,7 @@ $(function()
 		camera.position.set(navicella.position.x + directionZ.x * 15,
 							navicella.position.y + directionZ.y * 15,
 							navicella.position.z + directionZ.z * 15);
+							
 		if (camera.position.x == oldCameraPosition.x && camera.position.y == oldCameraPosition.y && camera.position.z == oldCameraPosition.z)
 		{			
 			try {
@@ -809,6 +810,7 @@ $(function()
 			
 		camera.lookAt(lookAtPosition);	
 		
+		/*
 		var SOGLIA = 0.1;
 		var oldRotation = camera.rotation.clone();
 		while (oldRotation.z > Math.PI)
@@ -821,6 +823,7 @@ $(function()
 			if (mol != 0)
 				camera.rotation.z = oldRotation.z + SOGLIA * mol;
 		}
+		*/
 		
 		
 		for (var i = 0; i < luci.length; i++)
@@ -871,7 +874,6 @@ $(function()
 			   n.z = o.z + SOGLIA;
 		   else
 			   n.z = o.z - SOGLIA;
-		   console.log("cambio: " + printVector3(n));
 	   }
 	   return n.clone();
    }
