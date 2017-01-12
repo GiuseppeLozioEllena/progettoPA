@@ -117,13 +117,13 @@ $(function()
   var lensflaresOriginalPositions;
   
   // Parametri
-  var LENS_FLARES_NUMBER = 0;
+  var LENS_FLARES_NUMBER = 5;
   var PLANETS_NUMBER = 15;
   var RANGE = 1000;
   var PLANETS_TOTAL_NUMBER = 1000;
   var DISTANZA_MINIMA_TRA_PIANETI = 60000;
   var SOGLIA_VISUALE_NAVICELLA = 6000000;
-  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 1; // Era diviso 13
+  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 11; // Era diviso 13
   var ASTEROIDS_NUMBER = 1; //3; // Numero di asteroidi contemporaneamente presenti in scena
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
   var MAX_DISTANCE_CAMERA = 5000;
@@ -245,7 +245,7 @@ $(function()
 	planetInfoManager.hideAll();
 
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
 	
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	/*
@@ -438,7 +438,7 @@ $(function()
 		lensFlare.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
 		lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
 
-		lensFlare.customUpdateCallback = lensFlareUpdateCallback;
+		//lensFlare.customUpdateCallback = lensFlareUpdateCallback;
 		
 		lensFlare.position.set(x,y,z);
 		
@@ -1508,7 +1508,7 @@ $(function()
 	function onFrame()
 	{
 		requestAnimationFrame( onFrame );
-		render_();
+		//render_();
 	}
 
 	

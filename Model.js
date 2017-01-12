@@ -56,7 +56,7 @@ function loadModelTexture(texture_path,scale,material)
 
 	loader.load( texture_path, function ( texture ) 
 	{
-	  var modelG = new THREE.SphereGeometry(scale,50,50);
+	  var modelG = new THREE.SphereGeometry(scale,25,25);
 	  var modelM = material;
 	  modelM.map=texture;
 	  var mesh=new THREE.Mesh(modelG,modelM);
@@ -76,7 +76,7 @@ function loadModelWithTexture(texture,scale,material)
 	var container = new THREE.Object3D();
 	container.position.set(this.x,this.y,this.z);
 	
-	var modelG = new THREE.SphereGeometry(scale,50,50);
+	var modelG = new THREE.SphereGeometry(scale,25,25);
 	var modelM = material;
 	modelM.map=texture;
 	var mesh=new THREE.Mesh(modelG,modelM);
