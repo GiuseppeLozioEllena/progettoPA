@@ -4,11 +4,10 @@
  */
 Asteroid = function () 
 {	
-	var MIN_FORCE = 0.0005;
-	var MAX_FORCE = 0.005;
-	var DISTANCE_MAX_FROM_SPACESHIP = 150;
-	
-	var ASTEROID_SIZE = 3000; // Forse da abbassare un po'
+	var MIN_FORCE = 0.0005; // Minima forza spostamento
+	var MAX_FORCE = 0.005; // Massima forza spostamento
+	var DISTANCE_MAX_FROM_SPACESHIP = 150;	// Distanza massima di sopravvivenza dalla navicella
+	var ASTEROID_SIZE = 3000; // Dimensione
 	
 	this.create = create;
 	this.createWithParameters = createWithParameters;
@@ -51,6 +50,11 @@ Asteroid = function ()
 		}
 	}
 	
+	/*
+	 * create
+	 * Data la posizione della navicella e una distanza minima oltre alla quale
+	 * poter creare l'asteroide, crea un nuovo asteroide con forza e direzioni casuali
+	 */
 	function create(navPosition, minimumDistance)
 	{
 		this.origin = this.generateOrigin(navPosition, minimumDistance);
@@ -59,11 +63,20 @@ Asteroid = function ()
 									this.generateForce());
 	}
 	
+	/*
+	 * getPosition
+	 * Ritorna la posizione dell'asteroid
+	 */
 	function getPosition()
 	{
 		return this.asteroid.position;
 	}
 	
+	/*
+	 * createWithParameters
+	 * Richiamata da create, ha in input l'origine, la direzione e la forza dell'asteroide,
+	 * si occupa di caricare l'oggetto e di ritornarlo
+	 */
 	function createWithParameters(o, d, f)
 	{
 		this.origin = o;
@@ -75,6 +88,10 @@ Asteroid = function ()
 		return this.asteroid;
 	}
 	
+	/*
+	 * getMesh
+	 * Ritorna la mesh dell'asteroide
+	 */
 	function getMesh()
 	{
 		if (this.asteroid.children.length == 1)
@@ -84,16 +101,28 @@ Asteroid = function ()
 		return null;
 	}
 	
+	/*
+	 * addToScene
+	 * Aggiunge l'asteroide alla scena
+	 */
 	function addToScene(scene)
 	{
 		scene.add(this.asteroid);
 	}
 	
+	/*
+	 * removeFromScene
+	 * Rimuove l'asteroide dalla scena (usata quando l'asteroide è troppo lontano)
+	 */
 	function removeFromScene(scene)
 	{
 		scene.remove(this.asteroid);
 	}
 	
+	/*
+	 * generateOrigin
+	 * Genera la posizione di origine dell'asteroide
+	 */
 	function generateOrigin(navPosition, minimumDistance)
 	{
 		var randomDirection = new THREE.Vector3(Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10);
@@ -112,6 +141,10 @@ Asteroid = function ()
 		return randomPoint;
 	}
 	
+	/* 
+     * generateDirection
+	 * Genera la direzione dell'asteroide
+	 */
 	function generateDirection(navPosition)
 	{
 		var randomDirection = new THREE.Vector3(Math.random() * DISTANCE_MAX_FROM_SPACESHIP - DISTANCE_MAX_FROM_SPACESHIP / 2, 
@@ -125,11 +158,20 @@ Asteroid = function ()
 								 internalPoint.z - this.origin.z);
 	}
 	
+	/*
+	 * generateForce
+	 * Genera la forza (ossia la velocità) dell'asteroide
+	 */
 	function generateForce()
 	{
 		return Math.random() * (MAX_FORCE - MIN_FORCE) + MIN_FORCE;
 	}
 	
+	/*
+	 * inCollision
+	 * True se è in collisione con la posizione data in input, false altrimenti
+	 * Nota: non viene più usato, è stato sostituto dai raggi che partono dalla navicella
+	 */
 	function inCollision(navPosition)
 	{
 		if (this.explosion == null)
@@ -143,9 +185,13 @@ Asteroid = function ()
 			return false;
 	}
 	
+	/*
+	 * explode
+	 * Per sviluppi futuri: fa esplodere l'asteroide
+	 * Non usata attualmente
+	 */
 	function explode(scene)
 	{
-		console.log("esplodo");
 		var e = new ParticlesExplosion();
 		e.init(scene, this.getPosition().x,
 					this.getPosition().y,

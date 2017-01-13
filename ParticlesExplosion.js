@@ -1,3 +1,7 @@
+/*
+ * ParticlesExplosion
+ * Esplosione particellare, utilizzata quando esplode la navicella
+ */
 ParticlesExplosion = function()
 {
 	var particle;
@@ -7,9 +11,13 @@ ParticlesExplosion = function()
 	
 	var PARTICLES_NUMBER = 60;
 	
-	var MIN_SIZE = 1;
+	var MIN_SIZE = 1;	
 	var MAX_VARIATION = 4;
 	
+	/*
+	 * init
+	 * Crea l'esplosione nella scene scene alle coordinate (x,y,z)
+	 */
 	function init(scene, x, y, z) {	
 		
 		var material = new THREE.SpriteMaterial( {
@@ -24,6 +32,9 @@ ParticlesExplosion = function()
 		}
 	}
 	
+	/*
+	 * generateSprite
+	 */
 	function generateSprite() {
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = 16;
@@ -39,6 +50,9 @@ ParticlesExplosion = function()
 		return canvas;
 	}
 	
+	/*
+	 * initParticle
+	 */
 	function initParticle( particle, delay, x, y, z ) {
 		var particle = this instanceof THREE.Sprite ? this : particle;
 		var delay = delay !== undefined ? delay : 0;
@@ -59,7 +73,9 @@ ParticlesExplosion = function()
 			.start();
 	}
 	
-
+	/*
+	 * animate
+	 */
 	function animate() {
 		requestAnimationFrame( animate );
 		TWEEN.update();

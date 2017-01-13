@@ -1,4 +1,7 @@
 <?php
+	/*
+	 * Algoritmo per l'estrazione di informazioni e texture dal sito $url
+	 */
 	ini_set('max_execution_time', 300);
 	
 	$projection = array("Square", "Mercator", "Transverse Mercator", "Icosahedral", "Mollweide", "Sinusoidal", "Spherical", "Animated Globe", "Polar Orthographic", "Polar Stereographic", "Polar Gnomonic");
