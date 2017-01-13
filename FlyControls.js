@@ -1,15 +1,17 @@
-THREE.FlyControls = function ( object, domElement ) {
-
-	var TURBO_MULTIPLIER = 10;
-	var TURBO_MAX_DURATION = 3;
+/*
+ * FlyControls
+ * Classe per gestire i comandi della navicella
+ */
+THREE.FlyControls = function ( object, domElement ) 
+{
+	var TURBO_MULTIPLIER = 10; // Velocità del turbo
+	var TURBO_MAX_DURATION = 3; // Durata turbo
 	var TURBO_SLEEP_TIME = 6; // Si può richiamare solo dopo x secondi che lo si è usato
+	var SOGLIA_DECELERAZIONE = -0.055; // Decelerazione navicella
 	
 	this.listener = null;
 	this.usable = true;
 	this.fire = null;
-	
-	MAX_Y = 26;
-	MIN_Y = -26;
 	
 	this.clock = new THREE.Clock();
 	this.turboDuration = -1;
@@ -18,7 +20,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.object = object;
 	this.navicella = object;
 	
-	this.lastAngle = 0;
+	this.oldVel = new THREE.Vector3(0,0,0);
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 	if ( domElement ) this.domElement.setAttribute( 'tabindex', - 1 );
@@ -37,8 +39,6 @@ THREE.FlyControls = function ( object, domElement ) {
 	
 	this.camera = null;
 	this.setCamera = setCamera;
-	
-	this.getFire = getFire;
 	
 	this.checkXBoxController = checkXBoxController;
 	this.doTurbo = doTurbo;
@@ -71,28 +71,17 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.keydown = function( event ) {
 
 		if ( event.altKey ) {
-
 			return;
-
 		}
-
-		//event.preventDefault();
 
 		switch ( event.keyCode ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
 			case 13: /* enter */ this.startPressed(); break;
-
-			//case 87: /*W*/ this.moveState.forward = 1; break;
-			//case 83: /*S*/ this.moveState.back = 1; break;
-
-			//case 65: /*A*/ this.moveState.left = 1; break;
-			//case 68: /*D*/ this.moveState.right = 1; break;
 			
 			case 37: /*left*/ this.moveState.yawLeft = 1; break;
 			case 39: /*right*/ this.moveState.yawRight = 1; break;
 
-			//case 83: /*S*/ this.moveState.back = 1; break;
 			case 87: /*W*/ this.moveState.forward = 1; 
 							this.manageFire(1);	
 							break;
@@ -104,55 +93,38 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 68: /*D*/ this.moveState.yawRight = 0; this.moveState.rollRight = 15; this.pressed = true; break;
 			
 			case 32: /*Space*/  this.doTurbo(); break; 
-			//case 81: /*Q*/ this.moveState.rollLeft = 1; break;
-			//case 69: /*E*/ this.moveState.rollRight = 1; break
 		}
-
 
 		this.updateMovementVector();
 		this.updateRotationVector();
-
 	};
 	
+	/*
+     * setCamera
+	 * Setta la camera del giocatore
+	 */
 	function setCamera(c)
 	{
 		this.camera = c;
 	}
 	
-	function getFire()
-	{
-		return this.fire;		
-	}
-	
+	/*
+	 * setFire
+	 * Setta il fuoco della navicella
+	 */
 	function setFire(f)
 	{
 		this.fire = f;
 		this.manageFire(0);
 	}
 	
+	/*
+	 * manageFire
+	 * Modifica la posizione (e quindi l'intensità) del fuoco, in base allo stato
+	 * della navicella (ferma, avanti, turbo)
+	 */
 	function manageFire(s)
 	{
-		/*
-		if (this.fire == null)
-		{
-			this.fire = new VolumetricFire(
-				fireWidth,
-				fireHeight,
-				fireDepth,
-				sliceSpacing,
-				this.camera
-			);
-			
-			// you can set position, rotation and scale
-			// fire.mesh accepts THREE.mesh features
-			
-			this.fire.mesh.rotation.x = 90;
-			//fire.mesh.position.x += 0.73;
-			this.fire.mesh.position.z = 6.5;
-			this.navicella.add(this.fire.mesh);
-		}
-		*/
-		
 		if (s == 0)
 		{
 			this.fire.mesh.position.z = 20; // Dietro la navicella, così non si vede
@@ -228,14 +200,6 @@ THREE.FlyControls = function ( object, domElement ) {
 		switch ( event.keyCode ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = 1; break;
-
-			
-			  //space bar
-			//case 87: /*W*/ this.moveState.forward = 0; break;
-			//case 83: /*S*/ this.moveState.back = 0; break;
-
-			//case 65: /*A*/ this.moveState.left = 0; break;
-			//case 68: /*D*/ this.moveState.right = 0; break;
 			
 			case 37: /*left*/ this.moveState.yawLeft = 0; break;
 			case 39: /*right*/ this.moveState.yawRight = 0; break;
@@ -248,97 +212,13 @@ THREE.FlyControls = function ( object, domElement ) {
 			case 38: /*up*/ this.moveState.pitchUp = 0; break;
 			case 40: /*down*/ this.moveState.pitchDown = 0; break;
 
-			case 65: /*A*/ this.moveState.yawLeft = 0; this.moveState.rollLeft = 0; this.lastAngle = this.object.rotation.y; break;
+			case 65: /*A*/ this.moveState.yawLeft = 0; this.moveState.rollLeft = 0; break;
 			case 68: /*D*/ this.moveState.yawRight = 0; this.moveState.rollRight = 0; break;
-			
-			//case 32: /*Space*/ this.moveState.turbo = 0; this.moveState.forward = 0; break;
-
-			//case 81: /*Q*/ this.moveState.rollLeft = 0; break;
-			//case 69: /*E*/ this.moveState.rollRight = 0; break;
-
 		}
 
 		this.updateMovementVector();
 		this.updateRotationVector();
-
 	};
-
-	/*
-	this.mousedown = function( event ) {
-
-		if ( this.domElement !== document ) {
-
-			this.domElement.focus();
-
-		}
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		if ( this.dragToLook ) {
-
-			this.mouseStatus ++;
-
-		} else {
-
-			switch ( event.button ) {
-
-				case 0: this.moveState.forward = 1; break;
-				case 2: this.moveState.back = 1; break;
-
-			}
-
-			this.updateMovementVector();
-
-		}
-
-	};
-
-	this.mousemove = function( event ) {
-
-		if ( ! this.dragToLook || this.mouseStatus > 0 ) {
-
-			var container = this.getContainerDimensions();
-			var halfWidth  = container.size[ 0 ] / 2;
-			var halfHeight = container.size[ 1 ] / 2;
-
-			this.moveState.yawLeft   = - ( ( event.pageX - container.offset[ 0 ] ) - halfWidth  ) / halfWidth;
-			this.moveState.pitchDown =   ( ( event.pageY - container.offset[ 1 ] ) - halfHeight ) / halfHeight;
-
-			this.updateRotationVector();
-
-		}
-
-	};
-
-	this.mouseup = function( event ) {
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		if ( this.dragToLook ) {
-
-			this.mouseStatus --;
-
-			this.moveState.yawLeft = this.moveState.pitchDown = 0;
-
-		} else {
-
-			switch ( event.button ) {
-
-				case 0: this.moveState.forward = 0; break;
-				case 2: this.moveState.back = 0; break;
-
-			}
-
-			this.updateMovementVector();
-
-		}
-
-		this.updateRotationVector();
-
-	};
-	*/
 	
 	function checkXBoxController()
 	{	
@@ -412,7 +292,7 @@ THREE.FlyControls = function ( object, domElement ) {
 				}
 				
 				/*
-					Other potential events to handle:
+					Esempi di stati 
 					if ( pad.faceButton0 ) // A on Xbox
 					if ( pad.faceButton1 ) // B on Xbox
 					if ( pad.faceButton2 ) // X on Xbox
@@ -478,33 +358,27 @@ THREE.FlyControls = function ( object, domElement ) {
 		if (!this.usable)
 			turboZ = 1;
 		
-		this.object.translateX( this.moveVector.x * moveMult );
-		this.object.translateY( this.moveVector.y * moveMult );
-		this.object.translateZ( this.moveVector.z * moveMult * turboZ);	
+		var vel = new THREE.Vector3(this.moveVector.x * moveMult, this.moveVector.y * moveMult, this.moveVector.z * moveMult * turboZ);
+		
+		if (Math.abs(vel.z) - Math.abs(this.oldVel.z) <	SOGLIA_DECELERAZIONE)
+			vel.z = this.oldVel.z - SOGLIA_DECELERAZIONE;
+		
+		this.object.translateX( vel.x );
+		this.object.translateY( vel.y );
+		this.object.translateZ( vel.z );	
+		
+		this.oldVel = vel;
 	
-		//console.log("ruoto di: " + this.rotationVector.x * rotMult + ", " + this.rotationVector.y * rotMult + ", " + this.rotationVector.z * rotMult);
 		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
-		//console.log("ruoto di1: " + this.tmpQuaternion.x + ", " + this.tmpQuaternion.y + ", " + this.tmpQuaternion.z);
-		this.object.quaternion.multiply( this.tmpQuaternion );
-		/*
-		this.object.quaternion.set( this.object.rotation.x + this.rotationVector.x * rotMult, 
-										 this.object.rotation.y + this.rotationVector.y * rotMult, 
-										 this.object.rotation.z + this.rotationVector.z * rotMult, 1 );
-		*/
-		//console.log("ruoto di2: " + this.object.quaternion.x + ", " + this.object.quaternion.y + ", " + this.object.quaternion.z);
+		this.object.quaternion.multiply( this.tmpQuaternion );	
 		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
-		//console.log("Rotazione: " + this.object.rotation.x + ", " + this.object.rotation.y + ", " + this.object.rotation.z);
 	};
 	
 	this.getRotation = function()
 	{
 		return this.object.rotation;
 	}
-	
-	this.getLastAngle = function()
-	{
-		return this.lastAngle;
-	}
+
 
 	this.updateMovementVector = function() {
 
