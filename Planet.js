@@ -29,6 +29,10 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 	this.getRings = getRings;
 	this.createRings = createRings;
 
+	/*
+	 * update
+	 * Gestisce rotazione del pianeta e luna (se c'è)
+	 */
 	function update(camera)
 	{
 		this.planet_reference.rotation.z += 0.001;
@@ -45,11 +49,19 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 			this.planetGlow.material.uniforms.viewVector.value =  new THREE.Vector3().subVectors( camera.position, this.planetGlow.position );
 	}
 	
+	/*
+	 * getPlanetReference
+	 * Ritorna il riferimento al pianeta
+	 */
 	function getPlanetReference()
 	{
 		return this.planet_reference.children[0];
 	}
 	
+	/*
+	 * addToScene
+	 * Aggiunge pianeta, atmosfera, luna (se c'è) e anelli (se ci sono) alla scena
+	 */
 	function addToScene(scene)
 	{
 		scene.add(this.planet_reference);
@@ -66,6 +78,10 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 			scene.add(this.rings);
 	}
 	
+	/*
+	 * removeFromScene
+	 * Rimuove pianeta, luna e anelli dalla scena
+	 */
 	function removeFromScene(scene)
 	{
 		scene.remove(this.planet_reference);
@@ -74,13 +90,18 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		scene.remove(this.master_reference);
 	}
 
-	function create(scalaPianeta, numeroTexture, texture2)
+	/*
+	 * create
+	 * Dati in input scala del pianeta e numero di texture
+	 * crea il nuovo pianeta
+	 */
+	function create(scalaPianeta, numeroTexture)
 	{
 		this.scala = scalaPianeta;
 		this.texture = "textures/planets_downloaded/texture" + numeroTexture + ".jpg";
 
 		this.textureNumber = numeroTexture;
-		//this.texture = "textures/planet/earth_texture_2.jpg";		
+		//this.texture = "textures/planet/earth_texture_2.jpg";	// Texture pianeta terra, da usare per debugging
 		this.mass = this.scala;
 		var model=new Model(this.x,this.y,this.z);
 		var modelM = new THREE.MeshPhongMaterial({
@@ -88,11 +109,14 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
           specular: 0x333333,
           shininess: 25});
 	    this.planet_reference = model.loadModelTexture(this.texture, this.scala, modelM);
-		//this.planet_reference = model.loadModelWithTexture(texture2, this.scala, modelM);
 		
 		return this.planet_reference;
 	}
 	
+	/*
+	 * createClouds
+	 * Crea l'atmosfera, ha in input la texture
+	 */
 	function createClouds(texture)
 	{
 		var model = new Model(this.x,this.y,this.z);
@@ -100,12 +124,15 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
           transparent: true,
           opacity: 0.3});
 		 		  
-		//this.clouds =  model.loadModelTexture("textures/clouds/clouds_2.jpg",this.scala + 2.5,modelM);
 		this.clouds =  model.loadModelWithTexture(texture,this.scala + 2.5,modelM);
 		
 		return this.clouds;
 	}
 	
+	/*
+	 * createGlow
+	 * Data la camera e la scena, aggiunta lo shader rappresentante il pianeta selezionato al pianeta
+	 */
 	function createGlow(camera, scene)
 	{
 		var customMaterial = new THREE.ShaderMaterial( 
@@ -132,12 +159,21 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		scene.add(this.planetGlow);
 	}
 	
+	/* 
+	 * removeGlowFromScene
+	 * Rimuove il glow dalla scena
+	 */
 	function removeGlowFromScene(scene)
 	{
 		scene.remove(this.planetGlow);
 		this.planetGlow = null;
 	}
 
+	/* 
+	 * generateMoon
+	 * Crea le lune del pianeta
+	 * Attualmente limitato a massimo una luna per problemi di performance
+	 */
 	function generateMoon(numero_lune_pianeta, velocity, positions, scales, texture)
 	{
 		this.numero_lune = numero_lune_pianeta;
@@ -152,7 +188,11 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		}
 		return this.master_reference;
 	}
-
+	
+	/*
+	 * createMoon
+	 * Crea l'oggetto l'una vero e proprio
+	 */
 	function createMoon(position, scale, texture)
 	{	
 		parent = new THREE.Object3D();
@@ -166,27 +206,44 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		this.master_reference.add(parent);
 	}
 
+	/*
+	 * position
+	 * Ritorna la posizione del pianeta
+	 */
 	function position()
 	{
 		var pos = new THREE.Vector3(this.x, this.y,this.z);
 		return pos;
 	}
 
+	/*
+	 * getPlanet
+	 */
 	function getPlanet()
 	{
 		return this.planet_reference;
 	}
 
+	/*
+	 * getMoons
+	 */
 	function getMoons()
 	{
 		return this.master_reference;
 	}
 
+	/*
+	 * getClouds
+	 */
 	function getClouds()
 	{
 		return this.clouds;
 	}
 	
+	/*
+	 * inCollision
+	 * Data la posizione della navicella, ritorna true se è in corso una collisione, false altrimenti
+	 */
 	function inCollision(navPosition)
 	{
 		if (distance(navPosition, new THREE.Vector3(this.x, this.y, this.z)) < this.scala * this.scala + 5)
@@ -204,6 +261,10 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		return false;
 	}
 	
+	/*
+	 * createRings
+	 * Crea gli anelli intorno al pianeta
+	 */
 	function createRings(radius, rotation, textureNumber, segments) 
 	{ 
 		var manager = new THREE.LoadingManager();
@@ -229,30 +290,29 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 		return this.rings;
 	} 
 	
+	/*
+	 * isNear
+	 * Ritorna true se la navicella è vicina al pianeta, false altrimenti
+	 */
 	function isNear(navPosition)
 	{
 		if (distance(navPosition, new THREE.Vector3(this.x, this.y, this.z)) < (this.scala * this.scala + 5) * 20)
 			return true;
-		
-		/*
-		for (i = 0; i < this.numero_lune; i++)
-		{
-			var v = new THREE.Vector3();
-			v.setFromMatrixPosition( this.master_reference.children[i].children[0].matrixWorld );
-		
-			if (distance(navPosition, v) < (this.moon_scales[i] * this.moon_scales[i] + 1 * 3))
-				return true;	
-		}
-		*/
-
 		return false;
 	}
 	
+	/*
+	 * getMass
+	 */
 	function getMass()
 	{
 		return this.mass;
 	}
 	
+	/*
+	 * distance
+	 * Calcola la distanza tra due punti (non fa la radice)
+	 */
     function distance(p1, p2)
     {
 	    return (p1.x - p2.x) * (p1.x - p2.x) +
@@ -260,6 +320,9 @@ Planet = function ( x_pianeta, y_pianeta, z_pianeta )
 				(p1.z - p2.z) * (p1.z - p2.z);
     }
 	
+	/*
+	 * getRings
+	 */
 	function getRings()
 	{
 		return this.rings;

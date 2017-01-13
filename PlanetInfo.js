@@ -3,17 +3,16 @@
  * Classe che gestisce le informazioni su un pianeta
  */
 PlanetInfo = function (position, scale, visibility) {
+	var SCALA_MINIMA = 40; // Scala minima
+	var SCALA_VARIAZIONE_MASSIMA = 15; // Scala massima = scala minima + variazione massima
+	var MAX_MOONS_NUMBER = 1; // Numero di lune massimo
+	var TEXTURES_NUMBER = 130; // Numero di texture pianeti diverse
+	var RING_TEXTURES_NUMBER = 5; // Numero di texture anelli diversi
+	var DISTANZA_MINIMA_LUNE = 25; // Distanza minima tra le lune (se ce ne sono più di una)
 	
-	var SCALA_MINIMA = 40;
-	var SCALA_VARIAZIONE_MASSIMA = 15;
-	var MAX_MOONS_NUMBER = 1;
-	var TEXTURES_NUMBER = 130;
-	var RING_TEXTURES_NUMBER = 5;
-	var DISTANZA_MINIMA_LUNE = 25;
-	
-	var SCALA_MINIMA_ANELLI = 45;
-	var SCALA_MASSIMA_ANELLI = 60;
-	var PROBABILITA_ANELLI = 5;
+	var SCALA_MINIMA_ANELLI = 45; // Scala minima anelli
+	var SCALA_MASSIMA_ANELLI = 60; // Scala massima anelli
+	var PROBABILITA_ANELLI = 5; // Probabilità che un pianeta abbia gli anelli
 	
 	this.position = position;
 	this.scale = scale;
@@ -191,7 +190,7 @@ PlanetInfo = function (position, scale, visibility) {
 		if (Math.random() * 100 < PROBABILITA_ANELLI)
 		{
 			this.ringSize = Math.random() * SCALA_MINIMA_ANELLI + SCALA_MASSIMA_ANELLI;
-			this.moonNumber = 0; // Se ci sono gli anelli non ci sono lune (per evitare a priori collisioni)
+			this.moonNumber = 0; // Se ci sono gli anelli non ci sono lune (per evitare collisioni)
 		}
 		else
 			this.ringSize = -1;

@@ -167,7 +167,7 @@ $(function()
   var is_red;
   var clouds_texture;
   var moon_texture;
-  var earth_texture;
+  var earth_texture; // Usata solo per debuggare
   
   /* Variabili fuoco */
   var fireWidth  = 1.25;
@@ -687,7 +687,8 @@ $(function()
 		if (e != null)
 			e.animate();
 		
-		showPlanets(navicella.position);
+		var pos = new THREE.Vector3(navicella.position.x % RANGE_UNIVERSO, navicella.position.y % RANGE_UNIVERSO, navicella.position.z % RANGE_UNIVERSO);
+		showPlanets(pos);
 		
 		for (var i = 0; i < lensFlares.length; i++)
 		{
@@ -1100,7 +1101,7 @@ $(function()
 			   if (!planetsInfo[i].isVisible())
 			   {
 				 var p = new Planet(planetsInfo[i].getPosition().x, planetsInfo[i].getPosition().y, planetsInfo[i].getPosition().z);
-				 p.create(planetsInfo[i].getScale(), planetsInfo[i].getTextureNumber(), earth_texture);
+				 p.create(planetsInfo[i].getScale(), planetsInfo[i].getTextureNumber());
 				 p.createClouds(clouds_texture);
 				 
 				 p.generateMoon(planetsInfo[i].getMoonNumber(), 

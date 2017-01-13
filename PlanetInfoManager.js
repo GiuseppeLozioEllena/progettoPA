@@ -20,16 +20,28 @@ PlanetInfoManager = function()
 	this.showPlanetName = showPlanetName;
 	this.hideAll = hideAll;
 	
+	/*
+	 * hideDiv
+	 * Nasconde il div di nome divName
+	 */
 	function hideDiv(divName)
 	{
 		document.getElementById(divName).style.display = 'none'; 
 	}
 	
+	/*
+	 * hideDiv
+	 * Mostra il div di nome divName
+	 */
 	function showDiv(divName)
 	{
 		document.getElementById(divName).style.display = 'block'; 
 	}
 	
+	/*
+	 * loadInfoFromFile
+	 * Legge le informazioni dai file
+	 */
 	function loadInfoFromFile(file)
 	{
 	    var rawFile = new XMLHttpRequest();
@@ -48,6 +60,10 @@ PlanetInfoManager = function()
 		rawFile.send(null);
 	}
 	
+	/*
+	 * store
+	 * Salva le informazioni del pianeta
+	 */
 	function store(planet_info)
 	{
 		var righe = planet_info.split("\n"); 
@@ -68,6 +84,10 @@ PlanetInfoManager = function()
 		}
 	}
 	
+	/*
+	 * show
+	 * Mostra le informazioni dei pianeti
+	 */
 	function show()
 	{
 		showPlanetName(name);
@@ -76,12 +96,20 @@ PlanetInfoManager = function()
 		this.active = true;
 	}
 	
+	/*
+	 * showPlanetName
+	 * Mostra il pannello con il nome del pianeta
+	 */
 	function showPlanetName(name)
 	{
 		showDiv("planetName");
 		document.getElementById("planetName").innerHTML = name;
 	}
 	
+	/*
+	 * showPanelInfo
+	 * Mostra i pannelli contenenti le informazioni sui pianeti
+	 */
 	function showPanelInfo(panelName, sectionName)
 	{
 		showDiv(panelName);
@@ -101,6 +129,10 @@ PlanetInfoManager = function()
 		document.getElementById(panelName).innerHTML = html;
 	}
 	
+	/*
+	 * hideAll
+	 * Nasconde tutti i pannelli
+	 */
 	function hideAll()
 	{
 		hideDiv('planetName');
