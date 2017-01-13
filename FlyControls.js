@@ -170,7 +170,6 @@ THREE.FlyControls = function ( object, domElement )
 		if (this.usable)
 		{
 			this.moveState.turbo = 1; 
-			this.moveState.forward = 1;
 			if (this.turboDuration == -1)
 			{
 				this.turboDuration = 0;
@@ -195,6 +194,10 @@ THREE.FlyControls = function ( object, domElement )
 		}
 	}
 
+	/*
+	 * keyup
+	 * Funzione chiamata sull'evento keyup
+	 */
 	this.keyup = function( event ) {
 
 		switch ( event.keyCode ) {
@@ -205,8 +208,8 @@ THREE.FlyControls = function ( object, domElement )
 			case 39: /*right*/ this.moveState.yawRight = 0; break;
 
 			case 87: /*W*/ this.moveState.forward = 0;
-							this.manageFire(0);
-							break;
+						   this.manageFire(0);
+						   break;
 			case 83: /*S*/ this.moveState.back = 0; break;
 
 			case 38: /*up*/ this.moveState.pitchUp = 0; break;
@@ -220,6 +223,11 @@ THREE.FlyControls = function ( object, domElement )
 		this.updateRotationVector();
 	};
 	
+	/*
+	 * checkXBoxController
+	 * Controlla se il pad è collegato e in caso positivo
+	 * verifica se sono stati premuti dei tasti
+	 */
 	function checkXBoxController()
 	{	
 		if (Gamepad.supported) 
@@ -307,6 +315,9 @@ THREE.FlyControls = function ( object, domElement )
 		}
 	}
 
+	/*
+	 * update
+	 */
 	this.update = function( delta ) 
 	{
 		this.checkXBoxController();
@@ -330,14 +341,15 @@ THREE.FlyControls = function ( object, domElement )
 				this.usable = false;
 				turboZ = 1;
 				this.moveState.turbo = 0;
-				this.moveState.forward = 0;
 				this.lastTurboUsedTime = 0;
-				this.manageFire(0);
+				if (this.moveState.forward == 0)
+					this.manageFire(0);
+				else
+					this.manageFire(1);
 			}
 			else
 			{
 				this.usable = true;
-				this.moveState.forward = 1;
 				this.manageFire(2);
 			}
 		}
@@ -373,25 +385,22 @@ THREE.FlyControls = function ( object, domElement )
 		this.object.quaternion.multiply( this.tmpQuaternion );	
 		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
 	};
-	
-	this.getRotation = function()
-	{
-		return this.object.rotation;
-	}
 
-
+	/*
+	 * updateMovementVector
+	 */
 	this.updateMovementVector = function() {
 
-		var forward = ( this.moveState.forward || ( this.autoForward && ! this.moveState.back ) ) ? 1 : 0;
+		var forward = ( this.moveState.forward || this.moveState.turbo || ( this.autoForward && ! this.moveState.back ) ) ? 1 : 0;
 
 		this.moveVector.x = ( - this.moveState.left    + this.moveState.right );
 		this.moveVector.y = ( - this.moveState.down    + this.moveState.up );
 		this.moveVector.z = ( - forward + this.moveState.back );
-
-		//console.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
-
 	};
 
+	/*
+	 * updateRotationVector
+	 */
 	this.updateRotationVector = function() {
 
 		this.rotationVector.x = ( - this.moveState.pitchDown + this.moveState.pitchUp );
@@ -399,42 +408,50 @@ THREE.FlyControls = function ( object, domElement )
 		this.rotationVector.z = ( - this.moveState.rollRight + this.moveState.rollLeft );
 	};
 
+	/*
+	 * getContainerDimensions
+	 */
 	this.getContainerDimensions = function() {
 
-		if ( this.domElement != document ) {
-
+		if ( this.domElement != document ) 
+		{
 			return {
 				size	: [ this.domElement.offsetWidth, this.domElement.offsetHeight ],
 				offset	: [ this.domElement.offsetLeft,  this.domElement.offsetTop ]
 			};
-
-		} else {
-
+		} 
+		else 
+		{
 			return {
 				size	: [ window.innerWidth, window.innerHeight ],
 				offset	: [ 0, 0 ]
 			};
-
 		}
 
 	};
 
-	function bind( scope, fn ) {
-
+	/* 
+	 * bind
+	 */
+	function bind( scope, fn ) 
+	{
 		return function () {
 			if (fn != null)
 				fn.apply( scope, arguments );
-
 		};
-
 	}
 
-	function contextmenu( event ) {
-
+	/* 
+	 * contextmenu
+	 */
+	function contextmenu( event ) 
+	{
 		event.preventDefault();
-
 	}
 
+	/*
+	 * dispose
+	 */
 	this.dispose = function() {
 
 		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
@@ -464,5 +481,4 @@ THREE.FlyControls = function ( object, domElement )
 
 	this.updateMovementVector();
 	this.updateRotationVector();
-
 };
