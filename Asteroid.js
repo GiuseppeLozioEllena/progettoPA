@@ -149,7 +149,7 @@ Asteroid = function ()
 	{
 		var randomDirection = new THREE.Vector3(Math.random() * DISTANCE_MAX_FROM_SPACESHIP - DISTANCE_MAX_FROM_SPACESHIP / 2, 
 												Math.random() * DISTANCE_MAX_FROM_SPACESHIP - DISTANCE_MAX_FROM_SPACESHIP / 2, 
-												Math.random() * DISTANCE_MAX_FROM_SPACESHIP - DISTANCE_MAX_FROM_SPACESHIP / 2);
+												Math.random() * DISTANCE_MAX_FROM_SPACESHIP - DISTANCE_MAX_FROM_SPACESHIP / 2);	
 		var internalPoint = new THREE.Vector3(navPosition.x + randomDirection.x,
 									navPosition.y + randomDirection.y,
 									navPosition.z + randomDirection.z);

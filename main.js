@@ -1,104 +1,3 @@
-
-THREE.VolumetericLightShader = {
-  uniforms: {
-    tDiffuse: {value:null},
-    lightPosition: {value: new THREE.Vector2(0.5, 0.5)},
-    exposure: {value: 0.18}, /* era 0.18 */
-    decay: {value: 0.95},
-    density: {value: 0.8},
-    weight: {value: 0.4}, /* era 0.4 */
-    samples: {value: 50}
-  },
-
-  vertexShader: [
-    "varying vec2 vUv;",
-    "void main() {",
-      "vUv = uv;",
-      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-    "}"
-  ].join("\n"),
-
-  fragmentShader: [
-    "varying vec2 vUv;",
-    "uniform sampler2D tDiffuse;",
-    "uniform vec2 lightPosition;",
-    "uniform float exposure;",
-    "uniform float decay;",
-    "uniform float density;",
-    "uniform float weight;",
-    "uniform int samples;",
-    "const int MAX_SAMPLES = 100;",
-    "void main()",
-    "{",
-      "vec2 texCoord = vUv;",
-      "vec2 deltaTextCoord = texCoord - lightPosition;",
-      "deltaTextCoord *= 1.0 / float(samples) * density;",
-      "vec4 color = texture2D(tDiffuse, texCoord);",
-      "float illuminationDecay = 1.0;",
-      "for(int i=0; i < MAX_SAMPLES; i++)",
-      "{",
-        "if(i == samples){",
-          "break;",
-        "}",
-        "texCoord -= deltaTextCoord;",
-        "vec4 sample = texture2D(tDiffuse, texCoord);",
-        "sample *= illuminationDecay * weight;",
-        "color += sample;",
-        "illuminationDecay *= decay;",
-      "}",
-      "gl_FragColor = color * exposure;",
-    "}"
-  ].join("\n")
-};
-
-THREE.AdditiveBlendingShader = {
-  uniforms: {
-    tDiffuse: { value:null },
-    tAdd: { value:null }
-  },
-
-  vertexShader: [
-    "varying vec2 vUv;",
-    "void main() {",
-      "vUv = uv;",
-      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-    "}"
-  ].join("\n"),
-
-  fragmentShader: [
-    "uniform sampler2D tDiffuse;",
-    "uniform sampler2D tAdd;",
-    "varying vec2 vUv;",
-    "void main() {",
-      "vec4 color = texture2D( tDiffuse, vUv );",
-      "vec4 add = texture2D( tAdd, vUv );",
-      "gl_FragColor = color + add;",
-    "}"
-  ].join("\n")
-};
-
-THREE.PassThroughShader = {
-	uniforms: {
-		tDiffuse: { value: null }
-	},
-
-	vertexShader: [
-		"varying vec2 vUv;",
-    "void main() {",
-		  "vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-		"}"
-	].join( "\n" ),
-
-	fragmentShader: [
-    "uniform sampler2D tDiffuse;",
-    "varying vec2 vUv;",
-    "void main() {",
-			"gl_FragColor = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
-		"}"
-	].join( "\n" )
-};
-
 $(function()
 {
   var scene,camera,renderer;
@@ -190,142 +89,146 @@ $(function()
 	var occlusionsComposer = [];
 	
 	var engine;
- 
-  function init()
-  {
-  	document.getElementById("intro").style.display = 'none'; 
-	document.getElementById("time").style.display = 'block'; 
-	manager = new THREE.LoadingManager();
-	is_red = false;
 	
-	arrow_presente = false;
-	
-	blue_texture = new THREE.Texture();
-	var loader = new THREE.ImageLoader(manager);
-	loader.load( 'textures/spaceship/diffuse.bmp', function ( image ) 
+	var t = 0;
+	var oldCameraPosition;
+	var time = 0;
+
+	/*
+	 * init
+	 * Inizializza tutto
+	 */
+	function init()
 	{
-		blue_texture.image = image;
-		blue_texture.needsUpdate = true;
-	} );
+		document.getElementById("intro").style.display = 'none'; 
+		document.getElementById("time").style.display = 'block'; 
+		manager = new THREE.LoadingManager();
+		is_red = false;
+	
+		arrow_presente = false;
+	
+		blue_texture = new THREE.Texture();
+		var loader = new THREE.ImageLoader(manager);
+		loader.load( 'textures/spaceship/diffuse.bmp', function ( image ) 
+		{
+			blue_texture.image = image;
+			blue_texture.needsUpdate = true;
+		} );
 				
-	red_texture = new THREE.Texture();
-	var loader = new THREE.ImageLoader(manager);
-	loader.load( 'textures/spaceship/diffuse red.bmp', function ( image ) 
-	{
-		red_texture.image = image;
-		red_texture.needsUpdate = true;
-	} );				
+		red_texture = new THREE.Texture();
+		var loader = new THREE.ImageLoader(manager);
+		loader.load( 'textures/spaceship/diffuse red.bmp', function ( image ) 
+		{
+			red_texture.image = image;
+			red_texture.needsUpdate = true;
+		} );				
 	
-	clouds_texture = new THREE.Texture();
-	var loader = new THREE.ImageLoader(manager);
-	loader.load( "textures/clouds/clouds_2.jpg", function ( image ) 
-	{
-		clouds_texture.image = image;
-		clouds_texture.needsUpdate = true;
-	} );
+		clouds_texture = new THREE.Texture();
+		var loader = new THREE.ImageLoader(manager);
+		loader.load( "textures/clouds/clouds_2.jpg", function ( image ) 
+		{
+			clouds_texture.image = image;
+			clouds_texture.needsUpdate = true;
+		} );
 	
-	moon_texture = new THREE.Texture();
-	var loader = new THREE.ImageLoader(manager);
-	loader.load( "textures/planet/moon.jpg", function ( image ) 
-	{
-		moon_texture.image = image;
-		moon_texture.needsUpdate = true;
-	} );
+		moon_texture = new THREE.Texture();
+		var loader = new THREE.ImageLoader(manager);
+		loader.load( "textures/planet/moon.jpg", function ( image ) 
+		{
+			moon_texture.image = image;
+			moon_texture.needsUpdate = true;
+		} );
 	
-	earth_texture = new THREE.Texture();
-	var loader = new THREE.ImageLoader(manager);
-	loader.load( "textures/planet/earth.jpg", function ( image ) 
-	{
-		earth_texture.image = image;
-		earth_texture.needsUpdate = true;
-	} );	
+		earth_texture = new THREE.Texture();
+		var loader = new THREE.ImageLoader(manager);
+		loader.load( "textures/planet/earth.jpg", function ( image ) 
+		{
+			earth_texture.image = image;
+			earth_texture.needsUpdate = true;
+		} );	
 
-	clock = new THREE.Clock();
-	
-	planetInfoManager = new PlanetInfoManager();
-	planetInfoManager.hideAll();
+		clock = new THREE.Clock();
+		
+		planetInfoManager = new PlanetInfoManager();
+		planetInfoManager.hideAll();
 
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
+		scene = new THREE.Scene();
+		camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, .1, MAX_DISTANCE_CAMERA);
 	
-	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-	/*
-	scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
-	scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
-	renderer.setClearColor( scene.fog.color );
-	*/
+		renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+		/*
+		scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
+		scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
+		renderer.setClearColor( scene.fog.color );
+		*/
 	
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight);
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight);
 	
-	/*
-	renderer = new THREE.WebGLRenderer();
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	*/
-	//renderer.shadowMapEnabled = true;
+		/*
+		renderer = new THREE.WebGLRenderer();
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		*/
+		//renderer.shadowMapEnabled = true;
+		
+		skybox = setSkybox();
+		scene.add(skybox);
 	
-	skybox = setSkybox();
-	scene.add(skybox);
-   
-  	renderer.setSize(window.innerWidth,window.innerHeight);
- 
-	camera.position.x=40;
-	camera.position.y=50;
-	camera.position.z=10;
+		renderer.setSize(window.innerWidth,window.innerHeight);
 	
-	listener = new THREE.AudioListener();
-	camera.add( listener );
+		camera.position.x = 40;
+		camera.position.y = 50;
+		camera.position.z = 10;
 	
-	var audioLoader = new THREE.AudioLoader();
+		listener = new THREE.AudioListener();
+		camera.add( listener );
+	
+		var audioLoader = new THREE.AudioLoader();
 
-	var backgroundMusic = new THREE.PositionalAudio( listener );
-	audioLoader.load( 'sounds/358232_j_s_song.ogg', function( buffer ) {
-		backgroundMusic.setLoop(true);
-		backgroundMusic.setBuffer( buffer );
-		backgroundMusic.setRefDistance( 20 );
-		backgroundMusic.play();
-	});
+		var backgroundMusic = new THREE.PositionalAudio( listener );
+		audioLoader.load( 'sounds/358232_j_s_song.ogg', function( buffer ) {
+			backgroundMusic.setLoop(true);
+			backgroundMusic.setBuffer( buffer );
+			backgroundMusic.setRefDistance( 20 );
+			backgroundMusic.play();
+		});
 	
-	engine = new THREE.PositionalAudio( listener );
-	audioLoader.load( 'sounds/engine.wav', function( buffer ) {
-		engine.setLoop(true);
-		engine.setBuffer( buffer );
-		engine.setRefDistance( 20 );
-	});
+		engine = new THREE.PositionalAudio( listener );
+		audioLoader.load( 'sounds/engine.wav', function( buffer ) {
+			engine.setLoop(true);
+			engine.setBuffer( buffer );
+			engine.setRefDistance( 20 );
+		});
 	
-	container = document.getElementById("webGL-container");
+		container = document.getElementById("webGL-container");
+		
+		caricaNavicella(40,50,15);
+		LoadMenu();
 	
-  	caricaNavicella(40,50,15);
-  	LoadMenu();
+		navicella.add(backgroundMusic);
+		navicella.add(engine);
+		
+		fire = new VolumetricFire(
+			fireWidth,
+			fireHeight,
+			fireDepth,
+			sliceSpacing,
+			camera
+		);
 	
-	navicella.add(backgroundMusic);
-	navicella.add(engine);
+		controls.setFire(fire);
+		
+		fire.mesh.rotation.x = 90;
+		fire.mesh.position.z = 100; // Nascosto
+		navicella.add(fire.mesh);
 	
-	fire = new VolumetricFire(
-		fireWidth,
-		fireHeight,
-		fireDepth,
-		sliceSpacing,
-		camera
-	);
+		populate_universe(PLANETS_TOTAL_NUMBER);
 	
-	controls.setFire(fire);
-	
-	// you can set position, rotation and scale
-	// fire.mesh accepts THREE.mesh features
-	
-	fire.mesh.rotation.x = 90;
-	fire.mesh.position.z = 100; // Nascosto
-	navicella.add(fire.mesh);
-	
-	populate_universe(PLANETS_TOTAL_NUMBER);
-	
-	generateAsteroids(ASTEROIDS_NUMBER);
+		generateAsteroids(ASTEROIDS_NUMBER);
   	
-  	generateLensFlares();
-  	setupScene();
-  	setupPostprocessing();
+		generateLensFlares();
+		setupScene();
 	
 	/*
 	 * populate_universe
@@ -340,7 +243,6 @@ $(function()
 		for (var i = 0; i < n; i++)
 		{
 			var x,y,z;
-			console.log("Range universo: " + RANGE_UNIVERSO);
 			do{
 				x = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.x;
 				y = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.y;
@@ -381,32 +283,39 @@ $(function()
 		}
 	}
   
-  function generateLensFlares()
-  {
-	lensFlares = [];
-	lights = [];
-	lensflaresOriginalPositions = [];
-	var textureLoader = new THREE.TextureLoader();
-
-	textureFlare1 = textureLoader.load( "textures/lensflare/lensflare0.png" );
-	textureFlare2 = textureLoader.load( "textures/lensflare/lensflare2.png" );
-	textureFlare3 = textureLoader.load( "textures/lensflare/lensflare3.png" );
-
-	textureFlare1.minFilter = THREE.LinearFilter;
-	textureFlare2.minFilter = THREE.LinearFilter;
-	textureFlare3.minFilter = THREE.LinearFilter;
-	
-	
-	for (var i = 0; i < LENS_FLARES_NUMBER; i++)
+	/*
+	* generateLensFlares
+	* Genera le lensflare e le posiziona casualmente in scena
+	*/
+	function generateLensFlares()
 	{
-		var x = random(-RANGE / 2, RANGE / 2);
-		var y = random(-RANGE / 2, RANGE / 2);
-		var z = random(-RANGE / 2, RANGE / 2);
-		lensflaresOriginalPositions.push(new THREE.Vector3(x,y,z));
-		addLensFlares(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), x, y, z);
+		lensFlares = [];
+		lights = [];
+		lensflaresOriginalPositions = [];
+		var textureLoader = new THREE.TextureLoader();
+
+		textureFlare1 = textureLoader.load( "textures/lensflare/lensflare0.png" );
+		textureFlare2 = textureLoader.load( "textures/lensflare/lensflare2.png" );
+		textureFlare3 = textureLoader.load( "textures/lensflare/lensflare3.png" );
+
+		textureFlare1.minFilter = THREE.LinearFilter;
+		textureFlare2.minFilter = THREE.LinearFilter;
+		textureFlare3.minFilter = THREE.LinearFilter;
+	
+		for (var i = 0; i < LENS_FLARES_NUMBER; i++)
+		{
+			var x = random(-RANGE / 2, RANGE / 2);
+			var y = random(-RANGE / 2, RANGE / 2);
+			var z = random(-RANGE / 2, RANGE / 2);
+			lensflaresOriginalPositions.push(new THREE.Vector3(x,y,z));
+			addLensFlares(random(0.50, 1), random(0.65, 0.85), random(0.4, 1), x, y, z);
+		}
 	}
-  }
   
+	/*
+	 * addLensFlare
+	 * Ha in input i parametri di una lensflare e la aggiunge alla scena
+	 */
 	function addLensFlares( h, s, l, x, y, z ) 
 	{
 		var textureFlare0 = new THREE.Texture();
@@ -447,69 +356,65 @@ $(function()
 
 		scene.add( lensFlare );
 	}  
-  
-  
- function lensFlareUpdateCallback( object ) 
- {
-	var f, fl = object.lensFlares.length;
-	var flare;
-	var vecX = -object.positionScreen.x * 2;
-	var vecY = -object.positionScreen.y * 2;
-
-
-	for( f = 0; f < fl; f++ ) {
-
-		flare = object.lensFlares[ f ];
-
-		flare.x = object.positionScreen.x + vecX * flare.distance;
-		flare.y = object.positionScreen.y + vecY * flare.distance;
-
-		flare.rotation = 0;
-
-	}
-
-	object.lensFlares[ 2 ].y += 0.025;
-	object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
-}
-  
-
-  
-  function getRandomInt(min, max) 
-  {
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  function setSkybox()
-  {
-	var imagePrefix = "skybox/skybox-";
-	var directions = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
-	var imageSuffix = ".png";
-
-	var materialArray = [];
-	for (var i = 0; i < 6; i++)
+    
+	/*
+	 * lensFlareUpdateCallback
+	 * Callback lensflare, per ora non usato
+	 */
+	function lensFlareUpdateCallback( object ) 
 	{
-		materialArray.push( new THREE.MeshBasicMaterial({
-			map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
-			side: THREE.BackSide}));
+		var f, fl = object.lensFlares.length;
+		var flare;
+		var vecX = -object.positionScreen.x * 2;
+		var vecY = -object.positionScreen.y * 2;
+
+		for( f = 0; f < fl; f++ ) 
+		{
+			flare = object.lensFlares[ f ];
+
+			flare.x = object.positionScreen.x + vecX * flare.distance;
+			flare.y = object.positionScreen.y + vecY * flare.distance;
+
+			flare.rotation = 0;
+		}
+
+		object.lensFlares[ 2 ].y += 0.025;
+		object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
 	}
-	var skyGeometry = new THREE.CubeGeometry(DIM_SKYBOX, DIM_SKYBOX, DIM_SKYBOX);
-	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
-	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
-	skyBox.renderDepth = 5000.0;  
-	skyBox.rotation.x += Math.PI / 2;
-	return skyBox;
 	
 	/*
-	var starGeometry = new THREE.SphereGeometry(1000, 50, 50);
-	var starMaterial = new THREE.MeshPhongMaterial({
-	  map: new THREE.ImageUtils.loadTexture("/skybox/skybox-xpos.png"),
-	  side: THREE.DoubleSide,
-	  shininess: 0
-	});
-	var starField = new THREE.Mesh(starGeometry, starMaterial);
-	return starField;
-	*/
-  }
+	 * getRandomInt
+	 * Ritorna un intero tra min e max
+	 */
+	function getRandomInt(min, max) 
+	{
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+	/*
+	 * setSkybox
+	 * Setta lo skybox in scena
+	 */
+	function setSkybox()
+	{
+		var imagePrefix = "skybox/skybox-";
+		var directions = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+		var imageSuffix = ".png";
+
+		var materialArray = [];
+		for (var i = 0; i < 6; i++)
+		{
+			materialArray.push( new THREE.MeshBasicMaterial({
+				map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+				side: THREE.BackSide}));
+		}
+		var skyGeometry = new THREE.CubeGeometry(DIM_SKYBOX, DIM_SKYBOX, DIM_SKYBOX);
+		var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+		var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+		skyBox.renderDepth = 5000.0;  
+		skyBox.rotation.x += Math.PI / 2;
+		return skyBox;
+	}
 
 	/*
 	 * caricaNavicella
@@ -565,8 +470,14 @@ $(function()
 	
 		scene.add(camera);
 	}  
-
-	function generateSprite() {
+	
+	
+	/*
+	 * generateSprite
+	 * Non più usata
+	 */
+	function generateSprite() 
+	{
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = 16;
@@ -583,31 +494,16 @@ $(function()
 		context.fillRect( 0, 0, canvas.width, canvas.height );
 
 		return canvas;
-
 	}
 
-	/*
-	guiControls=new function()
-	{
-		this.rotationX=0.0;
-		this.rotationY=0.0;
-		this.rotationZ=0.0;	
-	}
-	datGUI=new dat.GUI();
-	datGUI.close();
-	*/
 
-
- $("#webGL-container").append(renderer.domElement);
-       
+	$("#webGL-container").append(renderer.domElement);
         stats = new Stats();        
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.left = '800px';
         stats.domElement.style.top = '0px';     
         $("#webGL-container").append( stats.domElement );  
-
-         
- }
+	}
 
  
  
@@ -674,11 +570,11 @@ $(function()
 		}
 	}
 	
-	var t = 0;
-	var oldCameraPosition;
-	var time = 0;
-   function animate()
-   {
+	/*
+	 * animate
+	 */
+	function animate()
+	{
 		var delta = clock.getDelta();
 		requestAnimationFrame(animate);
 		stats.update();
@@ -707,12 +603,14 @@ $(function()
 										*/
 		}
 		
+		/*
 		for (var i = 0; i < luci.length; i++)
 		{
 			sfere[i].position.set(luci_original_positions[i].x + navicella.position.x - 40,
 									luci_original_positions[i].y + navicella.position.y - 40,
 									luci_original_positions[i].z + navicella.position.z - 40);
 		}
+		*/
 		
 		checkCollisions();
 
@@ -832,7 +730,7 @@ $(function()
 		}
 		*/
 		
-		
+		/*
 		for (var i = 0; i < luci.length; i++)
 		{
 			var p = sfere[i].position.clone(),
@@ -842,9 +740,13 @@ $(function()
           uniforms[i].lightPosition.value.set(x, y);
           luci[i].position.copy(sfere[i].position);
 		}
-		
+		*/
    }
    
+   /*
+    * calcolateDirection
+	* Non più usata
+	*/
    function calcolateDirection(r1, r2)
    {
 	   var d1 = r1 * 180 / Math.PI;
@@ -872,6 +774,10 @@ $(function()
 		return mol;
    }
    
+   /*
+    * correctRotation
+	* Non più usata
+	*/
    function correctRotation(o, n)
    {
 	   var SOGLIA = 0.1;
@@ -999,7 +905,6 @@ $(function()
 		}
 		*/
 		
-		
 		/*
 		 * Collisioni con anelli
 		 */
@@ -1073,7 +978,11 @@ $(function()
 			clearScene();
 		}
 	}
-
+	
+	/* 
+	 * clearScene
+	 * Aggiorna la scena (usata quando la navicella viene distrutta)
+	 */
 	function clearScene()
 	{
 		setTimeout(function()
@@ -1187,15 +1096,22 @@ $(function()
 	    }	
    }
    
-   function printVector3(v)
-   {
-	   return "(" + v.x + ";" + v.y + ";" + v.z + ")";
-   }
+   /*
+    * printVector3
+	* Usato per debuggare, stampa un Vector3
+	*/
+	function printVector3(v)
+	{
+		return "(" + v.x + ";" + v.y + ";" + v.z + ")";
+	}
    
-   function aggiungi(p)
-   {
-		console.log("add new planet");
-		
+	/*
+	 * aggiungi
+	 * Aggiunge un nuovo pianeta
+	 * Non più usata
+	 */
+	function aggiungi(p)
+	{
 		var pos = -1;
 		if (Math.random() * 100 < 50)
 			pos = 1;
@@ -1207,97 +1123,101 @@ $(function()
 			y = (Math.random() * (RANGE / 2) + (RANGE / 2)) * pos + navicella.position.y;
 			z = (Math.random() * (RANGE / 2) + (RANGE / 2)) * pos + navicella.position.z;
 		}while(!lontanoDaPianeti(x,y,z));
-		
-		console.log("navicella x: " + navicella.position.x);
-		console.log("navicella y: " + navicella.position.y);
-		console.log("navicella z: " + navicella.position.z);
-		
-		console.log("pianeta x: " + x);
-		console.log("pianeta y: " + y);
-		console.log("pianeta z: " + z);
-		
-		
+				
 		var p = new Planet(x, y, z);
 		scene.add(p.create());
 		scene.add(p.generateMoon(Math.random() * 5));
 		return p;
    }
    
-   function lontanoDaPianeti(planetsInfo, x,y,z)
-   {
-	   for (var i = 0; i < planetsInfo.length; i++)	 
-		   if (distanza(new THREE.Vector3(x,y,z), planetsInfo[i].getPosition()) < DISTANZA_MINIMA_TRA_PIANETI)
-			   return false;
-	   return true;
-   } 
+   /*
+    * lontanoDaPianeti
+	* Ritorna true se le coordinate date in input sono troppo vicine ad un altro pianeta
+	* false altrimenti
+	*/
+	function lontanoDaPianeti(planetsInfo, x,y,z)
+	{
+		for (var i = 0; i < planetsInfo.length; i++)	 
+			if (distanza(new THREE.Vector3(x,y,z), planetsInfo[i].getPosition()) < DISTANZA_MINIMA_TRA_PIANETI)
+				return false;
+		return true;
+	} 
    
-   function distanza(p1, p2)
-   {
-	   return Math.pow(p1.x - p2.x,2) + Math.pow(p1.y - p2.y,2) + Math.pow(p1.z - p2.z,2);
-   }
-   
-   function seguiNavicella()
-   {
-	   spotLight.position.set( navicella.position.x, navicella.position.y, navicella.position.z);
-   }
+	/*
+	 * distanza
+	 * Ritorna la distanza tra due punti (senza radice)
+	 */
+	function distanza(p1, p2)
+	{
+		return Math.pow(p1.x - p2.x,2) + Math.pow(p1.y - p2.y,2) + Math.pow(p1.z - p2.z,2);
+	}
 
-   function LoadMenu()
-   {
-   		        height = 1,
-				size = 10,
-				hover = 30,
-				curveSegments = 20,
-				bevelEnabled = false,
-				font = undefined,
-				fontName = "optimer", // helvetiker, optimer, gentilis, droid sans, droid serif
-				fontWeight = "bold"; // normal bold
+	/*
+	 * LoadMenu
+	 * Carica la scritta 
+	 */
+	function LoadMenu()
+	{
+		height = 1,
+		size = 10,
+		hover = 30,
+		curveSegments = 20,
+		bevelEnabled = false,
+		font = undefined,
+		fontName = "optimer",
+		fontWeight = "bold";
 
-				material = new THREE.MultiMaterial( [
-					new THREE.MeshPhongMaterial( { color: 0xff0000} ), // front
-					new THREE.MeshPhongMaterial( { color: 0xff0000 } ) // side
-				] );
-				loadFont();
+		material = new THREE.MultiMaterial( [
+			new THREE.MeshPhongMaterial( { color: 0xff0000} ), // front
+			new THREE.MeshPhongMaterial( { color: 0xff0000 } ) // side
+		] );
+		loadFont();
+	}
 
+	/*
+	 * loadFont
+	 * Carica font scritta start per iniziare
+	 */
+	function loadFont() 
+	{
+		var loader = new THREE.FontLoader();
+		loader.load( './fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
+			font = response;
+		createText();
+		} );
+    }  
+	
+	/* 
+	 * createText
+	 * Crea scritta inizia partita / pausa
+	 */
+	function createText() 
+	{
+		var text;
+		if(!controls.pause)
+			text="Press ENTER  to start";
+		textGeo = new THREE.TextGeometry(text, {
+			font: font,
+			size: size,
+			height: height,
+			curveSegments: curveSegments,
+			bevelEnabled: bevelEnabled,
+			material: 0,
+			extrudeMaterial: 1
+		});
+		textGeo.computeBoundingBox();
+		textGeo.computeVertexNormals();
 
-   }
+		var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+		PlayText = new THREE.Mesh( textGeo, material );
 
+		camera.add(PlayText);
+		PlayText.position.x=-60;
+		PlayText.position.y=10;
+		PlayText.position.z=-80;
 
-   function loadFont() {
-				var loader = new THREE.FontLoader();
-				loader.load( './fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
-					font = response;
-				createText();
-				} );
-
-        }  
-
-        function createText() 
-        {
-        		var text;
-        		if(!controls.pause)
-        			text="Press ENTER  to start";
-				textGeo = new THREE.TextGeometry(text, {
-					font: font,
-					size: size,
-					height: height,
-					curveSegments: curveSegments,
-					bevelEnabled: bevelEnabled,
-					material: 0,
-					extrudeMaterial: 1
-				});
-				textGeo.computeBoundingBox();
-				textGeo.computeVertexNormals();
-
-				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
-				PlayText = new THREE.Mesh( textGeo, material );
-
-				camera.add(PlayText);
-				PlayText.position.x=-60;
-				PlayText.position.y=10;
-				PlayText.position.z=-80;
-
-				//scene.add(PlayText);
-		}
+		//scene.add(PlayText);
+	}
 		
 	/*
 	 * startShowInfoPlanet
@@ -1366,7 +1286,10 @@ $(function()
 			planetInfoManager.show();
 		}
 	}
-
+	
+	/*
+	 * Evento keydown
+	 */
 	this.keydown = function( event ) {
 		if ( event.altKey ) {
 			return;
@@ -1438,11 +1361,19 @@ $(function()
 		return pianetiOrdinati;
 	}
 
+	/*
+	 * random
+	 * Ritorna un numero compreso tra minimo e massimo
+	 */
 	function random(min, max)
 	{
 	  return Math.random() * (max - min) + min;
 	}
     
+	/*
+	 * setupScene
+	 * Crea una luce ambientale nella scena
+	 */
 	function setupScene()
 	{
 		var ambientLight,
@@ -1459,76 +1390,35 @@ $(function()
 			var z = random(-RANGE / 2, RANGE / 2);
 			addLight(x, y, z);
 		}
-  }
+	}
 
-  function addLight(x, y, z ) 
-{
-    geometry = new THREE.SphereBufferGeometry(random(1, 5),16,16);
-    material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-    lightSphere = new THREE.Mesh( geometry, material );
-    lightSphere.layers.set( OCCLUSION_LAYER );
-    lightSphere.position.set(x,y,z);
-	
-	pointLight = new THREE.PointLight(0xffffff);
-	pointLight.position.set(x,y,z);
-    scene.add(pointLight);
-	
-	sfere.push(lightSphere);
-	luci.push(pointLight);
-	
-	luci_original_positions.push(new THREE.Vector3(x,y,z));
-    
-	scene.add(pointLight);
-    scene.add( lightSphere );
-}
-
-  function setupPostprocessing(){
-    var pass;
-    occlusionRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth * renderScale, window.innerHeight * renderScale );
-	for (var i = 0; i < NUMERO_LUCI; i++)
+	/*
+	 * addLight
+	 * Aggiunge la luce
+	 */
+	function addLight(x, y, z ) 
 	{
-		occlusionComposer = new THREE.EffectComposer( renderer, occlusionRenderTarget);
-		occlusionComposer.addPass( new THREE.RenderPass( scene, camera ) );
-		pass = new THREE.ShaderPass( THREE.VolumetericLightShader );
-		pass.needsSwap = false;
-		occlusionComposer.addPass( pass );
+		geometry = new THREE.SphereBufferGeometry(random(1, 5),16,16);
+		material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+		lightSphere = new THREE.Mesh( geometry, material );
+		lightSphere.layers.set( OCCLUSION_LAYER );
+		lightSphere.position.set(x,y,z);
+	
+		pointLight = new THREE.PointLight(0xffffff);
+		pointLight.position.set(x,y,z);
+		scene.add(pointLight);
+	
+		//sfere.push(lightSphere);
+		luci.push(pointLight);
+	
+		luci_original_positions.push(new THREE.Vector3(x,y,z));
 		
-		//volumetericLightShaderUniforms = pass.uniforms;
-		occlusionsComposer.push(occlusionComposer);
-		uniforms.push(pass.uniforms);
+		scene.add(pointLight);
+		//scene.add( lightSphere );
 	}
-    
-    composer = new THREE.EffectComposer( renderer );
-    composer.addPass( new THREE.RenderPass( scene, camera ) );
-    pass = new THREE.ShaderPass( THREE.AdditiveBlendingShader );
-    pass.uniforms.tAdd.value = occlusionRenderTarget.texture;
-    composer.addPass( pass );
-    pass.renderToScreen = true;
-  }
-  
-  function render_(){
-    camera.layers.set(OCCLUSION_LAYER);
-    renderer.setClearColor(0x000000);
-	
-	for (var i = 0; i < occlusionsComposer.length; i++)
-		occlusionsComposer[i].render();
-    
-    camera.layers.set(DEFAULT_LAYER);
-    renderer.setClearColor(0x090611);
-    composer.render();
-  }
-
-	function onFrame()
-	{
-		requestAnimationFrame( onFrame );
-		//render_();
-	}
-
-	
 
    init();
    animate(); 
-   onFrame();
 
    $(window).resize(function(){
    		SCREEN_WIDTH=window.innerWidth;
