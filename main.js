@@ -194,6 +194,7 @@ $(function()
   function init()
   {
   	document.getElementById("intro").style.display = 'none'; 
+	document.getElementById("time").style.display = 'block'; 
 	manager = new THREE.LoadingManager();
 	is_red = false;
 	
@@ -676,12 +677,17 @@ $(function()
 	
 	var t = 0;
 	var oldCameraPosition;
+	var time = 0;
    function animate()
    {
 		var delta = clock.getDelta();
 		requestAnimationFrame(animate);
 		stats.update();
    		renderer.render(scene,camera);
+		
+		time += delta;
+		
+		document.getElementById("time").innerHTML = "Time: " + parseInt(time);
    		
 		d = 100;
 		
