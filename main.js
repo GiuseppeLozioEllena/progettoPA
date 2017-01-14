@@ -586,6 +586,7 @@ $(function()
 
 	}
 
+	/*
 	guiControls=new function()
 	{
 		this.rotationX=0.0;
@@ -594,7 +595,7 @@ $(function()
 	}
 	datGUI=new dat.GUI();
 	datGUI.close();
-
+	*/
 
 
  $("#webGL-container").append(renderer.domElement);
