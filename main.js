@@ -128,7 +128,7 @@ $(function()
   var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
   var MAX_DISTANCE_CAMERA = 5000;
   var DIM_SKYBOX = 4000;
-  var SOGLIA_AVVISO_ASTEROIDE = 500000;
+  var SOGLIA_AVVISO_ASTEROIDE = 750000;
   
   // Tasti per visualizzare info pianeti
   var SHOW_INFO_BUTTON = 81; // Q
@@ -523,6 +523,7 @@ $(function()
 		
 		var geometry = new THREE.CylinderGeometry( 0, 1, 3, 12 );
 		geometry.rotateX( Math.PI / 2 );
+		
 		var material = new THREE.MeshNormalMaterial();
 		
 		arrow = new THREE.Mesh( geometry, material );
@@ -803,20 +804,21 @@ $(function()
 				// Significa che non ha ancora finito la chiamata asincrona per il caricamento, bisogna solo attendere
 			} 
 		}
-							
-		var v = new THREE.Vector3();
-		v.setFromMatrixPosition( fake_wireframe.matrixWorld );
-
-		wireframe.position.set(v.x, v.y, v.z)
-		wireframe.rotation.set(navicella.rotation.x, navicella.rotation.y, navicella.rotation.z);
-		
-		manageArrow();
 		
 		var lookAtPosition = new THREE.Vector3(navicella.position.x + + 0, /*directionY.x * 5, */
 												navicella.position.y + 5, /* directionY.y * 5, */
 												navicella.position.z + 0 /* directionY.z * 5 */);
 			
 		camera.lookAt(lookAtPosition);	
+		
+		scene.updateMatrixWorld();
+		var v = new THREE.Vector3();
+		v.setFromMatrixPosition( fake_wireframe.matrixWorld );
+
+		wireframe.position.set(v.x, v.y, v.z)
+		wireframe.rotation.set(navicella.rotation.x, navicella.rotation.y, navicella.rotation.z);
+
+		manageArrow();
 		
 		/*
 		var SOGLIA = 0.1;
@@ -954,6 +956,7 @@ $(function()
 			if (planets_reference[i].inCollision(navicella.position))
 			{
 				explode();
+				console.log("Distrutto da un pianeta");
 				inCollision = true;
 			}
 			
@@ -1029,6 +1032,7 @@ $(function()
 			var collisionResults = ray.intersectObjects( collidableMeshList );
 			if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
 			{
+				console.log("Distrutto da un asteroide");
 				explode();
 				inCollision = true;
 			}
