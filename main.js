@@ -176,7 +176,7 @@ $(function()
   var sliceSpacing = 0.25;
 
 	var arrow, fake_arrow, arrow_presente;
-	var wireframeCube, fake_wireframe;
+	var wireframe, fake_wireframe;
 
     var DEFAULT_LAYER = 0,
     OCCLUSION_LAYER = 1,
@@ -340,7 +340,7 @@ $(function()
 		for (var i = 0; i < n; i++)
 		{
 			var x,y,z;
-		
+			console.log("Range universo: " + RANGE_UNIVERSO);
 			do{
 				x = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.x;
 				y = (Math.random() * (RANGE_UNIVERSO * 2) - RANGE_UNIVERSO) + navicella.position.y;
@@ -545,8 +545,6 @@ $(function()
 		wireframe = new THREE.Mesh( cubeGeometry, wireMaterial );
 		wireframe.position.set(navicella.position.x, navicella.position.y, navicella.position.z);	
 		
-		wireframeCube = wireframe;
-		
 		fake_wireframe = new THREE.Object3D();
 		fake_wireframe.position.set(0, 1, 0);
 		
@@ -695,8 +693,7 @@ $(function()
 		if (e != null)
 			e.animate();
 		
-		var pos = new THREE.Vector3(navicella.position.x % RANGE_UNIVERSO, navicella.position.y % RANGE_UNIVERSO, navicella.position.z % RANGE_UNIVERSO);
-		showPlanets(pos);
+		showPlanets(navicella.position.clone());
 		
 		for (var i = 0; i < lensFlares.length; i++)
 		{
@@ -1022,11 +1019,11 @@ $(function()
 		}
 		
 		var originPoint = wireframe.position.clone();
-		for (var vertexIndex = 0; vertexIndex < wireframeCube.geometry.vertices.length && !inCollision; vertexIndex++)
+		for (var vertexIndex = 0; vertexIndex < wireframe.geometry.vertices.length && !inCollision; vertexIndex++)
 		{		
-			var localVertex = wireframeCube.geometry.vertices[vertexIndex].clone();
-			var globalVertex = localVertex.applyMatrix4( wireframeCube.matrix );
-			var directionVector = globalVertex.sub( wireframeCube.position );
+			var localVertex = wireframe.geometry.vertices[vertexIndex].clone();
+			var globalVertex = localVertex.applyMatrix4( wireframe.matrix );
+			var directionVector = globalVertex.sub( wireframe.position );
 		
 			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 			var collisionResults = ray.intersectObjects( collidableMeshList );
@@ -1099,19 +1096,23 @@ $(function()
 	* Data in input la posizione della navicella mostra i pianeti che hanno una distanza entro SOGLIA_VISUALE_NAVICELLA
 	* e nasconde quelli oltre questa soglia
 	*/
-   function showPlanets(nav_position)
+   function showPlanets(pos)
    {
+	   var nav_position = new THREE.Vector3(pos.x % RANGE_UNIVERSO, pos.y % RANGE_UNIVERSO, pos.z % RANGE_UNIVERSO);
+	   var diff = new THREE.Vector3(pos.x - nav_position.x, pos.y - nav_position.y, pos.z - nav_position.z);	   
+	   
 	   for (var i = 0; i < planets_reference.length; i++)
-		   if (distance(planets_reference[i].position(), nav_position) >= SOGLIA_VISUALE_NAVICELLA)
+		   if (distance(planets_reference[i].position(), pos) >= SOGLIA_VISUALE_NAVICELLA)
 				planets_reference[i].removeFromScene(scene);
 		   
 	   for (var i = 0; i < PLANETS_TOTAL_NUMBER; i++)
 	   {
 		   if (distance(planetsInfo[i].getPosition(), nav_position) < SOGLIA_VISUALE_NAVICELLA)
 		   {
+			   var pon = new THREE.Vector3(planetsInfo[i].getPosition().x + diff.x, planetsInfo[i].getPosition().y + diff.y, planetsInfo[i].getPosition().z + diff.z);
 			   if (!planetsInfo[i].isVisible())
 			   {
-				 var p = new Planet(planetsInfo[i].getPosition().x, planetsInfo[i].getPosition().y, planetsInfo[i].getPosition().z);
+				 var p = new Planet(planetsInfo[i].getPosition().x + diff.x, planetsInfo[i].getPosition().y + diff.y, planetsInfo[i].getPosition().z + diff.z);
 				 p.create(planetsInfo[i].getScale(), planetsInfo[i].getTextureNumber());
 				 p.createClouds(clouds_texture);
 				 
