@@ -2,7 +2,7 @@
 	color: #FFFFFF;
 	font-family: "merriweather-bold", serif;
 	font-size: 5.4rem;
-	max-width: 800px;
+	max-width: 1200px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -20,13 +20,14 @@
 }
 .intro-content .button {
 	border-color: #FFFFFF;
+	background-color: transparent;
 	color: #FFFFFF;
 	font-family: "raleway-heavy", sans-serif;
 	font-size: 2.5rem;
 	text-transform: uppercase;
 	letter-spacing: .4rem;
 	position: absolute;
-    top: 50%;
+    top: 60%;
     left: 46%;
 }
 .intro-content .button:hover, .intro-content .button:focus {

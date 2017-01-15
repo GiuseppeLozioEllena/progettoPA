@@ -108,7 +108,7 @@ $(function()
 		manager = new THREE.LoadingManager();
 		is_red = false;
 		
-		diffManager = new DifficultyManager(0);
+		diffManager = new DifficultyManager(document.forms.diff.level.value);
 	
 		arrow_presente = false;
 	
