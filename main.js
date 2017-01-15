@@ -828,19 +828,20 @@ $(function()
 		/*
 		 * Collisioni con anelli
 		 */
-		var collidableMeshList = [];
+		var collidableMeshList1 = [];
+		var collidableMeshList2 = [];
 		for (var i = 0; i < planets_reference.length; i++)
 		{
 			var mesh = planets_reference[i].getRings();
 			if (mesh != null)
-				collidableMeshList.push(mesh);
+				collidableMeshList1.push(mesh);
 		}
 		
 		for (var i = 0; i < asteroids_reference.length; i++)
 		{
 			var mesh = asteroids_reference[i].getMesh();
 			if (mesh != null)
-				collidableMeshList.push(mesh);
+				collidableMeshList2.push(mesh);
 		}
 		
 		var originPoint = wireframe.position.clone();
@@ -851,12 +852,34 @@ $(function()
 			var directionVector = globalVertex.sub( wireframe.position );
 		
 			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-			var collisionResults = ray.intersectObjects( collidableMeshList );
+			var collisionResults = ray.intersectObjects( collidableMeshList1 );
 			if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
 			{
-				console.log("Distrutto da un asteroide");
+				console.log("Distrutto da anelli");
 				explode();
 				inCollision = true;
+			}
+		}
+		
+		for (var vertexIndex = 0; vertexIndex < wireframe.geometry.vertices.length && !inCollision; vertexIndex++)
+		{		
+			var localVertex = wireframe.geometry.vertices[vertexIndex].clone();
+			var globalVertex = localVertex.applyMatrix4( wireframe.matrix );
+			var directionVector = globalVertex.sub( wireframe.position );
+		
+			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+			var collisionResults = ray.intersectObjects( collidableMeshList2 );
+			if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
+			{
+				var nearestAsteroidPosition = getNearestAsteroidPosition();
+				var distanza = distance(navicella.position, nearestAsteroidPosition);
+				if (distanza < 3000)
+				{
+					console.log("Distrutto da un asteroide");
+					console.log("Distanza: " + distance(navicella.position, nearestAsteroidPosition));
+					explode();
+					inCollision = true;
+				}
 			}
 		}
 	}
