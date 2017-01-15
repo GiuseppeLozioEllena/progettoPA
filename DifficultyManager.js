@@ -12,7 +12,7 @@ DifficultyManager = function (liv) {
 	
 	function calcolaNumeroAsteroidi(time)
 	{
-		var f = int.parse(time / 100);
+		var f = parseInt(time / 100);
 		return this.numeroBaseAsteroidi[this.level] + f * this.aumentoAsteroidi[this.level];
 	}
 }

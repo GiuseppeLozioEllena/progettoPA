@@ -93,6 +93,8 @@ $(function()
 	var t = 0;
 	var oldNavicellaPosition;
 	var time = 0;
+	
+	var diffManager;
 
 	/*
 	 * init
@@ -104,6 +106,8 @@ $(function()
 		document.getElementById("time").style.display = 'block'; 
 		manager = new THREE.LoadingManager();
 		is_red = false;
+		
+		diffManager = new DifficultyManager(0);
 	
 		arrow_presente = false;
 	
@@ -574,9 +578,13 @@ $(function()
 		stats.update();
    		renderer.render(scene,camera);
 		
-		ASTEROIDS_NUMBER = 
-		
 		time += delta;
+		
+		if (time > 1 && diffManager.calcolaNumeroAsteroidi(time) != ASTEROIDS_NUMBER)
+		{
+			ASTEROIDS_NUMBER = diffManager.calcolaNumeroAsteroidi(time);
+			addAsteroid();
+		}
 		
 		document.getElementById("time").innerHTML = "Time: " + parseInt(time);
    		
@@ -689,6 +697,22 @@ $(function()
 		wireframe.rotation.set(navicella.rotation.x, navicella.rotation.y, navicella.rotation.z);
 
 		manageArrow();
+   }
+   
+   /*
+    * addAsteroid
+	* Aggiunge gli asteroidi finchè non arriva al numero corretto
+	*/
+   function addAsteroid()
+   {
+		for (var i = asteroids_reference.length; i < ASTEROIDS_NUMBER; i++)
+		{
+			var asteroid = new Asteroid();
+			asteroid.create(navicella.position, SOGLIA_VISUALE_NAVICELLA);
+			asteroid.addToScene(scene);
+			asteroids_reference.push(asteroid);	   
+			console.log("Nuovo asteroide, ora in scena ci sono: " + asteroids_reference.length);
+		}
    }
    
    /*
