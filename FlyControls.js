@@ -6,8 +6,9 @@ THREE.FlyControls = function ( object, domElement )
 {
 	var TURBO_MULTIPLIER = 10; // Velocità del turbo
 	var TURBO_MAX_DURATION = 3; // Durata turbo
-	var TURBO_SLEEP_TIME = 6; // Si può richiamare solo dopo x secondi che lo si è usato
 	var SOGLIA_DECELERAZIONE = -0.055; // Decelerazione navicella
+	
+	this.TURBO_SLEEP_TIME; // Si può richiamare solo dopo x secondi che lo si è usato
 	
 	this.listener = null;
 	this.usable = true;
@@ -358,7 +359,7 @@ THREE.FlyControls = function ( object, domElement )
 			if (this.usable == false)
 			{
 				this.lastTurboUsedTime += delta;
-				if (this.lastTurboUsedTime >= TURBO_SLEEP_TIME)
+				if (this.lastTurboUsedTime >= this.TURBO_SLEEP_TIME)
 				{
 					this.turboDuration = -1;
 					this.lastTurboUsedTime = -1;

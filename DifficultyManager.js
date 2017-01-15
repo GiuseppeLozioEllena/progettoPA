@@ -9,9 +9,12 @@ DifficultyManager = function (liv) {
 	this.aumentoAsteroidi = [1,2,3];
 	
 	this.incrementoCostante = [0.1, 0.2, 0.3];
+	
+	this.intervalloTurbo = [6, 8, 12];
 
 	this.calcolaNumeroAsteroidi = calcolaNumeroAsteroidi;
 	this.calcolaMoltiplicatore = calcolaMoltiplicatore;
+	this.getTurboSleepTime = getTurboSleepTime;
 	
 	/*
 	 * calcolaNumeroAsteroidi
@@ -32,5 +35,15 @@ DifficultyManager = function (liv) {
 	{
 		var f = parseInt(time / 100);
 		return 1 + f * this.aumentoAsteroidi[this.level];
+	}
+	
+	/*
+	 * getTurboSleepTime
+	 * Ritorna quanti secondi il turbo deve rimanere disattivato dopo l'utilizzo
+	 * Cambia solo in base alla difficoltà, non al tempo
+	 */
+	function getTurboSleepTime()
+	{
+		return this.intervalloTurbo[this.level];
 	}
 }

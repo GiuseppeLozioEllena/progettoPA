@@ -436,6 +436,8 @@ $(function()
 				
 		camera.position.set(0, 3, 20);
 		controls = new THREE.FlyControls(navicella);
+		controls.TURBO_SLEEP_TIME = diffManager.getTurboSleepTime();
+		console.log("Sleep: " + controls.TURBO_SLEEP_TIME);
 		controls.setCamera(camera);
 		controls.movementSpeed = 1000;
 		controls.domElement = container;
