@@ -76,22 +76,10 @@ $(function()
 
 	var arrow, fake_arrow, arrow_presente;
 	var wireframe, fake_wireframe;
-
-    var DEFAULT_LAYER = 0,
-    OCCLUSION_LAYER = 1,
-    renderScale = 0.5,
-    angle = 0;
-	
-	var sfere = [];
-	var luci = [];
-	var luci_original_positions = [];
-	var uniforms = [];
-	var occlusionsComposer = [];
 	
 	var engine;
 	
 	var t = 0;
-	var oldNavicellaPosition;
 	var time = 0;
 	
 	var diffManager;
@@ -671,7 +659,7 @@ $(function()
 		var matrix2 = new THREE.Matrix4();
 		matrix2.extractRotation( camera.matrix );		
 							
-		if (navicella.position.x == oldNavicellaPosition.x && navicella.position.y == oldNavicellaPosition.y && navicella.position.z == oldNavicellaPosition.z)
+		if (controls.moveState.forward == 0)
 		{			
 			try {
 				if (engine.isPlaying)
@@ -691,8 +679,6 @@ $(function()
 				// Significa che non ha ancora finito la chiamata asincrona per il caricamento, bisogna solo attendere
 			} 
 		}
-		
-		oldNavicellaPosition = navicella.position.clone();
 		
 		camera.rotation.z = -navicella.rotation.z;
 		
@@ -1341,23 +1327,10 @@ $(function()
 	 */
 	function addLight(x, y, z ) 
 	{
-		geometry = new THREE.SphereBufferGeometry(random(1, 5),16,16);
-		material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-		lightSphere = new THREE.Mesh( geometry, material );
-		lightSphere.layers.set( OCCLUSION_LAYER );
-		lightSphere.position.set(x,y,z);
-	
 		pointLight = new THREE.PointLight(0xffffff);
 		pointLight.position.set(x,y,z);
+		scene.add(pointLight);		
 		scene.add(pointLight);
-	
-		//sfere.push(lightSphere);
-		luci.push(pointLight);
-	
-		luci_original_positions.push(new THREE.Vector3(x,y,z));
-		
-		scene.add(pointLight);
-		//scene.add( lightSphere );
 	}
 
    init();

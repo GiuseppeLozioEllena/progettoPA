@@ -4,7 +4,7 @@
  */
 THREE.FlyControls = function ( object, domElement ) 
 {
-	var TURBO_MULTIPLIER = 10; // Velocità del turbo
+	var TURBO_MULTIPLIER = 7; // Velocità del turbo
 	var TURBO_MAX_DURATION = 3; // Durata turbo
 	var SOGLIA_DECELERAZIONE = -0.055; // Decelerazione navicella
 	
