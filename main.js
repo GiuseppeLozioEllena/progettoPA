@@ -91,7 +91,7 @@ $(function()
 	var engine;
 	
 	var t = 0;
-	var oldCameraPosition;
+	var oldNavicellaPosition;
 	var time = 0;
 
 	/*
@@ -448,13 +448,13 @@ $(function()
 		
 		navicella.add(fake_wireframe);
 		
-		scene.add(wireframe);
+		//scene.add(wireframe);
 		
 		//var axis = new THREE.AxisHelper(5);
 		//navicella.add(axis);
 		scene.add(navicella);
 		
-		fake_arrow.position.set(0, 0, -20);
+		fake_arrow.position.set(0, 10, -25);
 	
 		arrow.position.set(40, 50, 15);
 		
@@ -574,6 +574,8 @@ $(function()
 		stats.update();
    		renderer.render(scene,camera);
 		
+		ASTEROIDS_NUMBER = 
+		
 		time += delta;
 		
 		document.getElementById("time").innerHTML = "Time: " + parseInt(time);
@@ -600,6 +602,8 @@ $(function()
 			controls.pause=false;
 		}
 
+		oldNavicellaPosition = navicella.position.clone();
+		
 		if (controls != null && controls.play && !isExplode && !controls.pause)
 		{
 			camera.remove(PlayText);
@@ -651,10 +655,8 @@ $(function()
 		
 		var matrix2 = new THREE.Matrix4();
 		matrix2.extractRotation( camera.matrix );		
-		
-		oldCameraPosition = navicella.position.clone();
 							
-		if (navicella.position.x == oldCameraPosition.x && navicella.position.y == oldCameraPosition.y && navicella.position.z == oldCameraPosition.z)
+		if (navicella.position.x == oldNavicellaPosition.x && navicella.position.y == oldNavicellaPosition.y && navicella.position.z == oldNavicellaPosition.z)
 		{			
 			try {
 				if (engine.isPlaying)
@@ -674,6 +676,8 @@ $(function()
 				// Significa che non ha ancora finito la chiamata asincrona per il caricamento, bisogna solo attendere
 			} 
 		}
+		
+		oldNavicellaPosition = navicella.position.clone();
 		
 		camera.rotation.z = -navicella.rotation.z;
 		
