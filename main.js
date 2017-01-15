@@ -1,78 +1,78 @@
 $(function()
 {
-  var scene,camera,renderer;
-  var controls,guiControls,datGUI;
-  var stats;
-  var spotLight,hemi;
-  var SCREEN_WIDTH,SCREEN_HEIGHT;
-  var navicella;
-  var camera;
-
-  var planets_reference; // Array con i riferimenti ai pianeti
-  var skybox; // Skybox, viene spostato con la navicella
-  var lensflares; // Array con i riferimenti alle lensflares
-  var lights;
-  var textureFlare1, textureFlare2, textureFlare3; // Texture dei lansflares
-  var lensflaresOriginalPositions;
+	var scene,camera,renderer;
+	var controls,guiControls,datGUI;
+	var stats;
+	var spotLight,hemi;
+	var SCREEN_WIDTH,SCREEN_HEIGHT;
+	var navicella;
+	var camera;
+	
+	var planets_reference; // Array con i riferimenti ai pianeti
+	var skybox; // Skybox, viene spostato con la navicella
+	var lensflares; // Array con i riferimenti alle lensflares
+	var lights;
+	var textureFlare1, textureFlare2, textureFlare3; // Texture dei lansflares
+	var lensflaresOriginalPositions;
   
-  // Parametri
-  var LENS_FLARES_NUMBER = 5;
-  var PLANETS_NUMBER = 15;
-  var RANGE = 1000;
-  var PLANETS_TOTAL_NUMBER = 1000;
-  var DISTANZA_MINIMA_TRA_PIANETI = 60000;
-  var SOGLIA_VISUALE_NAVICELLA = 6000000;
-  var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 11; // Era diviso 13
-  var ASTEROIDS_NUMBER = 1; //3; // Numero di asteroidi contemporaneamente presenti in scena
-  var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
-  var MAX_DISTANCE_CAMERA = 5000;
-  var DIM_SKYBOX = 4000;
-  var SOGLIA_AVVISO_ASTEROIDE = 750000;
+	// Parametri
+	var LENS_FLARES_NUMBER = 5;
+	var PLANETS_NUMBER = 15;
+	var RANGE = 1000;
+	var PLANETS_TOTAL_NUMBER = 1000;
+	var DISTANZA_MINIMA_TRA_PIANETI = 60000;
+	var SOGLIA_VISUALE_NAVICELLA = 6000000;
+	var RANGE_UNIVERSO = RANGE * (PLANETS_TOTAL_NUMBER / PLANETS_NUMBER) / 11; // Era diviso 13
+	var ASTEROIDS_NUMBER = 1; //3; // Numero di asteroidi contemporaneamente presenti in scena
+	var SOGLIA_DISTANZA_EFFETTO_GRAVITA = 300000;
+	var MAX_DISTANCE_CAMERA = 5000;
+	var DIM_SKYBOX = 4000;
+	var SOGLIA_AVVISO_ASTEROIDE = 750000;
   
-  // Tasti per visualizzare info pianeti
-  var SHOW_INFO_BUTTON = 81; // Q
-  var SHOW_INFO_FORWARD = 69; // E
-  //var SHOW_INFO_BACKWARD = 90; // Z
-
-  var NUMERO_LUCI = 1;
-
-  var clock;
-  var fire;
+	// Tasti per visualizzare info pianeti
+	var SHOW_INFO_BUTTON = 81; // Q
+	var SHOW_INFO_FORWARD = 69; // E
+	//var SHOW_INFO_BACKWARD = 90; // Z
+	
+	var NUMERO_LUCI = 1;
+	
+	var clock;
+	var fire;
   
-  var G = 6.67408 * 0.1; // Costante di gravitazione universale (cambiata la scala rispetto all'origianale, sorry Newton)
-  var MASSA_NAVICELLA = 1;
+	var G = 6.67408 * 0.1; // Costante di gravitazione universale (cambiata la scala rispetto all'origianale, sorry Newton)
+	var MASSA_NAVICELLA = 1;
+	
+	var listener;
+	
+	var universeInfo;
+	var planetsInfo;
+	var asteroids_reference;
+	
+	var planetInfoManager;
+	
+	var PlayText;
+	
+	var e; // Esplosione
+	
+	var isExplode=false;
   
-  var listener;
+	var button1Pressed = false;
+	var leftShoulderPressed = false;
+	var rightShoulderPressed = false;
   
-  var universeInfo;
-  var planetsInfo;
-  var asteroids_reference;
+	/* Variabili per la gestione del cambio delle texture */
+	var manager;
+	var blue_texture, red_texture;
+	var is_red;
+	var clouds_texture;
+	var moon_texture;
+	var earth_texture; // Usata solo per debuggare
   
-  var planetInfoManager;
-
-  var PlayText;
-  
-  var e; // Esplosione
-
-  var isExplode=false;
-  
-  var button1Pressed = false;
-  var leftShoulderPressed = false;
-  var rightShoulderPressed = false;
-  
-  /* Variabili per la gestione del cambio delle texture */
-  var manager;
-  var blue_texture, red_texture;
-  var is_red;
-  var clouds_texture;
-  var moon_texture;
-  var earth_texture; // Usata solo per debuggare
-  
-  /* Variabili fuoco */
-  var fireWidth  = 1.25;
-  var fireHeight = 1;
-  var fireDepth  = 1.75;
-  var sliceSpacing = 0.25;
+	/* Variabili fuoco */
+	var fireWidth  = 1.25;
+	var fireHeight = 1;
+	var fireDepth  = 1.75;
+	var sliceSpacing = 0.25;
 
 	var arrow, fake_arrow, arrow_presente;
 	var wireframe, fake_wireframe;
@@ -164,13 +164,6 @@ $(function()
 	
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight);
-	
-		/*
-		renderer = new THREE.WebGLRenderer();
-		renderer.setPixelRatio( window.devicePixelRatio );
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		*/
-		//renderer.shadowMapEnabled = true;
 		
 		skybox = setSkybox();
 		scene.add(skybox);
@@ -455,7 +448,7 @@ $(function()
 		
 		navicella.add(fake_wireframe);
 		
-		//scene.add(wireframe);
+		scene.add(wireframe);
 		
 		//var axis = new THREE.AxisHelper(5);
 		//navicella.add(axis);
@@ -464,11 +457,12 @@ $(function()
 		fake_arrow.position.set(0, 0, -20);
 	
 		arrow.position.set(40, 50, 15);
-		//scene.add(arrow);
 		
 		camera.add(fake_arrow);
-	
-		scene.add(camera);
+		
+		camera.position.set(0,0,15);
+		
+		navicella.add(camera);
 	}  
 	
 	
@@ -596,21 +590,7 @@ $(function()
 			lensFlares[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
 										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
 										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
-										/*
-			lights[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
-										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
-										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
-										*/
 		}
-		
-		/*
-		for (var i = 0; i < luci.length; i++)
-		{
-			sfere[i].position.set(luci_original_positions[i].x + navicella.position.x - 40,
-									luci_original_positions[i].y + navicella.position.y - 40,
-									luci_original_positions[i].z + navicella.position.z - 40);
-		}
-		*/
 		
 		checkCollisions();
 
@@ -664,22 +644,17 @@ $(function()
 			fire.update(elapsed);
 		
 		var matrix = new THREE.Matrix4();
-		matrix.extractRotation( navicella.matrix );		
+		matrix.extractRotation( navicella.matrix );
 	
 		var directionZ = new THREE.Vector3(0, 0, 1);
 		directionZ.applyMatrix4(matrix);	
 		
 		var matrix2 = new THREE.Matrix4();
 		matrix2.extractRotation( camera.matrix );		
-		var directionY = new THREE.Vector3(0, 1, 0);
-		directionY.applyMatrix4(matrix);
 		
-		oldCameraPosition = camera.position.clone();
-		camera.position.set(navicella.position.x + directionZ.x * 15,
-							navicella.position.y + directionZ.y * 15,
-							navicella.position.z + directionZ.z * 15);
+		oldCameraPosition = navicella.position.clone();
 							
-		if (camera.position.x == oldCameraPosition.x && camera.position.y == oldCameraPosition.y && camera.position.z == oldCameraPosition.z)
+		if (navicella.position.x == oldCameraPosition.x && navicella.position.y == oldCameraPosition.y && navicella.position.z == oldCameraPosition.z)
 		{			
 			try {
 				if (engine.isPlaying)
@@ -700,11 +675,7 @@ $(function()
 			} 
 		}
 		
-		var lookAtPosition = new THREE.Vector3(navicella.position.x + + 0, /*directionY.x * 5, */
-												navicella.position.y + 5, /* directionY.y * 5, */
-												navicella.position.z + 0 /* directionY.z * 5 */);
-			
-		camera.lookAt(lookAtPosition);	
+		camera.rotation.z = -navicella.rotation.z;
 		
 		scene.updateMatrixWorld();
 		var v = new THREE.Vector3();
@@ -714,81 +685,6 @@ $(function()
 		wireframe.rotation.set(navicella.rotation.x, navicella.rotation.y, navicella.rotation.z);
 
 		manageArrow();
-		
-		/*
-		var SOGLIA = 0.1;
-		var oldRotation = camera.rotation.clone();
-		while (oldRotation.z > Math.PI)
-			oldRotation -= Math.PI;
-		while (oldRotation.z < -Math.PI)
-			oldRotation += Math.PI;
-		if (Math.abs(oldRotation.z - camera.rotation.z) >= SOGLIA)
-		{
-			var mol = calcolateDirection(oldRotation.z, camera.rotation.z);
-			if (mol != 0)
-				camera.rotation.z = oldRotation.z + SOGLIA * mol;
-		}
-		*/
-		
-		/*
-		for (var i = 0; i < luci.length; i++)
-		{
-			var p = sfere[i].position.clone(),
-              vector = p.project(camera),
-              x = ( vector.x + 1 ) / 2,
-              y = ( vector.y + 1 ) / 2;
-          uniforms[i].lightPosition.value.set(x, y);
-          luci[i].position.copy(sfere[i].position);
-		}
-		*/
-   }
-   
-   /*
-    * calcolateDirection
-	* Non più usata
-	*/
-   function calcolateDirection(r1, r2)
-   {
-	   var d1 = r1 * 180 / Math.PI;
-	   var d2 = r2 * 180 / Math.PI;
-	    if (d1 < d2)
-		{
-			var diff = d2 - d1;
-			if (diff <= 6 || diff >= 354)
-				return 0;
-			if (diff <= 180)
-				mol = 1;
-			else
-				mol = -1;
-		}
-		else
-		{
-			var diff = d1 - d2;
-			if (diff <= 6 || diff >= 354)
-				return 0;
-			if (diff <= 180)
-				mol = -1;
-			else
-				mol = 1;
-		}	
-		return mol;
-   }
-   
-   /*
-    * correctRotation
-	* Non più usata
-	*/
-   function correctRotation(o, n)
-   {
-	   var SOGLIA = 0.1;
-	   if (Math.abs(o.z - n.z) > SOGLIA)
-	   {
-		   if (o.z < n.z)
-			   n.z = o.z + SOGLIA;
-		   else
-			   n.z = o.z - SOGLIA;
-	   }
-	   return n.clone();
    }
    
    /*
