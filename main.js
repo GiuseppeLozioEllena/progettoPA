@@ -104,6 +104,7 @@ $(function()
 	{
 		document.getElementById("intro").style.display = 'none'; 
 		document.getElementById("time").style.display = 'block'; 
+		document.getElementById("turboInfo").style.display = 'block'; 
 		manager = new THREE.LoadingManager();
 		is_red = false;
 		
@@ -577,14 +578,6 @@ $(function()
 		stats.update();
    		renderer.render(scene,camera);
 		
-		time += delta;
-		
-		if (time > 1 && diffManager.calcolaNumeroAsteroidi(time) != ASTEROIDS_NUMBER)
-		{
-			ASTEROIDS_NUMBER = diffManager.calcolaNumeroAsteroidi(time);
-			addAsteroid();
-		}
-		
 		document.getElementById("time").innerHTML = "Time: " + parseInt(time);
    		
 		d = 100;
@@ -642,6 +635,19 @@ $(function()
 			
 			if (!isExplode)
 				applyForces(diffManager.calcolaMoltiplicatore(time));
+			
+			time += delta;
+			
+			if (time > 1 && diffManager.calcolaNumeroAsteroidi(time) != ASTEROIDS_NUMBER)
+			{
+				ASTEROIDS_NUMBER = diffManager.calcolaNumeroAsteroidi(time);
+				addAsteroid();
+			}
+			
+			if (controls.usable && controls.moveState.turbo == 0)
+				document.getElementById("turboInfo").innerHTML = "<font color='green'>Turbo available</font>";
+			else
+				document.getElementById("turboInfo").innerHTML = "<font color='red'>Turbo not available</font>";
 		}
 		
 		skybox.position.x = navicella.position.x;

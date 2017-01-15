@@ -124,10 +124,23 @@ void main()
 		top: 0;
 		background-image: url('./images/panel_title.png');
 		background-size: 100% 100%;
-		width: 300px;
+		width: 200px;
 		border: 0px solid green;
 		padding: 5px;
-		margin: 0px 5px 0px 5px;
+		margin: 0px 0px 0px 5px;
+		color: white;		
+	}
+	
+	#turboInfo {
+		position: fixed;
+		right: 0;
+		background-image: url('./images/panel_title.png');
+		background-size: 100% 100%;
+		top: 50px;
+		width: 200px;
+		border: 0px solid green;
+		padding: 5px;
+		margin: 0px 0px 0px 0px;
 		color: white;		
 	}
 </style>
@@ -175,6 +188,10 @@ document.body.appendChild(text2);
 
 <div id="time" style="display: none;">
 	
+</div>
+
+<div id="turboInfo" style="display: none;">
+	<font color='green'>Turbo disponibile</font>
 </div>
 
 <!-- -- <script type="text/javascript" src="main.js"> -->
