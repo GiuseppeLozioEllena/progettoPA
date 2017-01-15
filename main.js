@@ -39,7 +39,7 @@ $(function()
 	var clock;
 	var fire;
   
-	var G = 6.67408 * 0.1; // Costante di gravitazione universale (cambiata la scala rispetto all'origianale, sorry Newton)
+	var G = 6.67408 * 0.1; // Costante di gravitazione universale (cambiata la scala rispetto all'originale, sorry Newton)
 	var MASSA_NAVICELLA = 1;
 	
 	var listener;
@@ -467,8 +467,7 @@ $(function()
 		camera.position.set(0,0,15);
 		
 		navicella.add(camera);
-	}  
-	
+	}	
 	
 	/*
 	 * generateSprite
@@ -642,7 +641,7 @@ $(function()
 				planets_reference[i].update(camera);
 			
 			if (!isExplode)
-				applyForces();
+				applyForces(diffManager.calcolaMoltiplicatore(time));
 		}
 		
 		skybox.position.x = navicella.position.x;
@@ -819,17 +818,6 @@ $(function()
 		}
 		
 		/*
-		for (var i = 0; i < asteroids_reference.length && !inCollision; i++)
-		{
-			if (asteroids_reference[i].inCollision(navicella.position))
-			{
-				explode();
-				inCollision = true;
-			}
-		}
-		*/
-		
-		/*
 		 * Collisioni con anelli
 		 */
 		var collidableMeshList = [];
@@ -989,7 +977,7 @@ $(function()
 	* Applicata solo sulla navicella (si presume che lo spostamento che la gravità della navicella influisce sui pianeti sia trascurabile)
 	* Calcola le singole forze di attrazione dei pianeti e applica la forza totale risultante
     */
-   function  applyForces()
+   function applyForces(mol)
    {
 		var finalForce = new THREE.Vector3();
 		for (var i = 0; i < planets_reference.length; i++)
@@ -1006,8 +994,8 @@ $(function()
 			
 				var m1 = planets_reference[i].getMass();
 				var m2 = MASSA_NAVICELLA;
-				var forza = G * (m1 * m2) / distanza;
-			
+				var forza = (G * mol) * (m1 * m2) / distanza;
+			 
 				finalForce.x += forza * direzione.x;
 				finalForce.y += forza * direzione.y;
 				finalForce.z += forza * direzione.z;
