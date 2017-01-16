@@ -4,7 +4,7 @@
  */
 THREE.FlyControls = function ( object, domElement ) 
 {
-	var TURBO_MULTIPLIER = 7; // Velocità del turbo
+	var TURBO_MULTIPLIER = 10; // Velocità del turbo
 	var TURBO_MAX_DURATION = 3; // Durata turbo
 	var SOGLIA_DECELERAZIONE = -0.055; // Decelerazione navicella
 	
@@ -26,7 +26,7 @@ THREE.FlyControls = function ( object, domElement )
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 	if ( domElement ) this.domElement.setAttribute( 'tabindex', - 1 );
 
-	this.movementSpeed = 1.0;
+	this.movementSpeed = 2.0;
 	this.rollSpeed = 0.005;
 
 	this.dragToLook = false;

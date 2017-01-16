@@ -1143,9 +1143,9 @@ $(function()
 		PlayText = new THREE.Mesh( textGeo, material );
 
 		camera.add(PlayText);
-		PlayText.position.x=-60;
-		PlayText.position.y=10;
-		PlayText.position.z=-80;
+		PlayText.position.x = -60;
+		PlayText.position.y = 25;
+		PlayText.position.z = -80;
 
 		//scene.add(PlayText);
 	}
