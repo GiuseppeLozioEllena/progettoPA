@@ -328,7 +328,7 @@ THREE.FlyControls = function ( object, domElement )
 		
 		var turboZ = (this.moveState.turbo == 1) ? TURBO_MULTIPLIER : 1;
 		
-		var delta = this.clock.getDelta();
+		//var delta = this.clock.getDelta();
 		if (this.usable)
 		{
 			if (this.turboDuration >= 0)
@@ -371,16 +371,20 @@ THREE.FlyControls = function ( object, domElement )
 		if (!this.usable)
 			turboZ = 1;
 		
-		var vel = new THREE.Vector3(this.moveVector.x * moveMult, this.moveVector.y * moveMult, this.moveVector.z * moveMult * turboZ);
+		var vel = new THREE.Vector3(this.moveVector.x * moveMult, this.moveVector.y * moveMult, (this.moveVector.z * turboZ) * moveMult);
+		var zWithoutTime = this.moveVector.z * turboZ;
 		
-		if (Math.abs(vel.z) - Math.abs(this.oldVel.z) <	SOGLIA_DECELERAZIONE)
-			vel.z = this.oldVel.z - SOGLIA_DECELERAZIONE;
+		if (Math.abs(zWithoutTime) - Math.abs(this.oldVel) < SOGLIA_DECELERAZIONE)
+		{
+			vel.z = (this.oldVel - SOGLIA_DECELERAZIONE) * moveMult;
+			zWithoutTime = this.oldVel - SOGLIA_DECELERAZIONE;
+		}
 		
 		this.object.translateX( vel.x );
 		this.object.translateY( vel.y );
 		this.object.translateZ( vel.z );	
 		
-		this.oldVel = vel;
+		this.oldVel = zWithoutTime;
 	
 		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
 		this.object.quaternion.multiply( this.tmpQuaternion );	

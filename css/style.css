@@ -10,7 +10,7 @@
 	color: rgba(255, 255, 255, 0.6);
 	font-family: "raleway-heavy", sans-serif;
 	font-size: 1.8rem;
-	line-height: 1.667;
+	line-height: 0.667;
 	margin-bottom: 0.6rem;
 	text-transform: uppercase;
 	letter-spacing: .25rem;
@@ -27,7 +27,7 @@
 	text-transform: uppercase;
 	letter-spacing: .4rem;
 	position: absolute;
-    top: 60%;
+    top: 70%;
     left: 46%;
 }
 .intro-content .button:hover, .intro-content .button:focus {

@@ -577,13 +577,6 @@ $(function()
 		
 		showPlanets(navicella.position.clone());
 		
-		for (var i = 0; i < lensFlares.length; i++)
-		{
-			lensFlares[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
-										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
-										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
-		}
-		
 		checkCollisions();
 
 		if(controls.pause && !controls.play)
@@ -638,6 +631,15 @@ $(function()
 				document.getElementById("turboInfo").innerHTML = "<font color='green'>Turbo available</font>";
 			else
 				document.getElementById("turboInfo").innerHTML = "<font color='red'>Turbo not available</font>";
+		}
+		
+		scene.updateMatrixWorld();		
+				
+		for (var i = 0; i < lensFlares.length; i++)
+		{
+			lensFlares[i].position.set(lensflaresOriginalPositions[i].x + navicella.position.x - 40,
+										lensflaresOriginalPositions[i].y + navicella.position.y - 50,
+										lensflaresOriginalPositions[i].z + navicella.position.z - 15);
 		}
 		
 		skybox.position.x = navicella.position.x;
