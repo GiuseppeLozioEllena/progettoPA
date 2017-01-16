@@ -73,6 +73,7 @@
 		{
 			var modelG = new THREE.SphereGeometry(scale,25,25);
 			var modelM = material;
+			texture.minFilter = THREE.LinearFilter;
 			modelM.map=texture;
 			var mesh=new THREE.Mesh(modelG,modelM);
 			container.add(mesh);
