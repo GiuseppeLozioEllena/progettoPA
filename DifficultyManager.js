@@ -5,10 +5,10 @@
 DifficultyManager = function (liv) {
 	this.level = liv;
 	
-	this.numeroBaseAsteroidi = [1,2,3];
+	this.numeroBaseAsteroidi = [1,3,5];
 	this.aumentoAsteroidi = [1,2,3];
 	
-	this.incrementoCostante = [0.1, 0.2, 0.3];
+	this.incrementoCostante = [0.1, 0.3, 0.6];
 	
 	this.intervalloTurbo = [6, 8, 12];
 
