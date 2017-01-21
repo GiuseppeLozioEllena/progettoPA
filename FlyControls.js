@@ -387,8 +387,11 @@ THREE.FlyControls = function ( object, domElement )
 		this.oldVel = zWithoutTime;
 	
 		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
+		
 		this.object.quaternion.multiply( this.tmpQuaternion );	
 		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+		
+		this.camera.rotation.z += -this.rotationVector.z * rotMult * 2;
 	};
 
 	/*

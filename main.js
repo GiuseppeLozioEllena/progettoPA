@@ -419,13 +419,11 @@ $(function()
 		
 		arrow = new THREE.Mesh( geometry, material );
 		fake_arrow = new THREE.Object3D();
-		
-		//navicella.add(camera);
 				
 		camera.position.set(0, 3, 20);
 		controls = new THREE.FlyControls(navicella);
 		controls.TURBO_SLEEP_TIME = diffManager.getTurboSleepTime();
-		console.log("Sleep: " + controls.TURBO_SLEEP_TIME);
+		
 		controls.setCamera(camera);
 		controls.movementSpeed = 1000;
 		controls.domElement = container;
@@ -682,7 +680,7 @@ $(function()
 			} 
 		}
 		
-		camera.rotation.z = -navicella.rotation.z;
+		//camera.rotation.z = -navicella.rotation.z;
 		
 		scene.updateMatrixWorld();
 		var v = new THREE.Vector3();
@@ -1332,7 +1330,6 @@ $(function()
 		pointLight = new THREE.PointLight(0xffffff);
 		pointLight.position.set(x,y,z);
 		scene.add(pointLight);		
-		scene.add(pointLight);
 	}
 
    init();
